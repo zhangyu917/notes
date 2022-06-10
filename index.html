@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eddie's Notes</title>
+    <link rel="stylesheet" href="mystyle.css">
+</head>
+<body>
+
+
+    <div class="main_container">
+        
+        <div class="toc">
+        
+        <dt>
+            <b>Table of Contents</b>
+        </dt> <br>
+
+        Part 1. C++
+            <ul>
+                <li><a href="pages/storage.html" target="right_panel">Storage</a></li>
+                <li><a href="pages/types.html" target="right_panel">Types and Casts</a></li>
+                <li><a href="pages/branches.html" target="right_panel">Branches and Loops</a></li>
+                <li><a href="pages/functions.html" target="right_panel">Function and Class</a></li>
+                <li><a href="pages/templates.html" target="right_panel">Templates</a></li>
+                <li><a href="pages/glibc.html" target="right_panel">glibc</a></li>
+                <li><a href="pages/container.html" target="right_panel">STL and Containers</a></li>
+                <li><a href="pages/c11and14.html" target="right_panel">C++ 11/14 features</a></li>
+                <li><a href="pages/c17.html" target="right_panel">C++ 17 features</a></li>
+                <li><a href="pages/c20.html" target="right_panel">C++ 20 features</a></li>
+                <li class="li_details">
+                    <details open>
+                        <summary><a href="pages/concurrency.html" target="right_panel">Concurrency</a></summary>
+                        <ul class="ul_indented">
+                            <li><a href="pages/locks.html" target="right_panel">CAS, mutexes, locks</a></li>
+                            <li><a href="pages/lockfree.html" target="right_panel">lock-free</a></li>
+                        </ul>
+                    </details>
+                </li>    
+                <li><a href="pages/c_concepts.html" target="right_panel">C++ Concepts</a></li>
+                <li><a href="pages/undefined.html" target="right_panel">Undefined Behavior</a></li>
+            </ul>
+
+        
+        Part 2. Compiler and Assembly
+        <ul>
+            <li> <a href="pages/compiler.html" target="right_panel">Compiler Optimizations</a></li>
+            
+            <li class="li_details">
+                <details open>
+                    <summary><a href="pages/assembly.html" target="right_panel">X86 Assembly</a></summary>
+                    <ul class="ul_indented">
+                        <li><a href="pages/simd.html" target="right_panel">SIMD vector</a></li>
+                    </ul>
+                </details>
+            </li>
+            
+            <li> <a href="pages/calling_convention.html" target="right_panel">Calling Convention</a></li>
+
+        </ul>
+
+        Part 3. Linux and Systems
+        <ul>
+            <li class="li_details">
+                <details open>
+                    <summary>
+                        <a href="pages/kernel.html" target="right_panel">Kernel</a>
+                    </summary>
+                    <ul class="ul_indented">
+                        <li><a href="pages/system_call.html" target="right_panel">System Calls</a></li>
+                        <li><a href="pages/signals.html" target="right_panel">Signals</a></li>
+                        <li><a href="pages/interrupts.html" target="right_panel">Interrupts</a></li>
+                    </ul>
+                </details>
+            </li>
+
+            <li class="li_details">
+                <details open>
+                    <summary>
+                        <a href="pages/process.html" target="right_panel">Process Management</a>
+                    </summary>
+                    <ul class="ul_indented">
+                        <li><a href="pages/scheduler.html" target="right_panel">Process Scheduler</a></li>
+                    </ul>
+                </details>
+            </li>
+
+            <li class="li_details">
+                <details open>
+                    <summary>
+                        <a href="pages/memory_management.html" target="right_panel">Memory Management</a>
+                    </summary>
+                    <ul class="ul_indented">
+                        <li><a href="pages/memory_allocator.html" target="right_panel">Memory Allocator</a></li>
+                        <li><a href="pages/cache.html" target="right_panel">Cache</a></li>
+                        <li><a href="pages/hugepage.html" target="right_panel">Hugepage</a></li>
+                    </ul>
+                </details>
+            </li>
+
+            <li class="li_details">
+                <details open>
+                    <summary>
+                        <a href="pages/files.html" target="right_panel">File System</a>
+                    </summary>
+                    <ul class="ul_indented">
+                    </ul>
+                </details>
+            </li>
+
+            <li><a href="pages/harddrive.html" target="right_panel">IO Device</a></li>
+
+            <li class="li_details">
+                <details open>
+                    <summary>
+                        <a href="pages/tcp.html" target="right_panel">TCP/IP</a>
+                    </summary>
+                    <ul class="ul_indented">
+                        <li><a href="pages/polls.html" target="right_panel">TCP and Epoll Internals</a></li>
+                        <li><a href="pages/switches.html" target="right_panel">Packet Capture and Switches</a></li>
+                    </ul>
+                </details>
+            </li>
+
+            <li class="li_details">
+                <details open>
+                    <summary>
+                        <a href="pages/processor.html" target="right_panel">Processor</a>
+                    </summary>
+                    <ul class="ul_indented">
+                        <li><a href="pages/intel.html" target="right_panel">Intel Microarchctures</a></li>
+                    </ul>
+                </details>
+            </li>
+            
+            <li><a href="pages/system_misc.html" target="right_panel">Misc</a></li>
+            <li><a href="pages/spectre.html" target="right_panel">Spectre</a></li>
+
+
+
+        </ul>
+  
+
+        Part 4. Performance
+        <ul>
+            <li><a href="pages/time_measure.html" target="right_panel">rdtsc Time Measure</a> </li>
+            <li><a href="pages/memory.html" target="right_panel">Memory Optimization</a> </li>
+            <li><a href="pages/optimization_technique.html" target="right_panel">Optimization Techniques</a> </li>
+            <li><a href="pages/perf.html" target="right_panel">Perf Tool</a> </li>
+            <li><a href="pages/sysperf.html" target="right_panel">System Performance Book</a> </li>
+            <li><a href="pages/bpf.html" target="right_panel">eBPF</a> </li>
+        </ul>     
+
+        Part 5. Data Structure and Algo
+        <ul>
+            <li><a href="pages/data_structure.html" target="right_panel">Data Structure</a> </li>
+            <li><a href="pages/algo.html" target="right_panel">Algorithm</a> </li>
+        </ul>     
+
+        <a href="pages/acknowledge.html" target="right_panel">Acknowledge</a>
+
+        </div>
+        
+        <div class="right_panel">
+            <iframe src="right.html" name="right_panel" frameborder=0>
+
+            </iframe>
+        </div>
+
+    </div>
+
+</body>
+</html>
