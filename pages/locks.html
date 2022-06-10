@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>C&plus;&plus; CAS&comma; Mutexes&comma; Locks</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{text-rendering:auto;font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.13.24"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+#button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <!-- title: C++ CAS, Mutexes, Locks -->
+<h1>C++ CAS, Mutexes, Locks</h1>
+<p><a href="#" class="to-top">➤</i></a></p>
+<ul>
+<li><a href="#cas">CAS</a></li>
+<li><a href="#mutex">Mutex</a></li>
+<li><a href="#locks">Locks</a>
+<ul>
+<li><a href="#lock-based">Lock-based</a></li>
+<li><a href="#wait-free">wait-free</a></li>
+<li><a href="#lock-free">lock-free</a>
+<ul>
+<li><a href="#wait-free-vs-lock-free">wait-free vs lock-free</a></li>
+</ul>
+</li>
+<li><a href="#performance-difference">performance difference</a></li>
+</ul>
+</li>
+<li><a href="#spin-lock">Spin-lock</a>
+<ul>
+<li><a href="#spin-lock-with-pointers">Spin-lock with pointers</a></li>
+</ul>
+</li>
+<li><a href="#semaphores">Semaphores</a></li>
+<li><a href="#a-thread-safe-queue-with-mutex-and-condition-variable">A thread-safe queue with mutex and condition variable</a>
+<ul>
+<li><a href="#a-non-thread-safe-ring-buffer">A non-thread safe ring buffer</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="cas">CAS</h1>
+<p><a href="https://preshing.com/20150402/you-can-do-any-kind-of-atomic-read-modify-write-operation/">https://preshing.com/20150402/you-can-do-any-kind-of-atomic-read-modify-write-operation/</a></p>
+<p>Atomic read-modify-write operations – or “RMWs” – let you read from a variable in shared memory and simultaneously write a different value in its place. In the C++11 atomic library, all of the following functions perform an RMW:</p>
+<ul>
+<li>std::atomic&lt;&gt;::fetch_add()</li>
+<li>std::atomic&lt;&gt;::fetch_sub()</li>
+<li>std::atomic&lt;&gt;::fetch_and()</li>
+<li>std::atomic&lt;&gt;::fetch_or()</li>
+<li>std::atomic&lt;&gt;::fetch_xor()</li>
+<li>std::atomic&lt;&gt;::exchange()</li>
+<li>std::atomic&lt;&gt;::compare_exchange_strong()</li>
+<li>std::atomic&lt;&gt;::compare_exchange_weak()</li>
+</ul>
+<p>Out of all the available RMW operations in C++11, the only one that is absolutely essential is <code>compare_exchange_weak</code>. Every other RMW operation can be implemented using that one.</p>
+<ul>
+<li><code>compare_exchange_weak</code> will sometimes false (spurious), so use it in a loop</li>
+</ul>
+<p>compare and swap conceptually an atomic execution of</p>
+<pre><code class="language-C++"><div>  <span class="hljs-keyword">bool</span> atomic&lt;T&gt;::<span class="hljs-built_in">compare_exchange_strong</span>(T&amp; expected, T desired) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>-&gt;value == expected) {
+          <span class="hljs-keyword">this</span>-&gt;value = desired; <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>; 
+      }
+      <span class="hljs-keyword">else</span> { 
+          expected = <span class="hljs-keyword">this</span>-&gt;value; <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>; 
+      }
+  }
+</div></code></pre>
+<p><img src="images/2022-04-26-14-38-16.png" alt=""></p>
+<p><strong>Implement spin lock with CAS</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">spin_lock</span>
+{</span>
+    <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">int</span> UNLOCKED = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">int</span> LOCKED = <span class="hljs-number">1</span>;
+
+    std::atomic&lt;<span class="hljs-keyword">int</span>&gt; m_value = <span class="hljs-number">0</span>;
+
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">lock</span><span class="hljs-params">()</span>
+    </span>{
+        <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>)
+        {
+            <span class="hljs-keyword">int</span> expected = UNLOCKED;
+            <span class="hljs-keyword">if</span> (m_value.<span class="hljs-built_in">compare_exchange_strong</span>(expected, LOCKED))
+                <span class="hljs-keyword">break</span>;
+        }
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span>
+    </span>{
+        m_value.<span class="hljs-built_in">store</span>(UNLOCKED);
+    }
+};
+</div></code></pre>
+<p><strong>Another way (test_and_set, TAS)</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SpinLock</span>
+{</span>
+<span class="hljs-keyword">private</span>:
+    std::atomic_flag _lockFlag;
+
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-built_in">SpinLock</span>()
+    : _lockFlag {ATOMIC_FLAG_INIT}
+    { }
+
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">lock</span><span class="hljs-params">()</span>
+    </span>{
+        <span class="hljs-keyword">while</span>(_lockFlag.<span class="hljs-built_in">test_and_set</span>(std::memory_order_acquire))
+        { }
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">try_lock</span><span class="hljs-params">()</span>
+    </span>{
+        <span class="hljs-keyword">return</span> !_lockFlag.<span class="hljs-built_in">test_and_set</span>(std::memory_order_acquire);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span>
+    </span>{
+        _lockFlag.<span class="hljs-built_in">clear</span>();
+    }
+};
+</div></code></pre>
+<p><code>test_and_set</code> operates on a bit, <code>compare_exchange_*</code> operates on a 32-bit field. <code>test_and_set</code> maybe cheaper to implement than <code>compare_exchange</code> on some platforms</p>
+<p><strong>Another version of TAS</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TasSpinLock</span>
+{</span>
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-function">ALWAYS_INLINE <span class="hljs-keyword">void</span> <span class="hljs-title">Enter</span><span class="hljs-params">()</span>
+    </span>{
+        <span class="hljs-comment">// atomic_bool::exchange() returns previous value of Locked</span>
+        <span class="hljs-keyword">while</span> (Locked.<span class="hljs-built_in">exchange</span>(<span class="hljs-literal">true</span>, std::memory_order_acquire) == <span class="hljs-literal">true</span>);
+    }
+ 
+    <span class="hljs-function">ALWAYS_INLINE <span class="hljs-keyword">void</span> <span class="hljs-title">Leave</span><span class="hljs-params">()</span>
+    </span>{
+        Locked.<span class="hljs-built_in">store</span>(<span class="hljs-literal">false</span>, std::memory_order_release);
+    }
+ 
+<span class="hljs-keyword">private</span>:
+    <span class="hljs-built_in"><span class="hljs-keyword">alignas</span></span>(CACHELINE_SIZE) std::<span class="hljs-keyword">atomic_bool</span> Locked = {<span class="hljs-literal">false</span>};
+};
+ 
+<span class="hljs-built_in"><span class="hljs-keyword">static_assert</span></span>(<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(TasSpinLock) == CACHELINE_SIZE, <span class="hljs-string">&quot;&quot;</span>);
+</div></code></pre>
+<p>TAS spinlock doesn’t scale well, a good article about how to improve it: <a href="https://geidav.wordpress.com/2016/03/23/test-and-set-spinlocks/">https://geidav.wordpress.com/2016/03/23/test-and-set-spinlocks/</a></p>
+<p>Two main issues:</p>
+<ul>
+<li><code>std::atomic_bool::exchange()</code> always invalidates the cache line Locked resides in, regardless of whether it succeeded in updating Locked or not. ⇒ <strong>use test-TAS pattern</strong></li>
+<li>When the spinlock is released, all waiting threads simultaneously try to acquire it. This is sometimes referred to as Thundering Herd problem. Acquiring the lock means first invalidating the cache line copy of all threads waiting for the lock and then reading the valid cache line copy from the core which released the lock. With t threads this results in O(t) memory bus transactions. <strong>=&gt; use exponential back-off strategy</strong></li>
+</ul>
+<p><strong>A minimal (correct) implementation of mutex:</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">mutex</span> {</span>
+    std::atomic&lt;<span class="hljs-keyword">bool</span>&gt; flag{<span class="hljs-literal">false</span>};
+
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">lock</span><span class="hljs-params">()</span>
+    </span>{
+        <span class="hljs-keyword">while</span> (flag.<span class="hljs-built_in">exchange</span>(<span class="hljs-literal">true</span>, std::memory_order_relaxed));
+        std::<span class="hljs-built_in">atomic_thread_fence</span>(std::memory_order_acquire);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span>
+    </span>{
+        std::<span class="hljs-built_in">atomic_thread_fence</span>(std::memory_order_release);
+        flag.<span class="hljs-built_in">store</span>(<span class="hljs-literal">false</span>, std::memory_order_relaxed);
+    }
+};
+</div></code></pre>
+<br>
+<br>
+<h1 id="mutex">Mutex</h1>
+<p>The mutexes have (at least) two atomic operations inside.</p>
+<ul>
+<li>Locking the mutex is an equivalent of a read operation with the acquire memory order</li>
+<li>When we unlock the mutex or release the lock, the release memory order is guaranteed.</li>
+</ul>
+<p><img src="images/2022-01-24-15-58-55.png" alt=""></p>
+<p>The pair of barriers, acquire and release, act as borders for the section of the code sandwiched between them. This is known as the critical section</p>
+<ul>
+<li>any operation executed inside the critical section (ie. while the thread is holding the lock) will become visible to any other thread when it enters the critical section.</li>
+<li>Other operations from the outside can enter the critical section, but no such operation can cross the critical section, ie, they can’t leave the critical section.</li>
+</ul>
+<p>The C++14 standard has five mutex types:</p>
+<ul>
+<li>std::mutex</li>
+<li>std::timed_mutex</li>
+<li>std::recursive_mutex</li>
+<li>std::recursive_timed_mutex</li>
+<li>std::shared_timed_mutex</li>
+</ul>
+<p>The variants with &quot;timed&quot; in the name are the same as those without, except that the lock operations can have time-outs specified, to limit the maximum wait time. If no time-out is specified (or possible) then the lock operations will block until the lock can be acquired — potentially forever if the thread that holds the lock never releases it.</p>
+<h1 id="locks">Locks</h1>
+<p>C++ Standard defines a triplet of class templates for objects that hold a lock. These are:</p>
+<ul>
+<li><code>std::lock_guard&lt;&gt;</code></li>
+<li><code>std::unique_lock&lt;&gt;</code></li>
+<li><code>std::shared_lock&lt;&gt;</code></li>
+</ul>
+<p>For basic operations, they all acquire the lock in the constructor, and release it in the destructor, though they can be used in more complex ways if desired.</p>
+<p><code>std::unique_lock&lt;&gt;</code> is similar, except</p>
+<ul>
+<li>It is movable. it can be returned from a function without releasing the lock. It can use to implement a move-able class that owns a lock.</li>
+<li>It can have the lock released before the destructor.</li>
+<li><code>std::shared_lock&lt;&gt;</code> is almost identical to <code>std::unique_lock&lt;&gt;</code> except that it acquires a shared lock on the mutex.</li>
+</ul>
+<p>For more details about <code>std::lock_guard</code> vs <code>std::unique_lock</code>, refer to: <a href="https://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-5-flexible-locking.html">https://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-5-flexible-locking.html</a></p>
+<p>A trick for conditional atomic check: <a href="https://www.justsoftwaresolutions.co.uk/threading/simplify_code_by_encapsulating_locks.html">https://www.justsoftwaresolutions.co.uk/threading/simplify_code_by_encapsulating_locks.html</a></p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Original code</span>
+<span class="hljs-built_in">lock_acquire</span>(lock);
+<span class="hljs-keyword">while</span>(<span class="hljs-built_in">check_condition</span>()){
+  <span class="hljs-built_in">lock_release</span>(lock);
+  <span class="hljs-comment">//do any actual work in the iteration - Thanks to Caleb for this comment</span>
+  <span class="hljs-built_in">lock_acquire</span>(lock);
+}
+<span class="hljs-built_in">lock_release</span>(lock);
+
+<span class="hljs-comment">// Transformed code</span>
+<span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">atomic_check_condition</span><span class="hljs-params">()</span>
+</span>{
+  <span class="hljs-function">std::lock_guard&lt;mutex_type&gt; <span class="hljs-title">guard</span><span class="hljs-params">(lock)</span></span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">check_condition</span>()
+}
+<span class="hljs-keyword">while</span>(<span class="hljs-built_in">atomic_check_condition</span>()){
+  <span class="hljs-comment">//do any actual work in the iteration - Thanks to Caleb for this comment</span>
+}
+
+<span class="hljs-comment">// C++17 if with initialization</span>
+<span class="hljs-keyword">if</span> (std::lock_guard&lt;std::mutex&gt; <span class="hljs-built_in">guard</span>(mx_); <span class="hljs-built_in">check_condition</span>()) {
+    <span class="hljs-comment">//do any actual work in the iteration</span>
+}
+
+</div></code></pre>
+<h2 id="lock-based">Lock-based</h2>
+<pre><code class="language-C++"><div>std::mutex m;
+<span class="hljs-keyword">size_t</span> count;<span class="hljs-comment">// Guarded by m</span>
+… on the threads …
+{
+    <span class="hljs-function">std::lock_guard <span class="hljs-title">l</span><span class="hljs-params">(m)</span></span>;
+    ++count;
+}
+</div></code></pre>
+<p>Problems with locks</p>
+<ul>
+<li>Dead-lock, live-lock</li>
+<li>convoying / starvation - a hot thread might get the lock again before any other waiting thread wake up to grab the lock</li>
+<li>Priority inversion - high-priority thread waiting for the low-priority thread</li>
+</ul>
+<h2 id="wait-free">wait-free</h2>
+<p>A wait-free implementation is usually possible only for very simple operations (such as incrementing a count)</p>
+<pre><code class="language-C++"><div>std::atomic&lt;<span class="hljs-keyword">size_t</span>&gt; count;
+… on the threads …
+++count;
+</div></code></pre>
+<p>or</p>
+<pre><code class="language-C++"><div>std::atomic&lt;<span class="hljs-keyword">size_t</span>&gt; count;
+… on the threads …
+count.<span class="hljs-built_in">fetch_add</span>(<span class="hljs-number">1</span>, std::memory_order_relaxed);
+</div></code></pre>
+<h2 id="lock-free">lock-free</h2>
+<pre><code class="language-C++"><div>std::atomic&lt;<span class="hljs-keyword">size_t</span>&gt; count;
+… on the threads …
+<span class="hljs-keyword">size_t</span> c = count.<span class="hljs-built_in">load</span>(std::memory_order_relaxed);
+<span class="hljs-keyword">while</span> (!count.<span class="hljs-built_in">compare_exchange_strong</span>(c, c + <span class="hljs-number">1</span>,
+    std::memory_order_relaxed, std::memory_order_relaxed)) {}
+</div></code></pre>
+<p>This lock-free approach can be generalized to any computation: instead of c + 1, we could use any other expression, and the program would work the same way.</p>
+<h3 id="wait-free-vs-lock-free">wait-free vs lock-free</h3>
+<ul>
+<li>In a wait-free program, each thread is executing the operations it needs and is always making progress toward the final goal; there is no waiting for access, and no work needs to be redone.</li>
+<li>In a lock-free program, multiple threads may be trying to update the same shared value, but only one of them will succeed. The rest will have to discard the work they have already done based on the original value, read the updated value, and do the computation again. But at least one thread is always guaranteed to commit its work and not have to redo it; thus, the entire program is always making progress, although not necessarily at full speed.</li>
+<li>Finally, in a lock-based program, one thread is holding the lock that gives it access to the shared data. Just because it's holding the lock does not mean it's doing anything with this data, though. So, when the concurrent access happens, at most one thread is making progress, but even that is not guaranteed.</li>
+</ul>
+<h2 id="performance-difference">performance difference</h2>
+<p><img src="images/2022-01-24-16-04-28.png" alt=""></p>
+<h1 id="spin-lock">Spin-lock</h1>
+<p>Optimization version: Test and CAS</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Spinlock</span> {</span>
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">lock</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-comment">// Test and CAS</span>
+        <span class="hljs-keyword">while</span> (flag_.<span class="hljs-built_in">load</span>(std::memory_order_relaxed) ||
+            flag_.<span class="hljs-built_in">exchange</span>(<span class="hljs-number">1</span>, std::memory_order_acquire)) {}
+    }
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span> </span>{ flag_.<span class="hljs-built_in">store</span>(<span class="hljs-number">0</span>, std::memory_order_release); }
+<span class="hljs-keyword">private</span>:
+    std::atomic&lt;<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>&gt; flag_;
+}
+</div></code></pre>
+<p>The optimization here is that we first read the flag until we see 0, then we swap it with 1. When pre-checking the flag, we don't care about the memory barrier at all since the final definitive check is always done using the exchange and its memory barrier.</p>
+<ul>
+<li>the waiting thread to give up the CPU after several attempts.</li>
+</ul>
+<h2 id="spin-lock-with-pointers">Spin-lock with pointers</h2>
+<p>Instead of a generic flag, we can make the lock itself be the only reference to the object it is guarding. The atomic variable is going to be a pointer.</p>
+<ul>
+<li>the meaning of the atomic variable is &quot;inverted:&quot; the lock is available if the atomic variable p_ is not null, otherwise it is taken.</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PtrSpinlock</span> {</span>
+    <span class="hljs-keyword">public</span>:
+    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">PtrSpinlock</span><span class="hljs-params">(T* p)</span> : p_(p) {</span>}
+    <span class="hljs-function">T* <span class="hljs-title">lock</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">while</span> (!(saved_p_ =
+            p_.<span class="hljs-built_in">exchange</span>(<span class="hljs-literal">nullptr</span>, std::memory_order_acquire))) {}
+    }
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span> </span>{
+        p_.<span class="hljs-built_in">store</span>(saved_p_, std::memory_order_release);
+    }
+    <span class="hljs-keyword">private</span>:
+        std::atomic&lt;T*&gt; p_;
+        T* saved_p_ = <span class="hljs-literal">nullptr</span>;
+};
+</div></code></pre>
+<h1 id="semaphores">Semaphores</h1>
+<p>A semaphore is a very relaxed type of lockable object. A given semaphore has a predefined maximum count, and a current count. You take ownership of a semaphore with a <em>wait</em> operation, also referred to as decrementing the semaphore, or even just abstractly called <em>P</em>. You release ownership with a <em>signal</em> operation, also referred to as incrementing the semaphore, a post operation, or abstractly called <em>V</em>. The single-letter operation names are from Dijkstra's original paper on semaphores.</p>
+<p>Every time you <em>wait</em> on a semaphore, you decrease the current count. If the count was greater than zero then the decrement just happens, and the wait call returns. If the count was already zero then it cannot be decremented, so the wait call will block until another thread increases the count by signalling the semaphore.</p>
+<p>Every time you <em>signal</em> a semaphore, you increase the current count. If the count was zero before you called signal, and there was a thread blocked in wait then that thread will be woken. If multiple threads were waiting, only one will be woken. If the count was already at its maximum value then the signal is typically ignored, although some semaphores may report an error.</p>
+<p>Whereas mutex ownership is tied very tightly to a thread, and only the thread that acquired the lock on a mutex can release it, semaphore ownership is far more relaxed and ephemeral. Any thread can signal a semaphore, at any time, whether or not that thread has previously waited for the semaphore.</p>
+<p>The C++ standard does not define a semaphore type. You can write your own with an atomic counter, a mutex and a condition variable if you need, but most uses of semaphores are better replaced with mutexes and/or condition variables anyway.</p>
+<br>
+<br>
+<h1 id="a-thread-safe-queue-with-mutex-and-condition-variable">A thread-safe queue with mutex and condition variable</h1>
+<p><a href="https://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html">https://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html</a></p>
+<p>Couple notes for the implementation below:</p>
+<ul>
+<li>Firstly, the lock variable is passed as a parameter to wait — this allows the condition variable implementation to atomically unlock the mutex and add the thread to the wait queue, so that another thread can update the protected data whilst the first thread waits.</li>
+<li>the condition variable wait is still inside a while loop — condition variables can be subject to <em>spurious wake-ups</em>, so it is important to check the actual condition being waited for when the call to wait returns.</li>
+<li>the call to <code>notify_one</code> comes <em>after</em> the data is pushed on the internal queue. This avoids the waiting thread being notified if the call to <code>the_queue.push</code> throws an exception.</li>
+<li>Condition variable notification comes <em>after</em> the mutex is unlocked, the waiting thread will be able to acquire the mutex without blocking</li>
+<li>Using a reference parameter to receive the result is used to transfer ownership out of the queue in order to avoid the exception safety issues of returning data by-value: if the copy constructor of a by-value return throws, then the data has been removed from the queue, but is lost, whereas with this approach, the potentially problematic copy is performed prior to modifying the queue</li>
+<li>If multiple threads are popping entries from a full queue, then they just get serialized inside <code>wait_and_pop</code>, and everything works fine. If the queue is empty, then each thread in turn will block waiting on the condition variable. When a new entry is added to the queue, one of the threads will wake and take the value, whilst the others keep blocking. If more than one thread wakes (e.g. with a spurious wake-up), or a new thread calls <code>wait_and_pop</code> concurrently, the while loop ensures that only one thread will do the pop, and the others will wait.</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> Data&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">concurrent_queue</span>
+{</span>
+<span class="hljs-keyword">private</span>:
+    std::queue&lt;Data&gt; the_queue;
+    <span class="hljs-keyword">mutable</span> boost::mutex the_mutex;
+    boost::condition_variable the_condition_variable;
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(Data <span class="hljs-keyword">const</span>&amp; data)</span>
+    </span>{
+        boost::<span class="hljs-function">mutex::scoped_lock <span class="hljs-title">lock</span><span class="hljs-params">(the_mutex)</span></span>;
+        the_queue.<span class="hljs-built_in">push</span>(data);
+        lock.<span class="hljs-built_in">unlock</span>();  <span class="hljs-comment">// 4</span>
+        the_condition_variable.<span class="hljs-built_in">notify_one</span>();   <span class="hljs-comment">//3</span>
+    }
+
+    <span class="hljs-comment">// Modern c++ way</span>
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push_back</span><span class="hljs-params">(T t)</span> 
+    </span>{ 
+    { 
+        <span class="hljs-function">std::lock_guard&lt;std::mutex&gt; <span class="hljs-title">guard</span><span class="hljs-params">(m)</span></span>; 
+        q.<span class="hljs-built_in">push</span>(t); 
+        } 
+        c.<span class="hljs-built_in">notify_one</span>(); 
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>
+    </span>{
+        boost::<span class="hljs-function">mutex::scoped_lock <span class="hljs-title">lock</span><span class="hljs-params">(the_mutex)</span></span>;
+        <span class="hljs-keyword">return</span> the_queue.<span class="hljs-built_in">empty</span>();
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">try_pop</span><span class="hljs-params">(Data&amp; popped_value)</span>
+    </span>{
+        boost::<span class="hljs-function">mutex::scoped_lock <span class="hljs-title">lock</span><span class="hljs-params">(the_mutex)</span></span>;
+        <span class="hljs-keyword">if</span>(the_queue.<span class="hljs-built_in">empty</span>())
+        {
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+        }
+        
+        popped_value=the_queue.<span class="hljs-built_in">front</span>();
+        the_queue.<span class="hljs-built_in">pop</span>();
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">wait_and_pop</span><span class="hljs-params">(Data&amp; popped_value)</span>
+    </span>{
+        boost::<span class="hljs-function">mutex::scoped_lock <span class="hljs-title">lock</span><span class="hljs-params">(the_mutex)</span></span>;
+        <span class="hljs-keyword">while</span>(the_queue.<span class="hljs-built_in">empty</span>())  <span class="hljs-comment">// 2</span>
+        {
+            the_condition_variable.<span class="hljs-built_in">wait</span>(lock);  <span class="hljs-comment">// 1</span>
+        }
+        
+        popped_value=the_queue.<span class="hljs-built_in">front</span>();  <span class="hljs-comment">// 5</span>
+        the_queue.<span class="hljs-built_in">pop</span>();
+    }
+
+    <span class="hljs-comment">// modern C++ way</span>
+    <span class="hljs-function">T <span class="hljs-title">pop_front</span><span class="hljs-params">()</span>
+    </span>{
+        <span class="hljs-function">std::unique_lock&lt;std::mutex&gt; <span class="hljs-title">guard</span><span class="hljs-params">(m)</span></span>; 
+        c.<span class="hljs-built_in">wait</span>(guard,[=]{<span class="hljs-keyword">return</span> !q.<span class="hljs-built_in">empty</span>();}); 
+        <span class="hljs-keyword">auto</span> ret=q.<span class="hljs-built_in">front</span>(); 
+        q.<span class="hljs-built_in">pop</span>(); 
+        <span class="hljs-keyword">return</span> ret; 
+    }
+};
+</div></code></pre>
+<h2 id="a-non-thread-safe-ring-buffer">A non-thread safe ring buffer</h2>
+<ul>
+<li>Two variables that will keep increasing</li>
+<li>Only do <code>&amp; capacity-1</code> when accessing the node in push/pop</li>
+<li>Capacity has to be power-of-2: to handle index overflow
+<ul>
+<li>Max index: <code>0xfffffff &amp; capacity-1 = 0xffff</code></li>
+<li>Next index after overflow: <code>0x0 &amp; capacity - 1 = 0</code></li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-C++"><div>uint32 read;
+uint32 write;
+<span class="hljs-built_in">mask</span>(val)  { <span class="hljs-keyword">return</span> val &amp; (array.capacity - <span class="hljs-number">1</span>); }
+<span class="hljs-built_in">push</span>(val)  { <span class="hljs-built_in">assert</span>(!<span class="hljs-built_in">full</span>()); array[<span class="hljs-built_in">mask</span>(write++)] = val; }
+<span class="hljs-built_in">pop</span>()    { <span class="hljs-built_in">assert</span>(!<span class="hljs-built_in">empty</span>()); <span class="hljs-keyword">return</span> array[<span class="hljs-built_in">mask</span>(read++)]; }
+<span class="hljs-built_in">empty</span>()    { <span class="hljs-keyword">return</span> read == write; }
+<span class="hljs-built_in">full</span>()     { <span class="hljs-keyword">return</span> <span class="hljs-built_in">size</span>() == array.capacity }
+<span class="hljs-built_in">size</span>()     { <span class="hljs-keyword">return</span> write - read; }
+</div></code></pre>
+<br>
+<br>
+        
+        
+    </body>
+    </html>

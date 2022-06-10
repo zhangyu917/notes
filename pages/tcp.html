@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>TCP</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{text-rendering:auto;font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.13.24"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+#button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <!-- title: TCP -->
+<ul>
+<li><a href="#pending-question">Pending question</a></li>
+<li><a href="#osi-model">OSI model</a>
+<ul>
+<li><a href="#ethernet-frame">Ethernet Frame</a></li>
+<li><a href="#ip-header">IP Header</a></li>
+<li><a href="#tcp-header">TCP Header</a>
+<ul>
+<li><a href="#tcp-header-options">TCP Header Options</a></li>
+</ul>
+</li>
+<li><a href="#udp-header">UDP Header</a></li>
+</ul>
+</li>
+<li><a href="#linux-network-monitoring-and-tuning">Linux network Monitoring and Tuning</a>
+<ul>
+<li><a href="#tcp-parameters">TCP Parameters</a></li>
+</ul>
+</li>
+<li><a href="#tcp">TCP</a>
+<ul>
+<li><a href="#tcp-state-machine">TCP State Machine</a></li>
+<li><a href="#tcp-establish">TCP Establish</a>
+<ul>
+<li><a href="#tcp-fast-open">TCP Fast Open</a></li>
+<li><a href="#tcp-establish-parameter-summary">TCP Establish Parameter Summary</a></li>
+</ul>
+</li>
+<li><a href="#tcp-teardown">TCP Teardown</a>
+<ul>
+<li><a href="#tcp-teardown-parameter-summary">TCP Teardown Parameter Summary</a></li>
+</ul>
+</li>
+<li><a href="#tcp-keep-alive">TCP Keep-alive</a></li>
+<li><a href="#tcp-nagles-algorithm-and-delayed-ack">TCP Nagle's algorithm and Delayed Ack</a></li>
+<li><a href="#so_reuseaddr-and-so_reuseport">SO_REUSEADDR and SO_REUSEPORT</a>
+<ul>
+<li><a href="#so_reuseport-kernel-internal">SO_REUSEPORT Kernel Internal</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#tcp-flow-control">TCP Flow Control</a>
+<ul>
+<li><a href="#sender-window">Sender Window</a>
+<ul>
+<li><a href="#congestion-window">Congestion Window</a></li>
+</ul>
+</li>
+<li><a href="#receive-window">Receive Window</a>
+<ul>
+<li><a href="#silly-window-syndrome">Silly-window syndrome</a></li>
+</ul>
+</li>
+<li><a href="#tcp-buffer-size-parameters">TCP Buffer Size Parameters</a></li>
+</ul>
+</li>
+<li><a href="#tcp-congestion-control">TCP Congestion control</a>
+<ul>
+<li><a href="#slow-start">Slow Start</a></li>
+<li><a href="#congestion-avoidance">Congestion avoidance</a></li>
+<li><a href="#fast-retransmission">Fast Retransmission</a></li>
+<li><a href="#fast-recovery-tcp-reno">Fast recovery (TCP Reno)</a>
+<ul>
+<li><a href="#fast-retransmission-and-fast-recovery-work-together">Fast retransmission and Fast-Recovery work together</a></li>
+</ul>
+</li>
+<li><a href="#two-retransmission-types">Two retransmission types</a></li>
+<li><a href="#timeout-retransmission">Timeout Retransmission</a></li>
+<li><a href="#sack-selective-acknowledgment">SACK Selective Acknowledgment</a>
+<ul>
+<li><a href="#d-sack">D-SACK</a></li>
+</ul>
+</li>
+<li><a href="#timers-used-in-tcp">Timers Used in TCP</a></li>
+</ul>
+</li>
+<li><a href="#congestion-avoidance-alogrithms">Congestion avoidance alogrithms</a>
+<ul>
+<li><a href="#cubic">CUBIC</a></li>
+<li><a href="#bbr">BBR</a></li>
+<li><a href="#dctcp">DCTCP</a></li>
+</ul>
+</li>
+<li><a href="#user-space-tcp-stack">User-space TCP stack</a>
+<ul>
+<li><a href="#solarflare">Solarflare</a></li>
+<li><a href="#mellanox">Mellanox</a></li>
+</ul>
+</li>
+<li><a href="#ip">IP</a>
+<ul>
+<li><a href="#arp">ARP</a></li>
+<li><a href="#icmp">ICMP</a>
+<ul>
+<li><a href="#how-traceroute-works">How traceroute works</a></li>
+</ul>
+</li>
+<li><a href="#igmp">IGMP</a></li>
+<li><a href="#quic-and-http3">QUIC and HTTP/3</a></li>
+</ul>
+</li>
+<li><a href="#upper-layer-protocols">Upper layer protocols</a>
+<ul>
+<li><a href="#dns">DNS</a></li>
+<li><a href="#dhcp">DHCP</a></li>
+</ul>
+</li>
+<li><a href="#ipv6">IPv6</a></li>
+</ul>
+<p><a href="#" class="to-top">➤</i></a></p>
+<h1 id="pending-question">Pending question</h1>
+<ul>
+<li>how long is delayed ACK?</li>
+<li>how quickack flag is reset?</li>
+<li>REUSE_ADDR flag</li>
+<li>http knowledge missing</li>
+</ul>
+<h1 id="osi-model">OSI model</h1>
+<p>Layer1 - physical layer: wired, wireless</p>
+<p>Layer2 - data layer: Ethernet</p>
+<p>Layer3 - network layer: IP</p>
+<p>Layer4 - Transport layer: TCP, UDP</p>
+<p>Layer5 - Session: NetBIOS, SAP, SDP</p>
+<p>Layer6 - Presentation: ASCII, JPEG, MIDI</p>
+<p>Layer7 - Application: HTTP, DHCP, DNS, SMTP, FTP, Telnet</p>
+<br>
+<h2 id="ethernet-frame">Ethernet Frame</h2>
+<p><img src="images/2022-03-07-15-06-38.png" alt=""></p>
+<blockquote>
+<p>The default 802.3 Ethernet frame size is 1518 bytes, or 1522 bytes with a VLAN tag. The Ethernet header consumes 18 bytes of this (or 22 bytes with VLAN tag), leaving an effective
+maximum MTU of 1500 bytes.</p>
+</blockquote>
+<p><img src="images/2022-03-11-13-43-26.png" alt=""></p>
+<hr>
+<p>Below is an example using a 1500 byte ethernet frame, what is the real payload bandwidth of a TCP packet?</p>
+<p><img src="images/2022-03-08-20-58-59.png" alt=""></p>
+<p><img src="images/2022-03-08-21-05-46.png" alt=""></p>
+<p>As you can see from the table above, its 1426 B of data payload wraped in 1524B worth of 10G bandwidth. If we do the math on this</p>
+<p><code>10.00e9 bits / (8bits * 1524 bytes) = 820,209 packets</code></p>
+<p>With the resulting effective TCP payload bandwidth</p>
+<p><code>820,209 packets * 1426 bytes * 8 bits = 9.36 Gbps</code></p>
+<p>Its not bad but we've effectively lost close to 1Gbps of bandwidth from the ethernet + IP + TCP encoding. So if your getting high 8.xx Gbps numbers in a TCP bandwidth test, your doing pretty dam well.</p>
+<p><strong>IFG (Inter Frame GAP) or IPG</strong></p>
+<p>The frames running along the line is not tightly back to back. There should be some space (time gap) with a certain minimum duration. This time gap is called Inter Frame GAP (or Inter packet gap).</p>
+<ul>
+<li>Transmitter must allow a minimum idle period between transmission of Ethernet packets.</li>
+<li>A brief recovery time between packets allows devices to prepare for reception of the next packet.</li>
+<li>The IFG will allow the signal time to propagate through the receiver electronics at the destination.</li>
+</ul>
+<p>The standard minimum interpacket gap for transmission is 96 bit (12 bytes) times (the time it takes to transmit 96 bits  of data on the medium).</p>
+<p>on 10G Ethenet, it is 96 ns.</p>
+<p><strong>Preamble/SOF</strong></p>
+<p>The purpose of the preamble is to allow time before transmission starts is to allow a small time interval for the receiver electronics in each of the nodes to settle after completion of the previous frame.</p>
+<hr>
+<br>
+<h2 id="ip-header">IP Header</h2>
+<p><img src="images/2022-03-07-15-12-22.png" alt=""></p>
+<p>20 bytes</p>
+<ul>
+<li><strong>Version</strong> (always set to the value 4 in the current version of IP)</li>
+<li><strong>IP Header Length</strong> (number of 32 -bit words forming the header, ie. <strong>in multiple of 4 bytes</strong>. It is usually five)</li>
+<li><strong>Total Length</strong> (in bytes, this is the combined length of the header and the data)</li>
+<li><strong>Identification</strong> (16-bit number which together with the source address uniquely identifies this packet - used during reassembly of fragmented datagrams)</li>
+<li><strong>Flags</strong> (a sequence of three flags
+<ul>
+<li>First bit:</li>
+<li>Second bit: control whether routers are allowed to fragment a packet (i.e. the Don't Fragment, DF, flag),</li>
+<li>Third bit: More Fragments (MF) - all but the last fragmented packet will set to 1</li>
+</ul>
+</li>
+<li><strong>Fragmentation Offset</strong> (a byte count from the start of the original sent packet, set by any router which performs IP router fragmentation)</li>
+<li><strong>Time To Live</strong> (Number of hops /links which the packet may be routed over, decremented by most routers - used to prevent accidental routing loops)</li>
+<li><strong>Protocol</strong> (Service Access Point (SAP) which indicates the type of transport packet being carried (e.g. <strong>1 = ICMP; 2= IGMP; 6 = TCP; 17= UDP</strong>).</li>
+<li><strong>Header Checksum</strong> (A 1's complement checksum inserted by the sender and updated whenever the packet header is modified by a router - Used to detect processing errors introduced into the packet inside a router or bridge where the packet is not protected by a link layer cyclic redundancy check. Packets with an invalid checksum are discarded by all nodes in an IP network)</li>
+<li><strong>Source Address</strong> (the IP address of the original sender of the packet)</li>
+<li><strong>Destination Address</strong> (the IP address of the final destination of the packet)</li>
+<li><strong>Options</strong> (not normally used, but, when used, the IP header length will be greater than five 32-bit words to indicate the size of the options field)</li>
+</ul>
+<br>
+<h2 id="tcp-header">TCP Header</h2>
+<p><img src="images/2022-03-07-15-07-33.png" alt=""></p>
+<p><img src="images/2022-03-07-15-08-30.png" alt=""></p>
+<p>The TCP header’s normal size is <strong>20 bytes</strong>, unless options are present, then it can go up to 60 bytes.</p>
+<p>The shaded fields (Acknowledgment Number, Window Size, plus ECE and ACK bits) refer to the data flowing in the opposite direction relative to the sender of this segment.</p>
+<p>Multiple control bits (or none at all) may be set in a segment, which allows a single segment to serve multiple purposes.</p>
+<ul>
+<li><strong>Source port number</strong>: 16 bits. This is the port number of the sending TCP.</li>
+<li><strong>Destination port number</strong>: 16 bits. This is the port number of the destination TCP.</li>
+<li><strong>Sequence number</strong>: 32 bits. This is the sequence number for this segment. This is the offset of the first byte of data in this segment within the stream of data being transmitted in this direction over the connection</li>
+<li><strong>Acknowledgement number</strong>: 32 bits. This field contains the sequence number of the next byte of data that the receiver expects to receive from the sender. It is set if the ACK bit (see below) is set.</li>
+<li><strong>Header length</strong>: Also called Data Offset. This is the length of the header, in units of 32-bit words. Since this is a 4-bit field, the total header length can be up to 60 bytes (15 words). This field enables the receiving TCP to determine the length of the variable-length options field and the starting point of the data.
+<ul>
+<li>Note there is no header-length field in UDP header, because UDP header size is fixed while TCP is not.</li>
+</ul>
+</li>
+<li>Reserved: This consists of 4 unused bits (must be set to 0).</li>
+<li><strong>Control bits</strong>: This field consists of 8 bits that further specify the meaning of the segment:
+<ul>
+<li>CWR: the congestion window reduced flag.</li>
+<li>ECE: the explicit congestion notification echo flag. The CWR and ECE flags are used as part of TCP/IP’s Explicit Congestion Notification (ECN) algorithm. ECN is a relatively recent addition to TCP/IP and is described in RFC 3168. ECN is enabled by placing a nonzero value in the Linux-specific<code> /proc/sys/net/ipv4/tcp_ecn</code> file.</li>
+<li>URG: if set, then the urgent pointer field contains valid information.</li>
+<li>ACK: if set, then the acknowledgement number field contains valid information. TCP 规定除了最初建立连接时的 SYN 包之外该位必须设置为 1 。</li>
+<li>PSH: push all received data to the receiving process. This flag is described in RFC 993.</li>
+<li>RST: reset the connection. This is used to handle various error situations.</li>
+<li>SYN: synchronize sequence numbers. Segments with this flag set are exchanged during connection establishment to allow the two TCPs to specify the initial sequence numbers to be used for transferring data in each direction.</li>
+<li>FIN: used by a sender to indicate that it has finished sending data.</li>
+</ul>
+</li>
+<li><strong>Window size</strong>: 16 bits. This field is used when a receiver sends an ACK to indicate the number of bytes of data that the receiver has space to accept.</li>
+<li><strong>Checksum</strong>: 16 bits. The checksum field is the 16 bit one's complement of the one's complement sum of all 16 bit words in TCP header and the TCP data. If a segment contains an odd number of header and text octets, it is padded with a zero byte (the pad is not transmitted). While comuting checksum, zeros are used for the checksum field itself.
+<ul>
+<li>The TCP checksum covers not just the TCP header and data, but also 12 bytes usually referred to as the TCP pseudoheader. The pseudoheader consists of the following:
+<ul>
+<li>the source and destination IP address (4 bytes each);</li>
+<li>2 bytes specifying the size of the TCP segment (including TCP header length plus the data length, in bytes. This value is computed, but doesn’t form part of either the IP or the TCP header);</li>
+<li>1 byte containing the value 6, which is TCP’s unique protocol number</li>
+<li>1 padding byte containing 0</li>
+</ul>
+</li>
+<li>UDP calculates the checksum in its packet headers in a similar manner<pre><code class="language-bash"><div>pseudo header:
++--------+--------+--------+--------+
+|           Source Address          |
++--------+--------+--------+--------+
+|         Destination Address       |
++--------+--------+--------+--------+
+|  zero  |  PTCL  |    TCP Length   |
++--------+--------+--------+--------+
+</div></code></pre>
+Sample code: <a href="https://gist.github.com/david-hoze/0c7021434796997a4ca42d7731a7073a">https://gist.github.com/david-hoze/0c7021434796997a4ca42d7731a7073a</a></li>
+</ul>
+</li>
+<li><strong>Urgent pointer</strong>: If the URG control bit is set, then this field indicates the location of so-called urgent data within the stream of data being transmitted from the sender to the receiver.</li>
+<li><strong>Options</strong>: This is a variable-length field containing options controlling the operation of the TCP connection.</li>
+<li><strong>Padding</strong>: The TCP header padding is used to ensure that the TCP header ends and data begins on a 32-bit boundary in the case of the variable length options fields presented. The padding is composed of zeros.</li>
+<li><strong>Data</strong>: This field contains the user data transmitted in this segment. This field may be of length 0 if this segment doesn’t contain any data (e.g., if it is simply an ACK segment).</li>
+</ul>
+<h3 id="tcp-header-options">TCP Header Options</h3>
+<p>The option-length includes two byte of Option-Kind and Option-Length.</p>
+<table>
+<thead>
+<tr>
+<th>Option-Kind</th>
+<th>Option-Length</th>
+<th>Option-Data</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>—</td>
+<td>—</td>
+<td><strong>End Of Option List</strong>: A single byte option that marks the end of all options included in this segment. This only needs to be included when the end of the options doesn't coincide with the end of the TCP header.</td>
+</tr>
+<tr>
+<td>1</td>
+<td>—</td>
+<td>—</td>
+<td><strong>No-Operation</strong>: A “spacer” that can be included between options to align a subsequent option on a 32-bit boundary if needed.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>4</td>
+<td>SS</td>
+<td><strong>Maximum Segment Size:</strong> Conveys the size of the largest segment the sender of the segment wishes to receive. Used only in <em>SYN</em> messages.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>3</td>
+<td>S</td>
+<td><strong>Window Scale:</strong>  16-bit window size field can only represent 65535 bytes. Window scale feature allows to increase the maximum window size from 65,535 bytes to 1 gigabyte. The value  represents the number of bits to left-shift for the window size. For example, if the value of Option-Data is 3, this means values in the Window field should be multiplied by 8 (&lt;&lt; 3). The window scale value can be set from 0 (no shift) to 14 for each direction independently. Used only during the TCP 3-way handshake.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2</td>
+<td>—</td>
+<td><strong>Selective Acknowledgment Permitted</strong>: Specifies that this device supports the selective acknowledgment (SACK) feature. This was implemented as a two-byte option with no Option-Data field, instead of a single-byte option like End Of Option List or No-Operation. This was necessary because it was defined after the original TCP specification, so an explicit option length had to be indicated for backwards compatibility.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Variable (10, 18, 26, or 34)</td>
+<td>BBBB, EEEE, ...</td>
+<td><strong>Selective Acknowledgment</strong>: Allows devices supporting the optional selective acknowledgment feature to specify non-contiguous blocks of data that have been received. It can a list of 1–4 blocks being selectively acknowledged, specified as 32-bit begin/end pointers</td>
+</tr>
+<tr>
+<td>8</td>
+<td>10</td>
+<td>TTTT,EEEE</td>
+<td><strong>Timestamps</strong>: TCP timestamps, defined in <a href="https://datatracker.ietf.org/doc/html/rfc1323">RFC 1323</a> in 1992, can help TCP determine in which order packets were sent. There are two timestamp fields: a 4-byte sender timestamp value (my timestamp), a 4-byte echo reply timestamp value (the most recent timestamp received from you). TCP timestamps are enabled by default In Linux kernel.</td>
+</tr>
+<tr>
+<td>14</td>
+<td>3</td>
+<td>Alternate Checksum Algorithm</td>
+<td><strong>Alternate Checksum Request</strong>: Lets a device request that a checksum generation algorithm other than the standard TCP algorithm be used for this connection. Both devices must agree to the algorithm for it to be used.</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Variable</td>
+<td>Alternate Checksum</td>
+<td><strong>Alternate Checksum</strong>: If the checksum value needed to implement an alternate checksum is too large to fit in the standard 16-bit Checksum field, it is placed in this option.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="udp-header">UDP Header</h2>
+<p><img src="images/2022-03-07-15-12-00.png" alt=""></p>
+<ul>
+<li>Length: the sum of UDP Header and UDP data.
+<ul>
+<li>In theory the UDP packet length can be calcuated as <code>IP_header.total_length - IP_header.Header_length * 4</code>. But UDP Header has its own length field in case it is transimited/used over another protocol than IP.</li>
+</ul>
+</li>
+</ul>
+<br>
+<br>
+<h1 id="linux-network-monitoring-and-tuning">Linux network Monitoring and Tuning</h1>
+<p>Locate the bottleneck by investigating the following points:</p>
+<ul>
+<li>The adapter firmware level
+<ul>
+<li>Observe drops in<code> ethtool -S ethX</code> statistics</li>
+<li>network device stats: <code>/proc/net/softnet_stat</code></li>
+</ul>
+</li>
+<li>The adapter driver level</li>
+<li>The Linux kernel, IRQs or SoftIRQs
+<ul>
+<li>Check <code>/proc/interrupts</code> or <code>/proc/softirqs</code></li>
+</ul>
+</li>
+<li>The protocol layers IP, TCP, or UDP
+<ul>
+<li>Use <code>netstat -s</code> and look for error counters.</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>ethtool</code></strong></p>
+<p>A utility for displaying and changing NIC settings.</p>
+<pre><code class="language-bash"><div>-i    <span class="hljs-comment"># 显示网卡驱动的信息，如驱动的名称、版本等</span>
+-S    <span class="hljs-comment"># 查看网卡收发包的统计情况 (also shows ring buffer error as `rx_fifo_errors` and `tx_fifo_errors`)</span>
+-g/-G <span class="hljs-comment"># 查看(-g)或者修改(-G)RingBuffer的大小 </span>
+-l/-L <span class="hljs-comment"># 查看(-l)或者修改(-L)网卡队列数。每一个队列都有一个中断号，可以独立向某个CPU核心发起硬中断请求，让CPU来poll包。通过将接收进来的包被放到不同的内存队列里，多个CPU就可以同时分别向不同的队列发起消费了。</span>
+-c/-C <span class="hljs-comment"># 查看(-c)或者修改(-C)硬中断合并策略</span>
+-k/-K <span class="hljs-comment"># view(-k) or change(-K) offloading features which move some network processing load onto the network interface card.</span>
+
+Examples:
+<span class="hljs-comment"># check ring buffer errors</span>
+ethtool -S eth3 | grep rx_*_errors
+    rx_over_errors: 399
+    rx_fifo_errors: 399
+    rx_missed_errors: 399
+
+<span class="hljs-comment"># increase both the RX and TX buffers to 8192 bytes</span>
+ethtool -G eth3 rx 8192 tx 8192
+
+<span class="hljs-comment"># check offline features</span>
+ethtool -k eth0
+Features <span class="hljs-keyword">for</span> eth0:
+rx-checksumming: on
+tx-checksumming: on
+tcp-segmentation-offload: on  <span class="hljs-comment"># tso</span>
+generic-receive-offload: on  <span class="hljs-comment"># gro</span>
+large-receive-offload: on <span class="hljs-comment"># lro</span>
+rx-vlan-offload: on
+tx-vlan-offload: on
+...
+
+<span class="hljs-comment"># turn on gro</span>
+ethtool -K eth0 gro on
+
+<span class="hljs-comment"># Hard Interrupt Coalescence (IC)</span>
+<span class="hljs-comment"># number of microseconds/frames to wait before raising a hardIRQ, </span>
+<span class="hljs-comment"># from the NIC perspective it&#x27;ll DMA data packets until this timeout/number of frames</span>
+ethtool -c ethX
+ethtool -C ethX rx-usecs value tx-usecs value
+</div></code></pre>
+<p><strong>netstat</strong></p>
+<p>It prints information about open network connections and protocol stack statistics. It retrieves information about the networking subsystem from the <code>/proc/net/</code> (including <code>/proc/net/dev</code>, <code>/proc/net/tcp</code>, etc)</p>
+<p><strong>/proc/interrupts</strong></p>
+<p>Use smp_affinity_list to balance the interrupts</p>
+<p><img src="images/2022-03-16-23-58-19.png" alt=""></p>
+<p><strong>ifconfig</strong></p>
+<pre><code class="language-bash"><div>eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 10.162.42.51  netmask 255.255.248.0  broadcast 10.162.47.255
+        inet6 fe80::6e0b:84ff:fed5:88d1  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether 6c:0b:84:d5:88:d1  txqueuelen 1000  (Ethernet)
+        RX packets 2953454  bytes 414212810 (395.0 MiB)
+        RX errors 0  dropped 4636605  overruns 0  frame 0
+        TX packets 127887  bytes 82943405 (79.1 MiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+</div></code></pre>
+<ul>
+<li>RX packets：接收的总包数</li>
+<li>RX bytes：接收的字节数</li>
+<li>RX errors：表示总的收包的错误数量，这包括 too-long-frames 错误，Ring Buffer 溢出错误，crc 校验错误，帧同步错误，fifo overruns 以及 missed pkg 等等。</li>
+<li>RX dropped：数据包已经进入了 Ring Buffer，但是由于其它原因导致的丢包. 如下四种情况导致dropped：Softnet backlog full（pfmemalloc &amp;&amp; !skb_pfmemalloc_protocol(skb)–分配内存失败）；Bad / Unintended VLAN tags；Unknown / Unregistered protocols；IPv6 frames</li>
+<li>RX overruns：表示了 fifo 的 overruns，这是由于 Ring Buffer不足导致的丢包. overruns意味着数据包没到Ring Buffer就被网卡物理层给丢弃了，而CPU无法及时的处理中断是造成Ring Buffer满的原因之一，例如中断分配的不均匀。或者Ring Buffer太小导致的（很少见），overruns数量持续增加，建议增大Ring Buffer ，使用ethtool ‐G 进行设置。</li>
+</ul>
+<p><strong>/proc/net/dev</strong></p>
+<pre><code class="language-bash"><div>$ cat /proc/net/dev
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+  eth0: 110346752214 597737500    0    2    0     0          0  20963860 990024805984 6066582604    0    0    0     0       0          0
+    lo: 428349463836 1579868535    0    0    0     0          0         0 428349463836 1579868535    0    0    0     0       0          0
+</div></code></pre>
+<ul>
+<li>bytes: 发送或接收的数据的总字节数</li>
+<li>packets: 接口发送或接收的数据包总数</li>
+<li>errs: 由设备驱动程序检测到的发送或接收错误的总数</li>
+<li>drop: 设备驱动程序丢弃的数据包总数</li>
+<li>fifo: FIFO缓冲区错误的数量</li>
+<li>frame: The number of packet framing errors.（分组帧错误的数量）</li>
+<li>colls: 接口上检测到的冲突数</li>
+</ul>
+<p><strong>sysfs</strong>
+<code>sysfs</code>和<code>/proc</code>类似，也是一个伪文件系统，但是比<code>/proc</code>更新，结构更清晰。其中的<code>/sys/class/net/eth0/statistics/</code>也包含了网卡的统计信息。</p>
+<pre><code class="language-bash"><div><span class="hljs-comment"># cd /sys/class/net/eth0/statistics/ </span>
+<span class="hljs-comment"># grep . * | grep tx</span>
+tx_aborted_errors:0
+tx_bytes:170699510
+tx_carrier_errors:0
+tx_compressed:0
+tx_dropped:0
+tx_errors:0
+tx_fifo_errors:0
+tx_heartbeat_errors:0
+tx_packets:262330
+tx_window_errors:0
+</div></code></pre>
+<p><strong><code>/proc/net/softnet_stat</code></strong> SoftNetStats</p>
+<p>This parser parses the stats from network devices.</p>
+<pre><code class="language-bash"><div><span class="hljs-comment"># cat softnet_stat</span>
+0073d76b 00000000 000049ae 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+000000d2 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+0000015c 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+0000002a 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+</div></code></pre>
+<p>Each line is per CPU</p>
+<ul>
+<li>Column-01: packet_process: the number of frames received by the interrupt handler..</li>
+<li>Column-02: packet_drop: the number of frames dropped due to <code>netdev_max_backlog</code> being exceeded.
+<ul>
+<li>The <code>netdev_max_backlog</code> is a input_pkt_queue within the Linux kernel where traffic is stored after reception from the NIC, but before processing by the protocol stacks (IP, TCP, etc). <code>netif_receive_skb()</code> kernel function will find the corresponding CPU for a packet, and enqueue packets in that CPU's queue.</li>
+<li>If your driver is using <code>netif_receive_skb()</code> call and RPS is not enabled, increasing the <code>netdev_max_backlog</code> will not yield any performance improvement because no data will ever make it to the input_pkt_queue.</li>
+<li>Increase <code>net.core.netdev_max_backlog</code> to alleviate this. A recommended approach is to increase the backlog value by the change in column 2 over a 10 second period + some buffer.</li>
+</ul>
+</li>
+<li>Column-03: time_squeeze: time squeeze happened in net_rx_action. ie, when netdev_budget is used up but it still has data to poll.
+<ul>
+<li>Increase of third column indicates the SoftIRQs do not run for long enough that it was unable to process all packets available before the budget was exhausted. You can increase <code>net.core.netdev_budget</code> to alleviate this.</li>
+</ul>
+</li>
+<li>Column-04-07: all zeroes.</li>
+<li>Column-08: cpu_collision: collision occur while obtaining device lock while transmitting.</li>
+<li>Column-09: received_rps: number of times cpu woken up received RPS (receive packet steering) IPI.</li>
+<li>Column-10: flow_limit_count: number of times reached flow limit count.</li>
+</ul>
+<br>
+<br>
+<h2 id="tcp-parameters">TCP Parameters</h2>
+<p>system-wide tunable parameters can be viewed and set using the sysctl(8) command
+and written to <code>/etc/sysctl.conf</code>. They can also be read and written from the <code>/proc</code> file system,
+under <code>/proc/sys/net</code>.</p>
+<p><a href="#tcp-buffer-size-parameters">Socket Buffers</a></p>
+<p><a href="#tcp-establish-parameter-summary">TCP establish and Backlog</a></p>
+<p><a href="#tcp-teardown-parameter-summary">TCP teardown and time_wait</a></p>
+<p><strong>Device backlog</strong>: Increasing the length of the network device backlog queue, per CPU:</p>
+<pre><code class="language-bash"><div>net.core.netdev_max_backlog = 10000
+</div></code></pre>
+<p><strong>Queueing Disciplines</strong></p>
+<p>This is an optional layer for managing traffic classification (tc), scheduling, manipulation, filtering,
+and shaping of network packets. Linux provides numerous queueing discipline algorithms
+(qdiscs), which can be configured using the <code>tc(8)</code> command. As each has a man page, the <code>man(1)</code>
+command can be used to list them:</p>
+<pre><code class="language-bash"><div>$ man -k tc-
+
+<span class="hljs-comment"># The default qdisc can be viewed and set using:</span>
+$ sysctl net.core.default_qdisc
+net.core.default_qdisc = fq_codel
+
+<span class="hljs-comment"># lists the current qdisc configuration for the interface eth0:</span>
+$ tc qdisc show dev eth0
+
+<span class="hljs-comment"># Add netem qdisc. Also, use the packet loss parameters for netem, and set packet loss to 1%.</span>
+$ tc qdisc add dev eth0 root netem loss 1%
+
+<span class="hljs-comment"># The -s option to tc(8) shows statistics:</span>
+$ tc -s qdisc show dev eth0
+</div></code></pre>
+<p>The Linux kernel sets pfifo_fast as the default qdisc. But many Linux distributions have already switched to fq_codel as the default because it provides good performance in most cases.</p>
+<br>
+<br>
+<h1 id="tcp">TCP</h1>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc793">RFC 793</a>: &quot;Transmission Control Protocol&quot; (September 1981)</p>
+<ul>
+<li>This is the fundamental TCP specification document, it describes the TCP packet format, the TCP state machine
+and event processing, and TCP's semantics for data transmission,
+reliability, flow control, multiplexing, and acknowledgment.</li>
+</ul>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc1122">RFC 1122</a>: &quot;Requirements for Internet Hosts - Communication Layers&quot; (October 1989)</p>
+<ul>
+<li>This document [RFC1122] updates and clarifies RFC 793.  It
+also explains some features such as keep-alives and Karn's and
+Jacobson's RTO estimation algorithms</li>
+</ul>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc5681">RFC 5681</a>: &quot;TCP Congestion Control&quot; (August 2009)</p>
+<ul>
+<li>This document
+[RFC5681] defines congestion avoidance and control mechanism for
+TCP, based on Van Jacobson's 1988 SIGCOMM paper</li>
+<li>A number of behaviors that together constitute what the community
+refers to as &quot;Reno TCP&quot; is described in RFC 5681. Reno TCP
+includes the congestion control features of slow start, congestion
+avoidance, fast retransmit, and fast recovery.</li>
+</ul>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc6298">RFC 6298</a>: &quot;Computing TCP's Retransmission Timer&quot; (June 2011)</p>
+<ul>
+<li>This document defines the       standard algorithm that TCP       senders are required to use to compute and manage their      retransmission timer.</li>
+</ul>
+<br>
+<h2 id="tcp-state-machine">TCP State Machine</h2>
+<p><img src="images/2022-03-07-15-24-56.png" alt=""></p>
+<br>
+<h2 id="tcp-establish">TCP Establish</h2>
+<p><img src="images/2022-03-09-12-37-38.png" alt=""></p>
+<p><strong>ISN</strong></p>
+<p>The initial sequence number (ISN) for a stream doesn’t start at 0. Instead, it is generated via an algorithm that increases the <em>ISN</em> assigned to successive TCP connections</p>
+<ul>
+<li>to prevent the possibility of old segments from a previous incarnation of the connection （相同四元组的连接）being confused with segments for this connection).</li>
+<li>to make guessing the <em>ISN</em> difficult.</li>
+<li><em>ISN</em> is a 32-bit unsigned value that is wrapped around to 0 when the maximum value is reached.</li>
+</ul>
+<p>RFC1948 提到初始化序列号 ISN 随机生成算法：ISN = M + F(localhost, localport, remotehost, remoteport)。</p>
+<ul>
+<li>M 是一个计时器，这个计时器每隔 4 毫秒加 1。转一圈要 4.55 个小时。</li>
+<li>F 是一个 Hash 算法，根据源 IP、目的 IP、源端口、目的端口生成一个随机数值。要保证 Hash 算法不能被外部轻易推算得出，用 MD5 算法是一个比较好的选择。</li>
+</ul>
+<p>The <strong>SYN</strong> flag consumes a byte of the sequence-number space for the connection. This is necessary so that this flag can be acknowledged unambiguously, this is why we show the acknowledgement of the <em>SYN</em> x segment as <em>ACK</em> x+1</p>
+<p>第三次握手是可以携带数据的，前两次握手是不可以携带数据的。</p>
+<p><strong>Why three-way handshake?</strong></p>
+<ul>
+<li>(From RFC 793) The principle reason for the three-way handshake is to prevent old duplicate connection initiations from causing confusion.
+<ul>
+<li>During network congestion, client can send multiple <em>SYN</em> packets, if server acks an old <em>SYN</em> packet, the client will response with a RST. The server has to wait for the third hand-shake ACK packet to move from <em>SYN-RCVD</em> state to <em>ESTABLISHED</em> state.</li>
+</ul>
+</li>
+<li>三次握手才可以同步双方的初始序列号。确保双方的ISN被对方可靠的同步。</li>
+<li>三次握手才可以避免资源浪费。如果只有「两次握手」, 如果客户端的 SYN 阻塞了，重复发送多次 SYN 报文，那么服务器在收到请求后就会建立多个冗余的无效链接，造成不必要的资源浪费。</li>
+</ul>
+<p><strong>Missing SYN packet</strong></p>
+<ul>
+<li>
+<p>如果客户端迟迟收不到服务端的 SYN-ACK 报文（第二次握手），就会触发「超时重传」机制，重传 SYN 报文。</p>
+<ul>
+<li>在 Linux 里，客户端的 SYN 报文最大重传次数由 <code>net.ipv4.tcp_syn_retries</code>内核参数控制，默认值一般是 5。</li>
+<li>通常，第一次超时重传是在 1 秒后，每次超时的时间是上一次的 2 倍。总耗时是 1+2+4+8+16+32=63 秒，大约 1 分钟左右。</li>
+<li>如果服务端仍然没有回应 ACK，客户端就不再发送 SYN 包，然后断开 TCP 连接。</li>
+</ul>
+</li>
+<li>
+<p>如果第二次握手丢失了，服务端就收不到第三次握手。或者客户端接到SYN-ACK后发的第三次握手ACK丢失了。服务端这边会触发超时重传机制，重传 SYN-ACK 报文。</p>
+<ul>
+<li>在 Linux 下，SYN-ACK 报文的最大重传次数由 <code>net.ipv4.tcp_synack_retries</code>内核参数决定，默认值是 5。</li>
+</ul>
+</li>
+</ul>
+<p><img src="images/2022-03-09-17-13-17.png" alt=""></p>
+<p>在 TCP 三次握手的时候，Linux 内核会维护两个队列，分别是：</p>
+<ul>
+<li><strong>全连接队列</strong>，也称 <strong>Accept queue</strong>, it is maintained as a queue (list) in kernel；</li>
+<li><strong>半连接队列</strong>，也称 <strong>SYN queue</strong>, it is maintained as a hashtable in kernel for fast lookup；</li>
+</ul>
+<p>服务端收到客户端发起的 SYN 请求后，内核会把该连接存储到半连接队列，并向客户端响应 SYN+ACK，接着客户端会返回 ACK，服务端收到第三次握手的 ACK 后，内核会把连接从半连接队列移除，然后创建新的完全的连接，并将其添加到 accept 队列，等待进程调用 accept 函数时把连接取出来。</p>
+<p><strong>Accept Queue</strong></p>
+<p>TCP 全连接队列足最大值取决于 <code>somaxconn</code> 和 <code>backlog</code> 之间的最小值，也就是 <code>min(somaxconn, backlog)</code></p>
+<ul>
+<li><code>somaxconn</code> 是 Linux 内核的参数，默认值是 128，可以通过 <code>/proc/sys/net/core/somaxconn</code> 来设置其值；</li>
+<li><code>backlog</code> 是 <code>listen(int sockfd, int backlog)</code> 函数中的 <code>backlog</code> 大小</li>
+</ul>
+<p>在服务端可以使用 <code>ss</code> 命令，来查看 TCP 全连接队列的情况。在「LISTEN 状态」时，Recv-Q/Send-Q 表示的含义如下：</p>
+<ul>
+<li>Recv-Q：当前全连接队列的大小，也就是当前已完成三次握手并等待服务端 <code>accept()</code> 的 TCP 连接个数；</li>
+<li>Send-Q：当前全连接最大队列长度，上面的输出结果说明监听 8088 端口的 TCP 服务进程，最大全连接长度为 128；</li>
+</ul>
+<p><img src="images/2022-03-09-17-13-56.png" alt=""></p>
+<p>当超过了 TCP 最大全连接队列，服务端则会丢掉后续进来的 TCP 连接，丢掉的 TCP 连接的个数会被统计起来，我们可以使用 <code>netstat -s</code> 命令来查看：</p>
+<p><img src="images/2022-03-09-17-14-43.png" alt=""></p>
+<p><code>net.ipv4.tcp_abort_on_overflow</code> 可改变全连接队列满后Linux的行为</p>
+<ul>
+<li>0 ：表示如果全连接队列满了，那么 server 扔掉 client 发过来的 ack ；</li>
+<li>1 ：表示如果全连接队列满了，那么 server 发送一个 reset 包给 client，表示废掉这个握手过程和这个连接；</li>
+</ul>
+<p><strong>SYN Queue</strong></p>
+<p>After kernel 4.3,  the <code>backlog</code> parameter passed to the <code>listen(2)</code> sets the SYN Queue size too.</p>
+<p>The SYN Queue cap used to be configured by the <code>net.ipv4.tcp_max_syn_backlog</code> setting, but this isn't the case anymore. Nowadays <code>net.core.somaxconn</code> caps both queue sizes.</p>
+<p>The SYN will be dropped if SYN queue is full <em>or</em><code> (tcp_max_syn_backlog - current syn_queue size &lt; tcp_max_syn_backlog &gt;&gt; 2)</code></p>
+<p>In summary, to increase the SYN queue, we have to change all three settings to proper values: <code>net.ipv4.tcp_max_syn_backlog</code>, <code>net.core.somaxconn</code>, and <code>backlog</code> parameter.</p>
+<p>There is no good way to check the SYN queue overflow. In turn, we can check how many sockets in &quot;SYN_RECV&quot; state with <code># netstat -antp | grep SYN_RECV</code></p>
+<p><strong>SYN Flood attack</strong></p>
+<p>攻击者短时间伪造不同 IP 地址（spoofed addresses）的 SYN 报文，服务端每接收到一个 SYN 报文，就进入SYN_RCVD 状态，但服务端发送出去的 SYN_ACK 报文，不会得到未知IP的ACK，久而久之就会占满服务端的半连接队列，使得服务器不能为正常用户服务。</p>
+<p>一种解决方式是通过修改 Linux 内核参数，控制队列大小和当队列满时应做什么处理。</p>
+<ul>
+<li>当网卡接收数据包的速度大于内核处理的速度时，会有一个队列保存这些数据包。控制该队列的最大值如下参数：<code>net.core.netdev_max_backlog</code></li>
+<li>SYN_RCVD 状态连接的最大个数：<code>net.ipv4.tcp_max_syn_backlog</code></li>
+<li>超出处理能时，对新的 SYN 直接回报 RST，丢弃连接：<code>net.ipv4.tcp_abort_on_overflow</code></li>
+</ul>
+<p>tcp_syncookies 的方式可以应对 SYN 攻击：<code>net.ipv4.tcp_syncookies = 1</code></p>
+<ul>
+<li>当 「SYN 队列」满之后，后续服务器收到 SYN 包，不进入「SYN 队列」；</li>
+<li>计算出一个 cookie 值，再以 SYN + ACK 中的「序列号」返回客户端，</li>
+<li>服务端接收到客户端的应答报文时，服务器会检查这个 ACK 包的合法性。如果合法，直接放入到「Accept 队列」。
+This technique does not operate in a fully standards-compliant manner (eg. do not allow to use TCP extensions), but is only activated when a flood condition is detected, and allows defense of the system while continuing to service valid requests.</li>
+</ul>
+<h3 id="tcp-fast-open">TCP Fast Open</h3>
+<p>Defined in <a href="https://tools.ietf.org/html/rfc7413">RFC 7413</a></p>
+<p>TCP Fast Open (TFO) is an optional mechanism that allows optional data to be carried in the SYN and SYN-ACK packets. It lets endpoints that have established a full TCP connection in the past eliminate a round-trip of the handshake and send data right away.</p>
+<ul>
+<li>Step 1: In first connection, the client sends a SYN packet with TCP Fast Open option is included (in the header &quot;TCP Options&quot; field, tcp.option_kind == 34)</li>
+<li>Step 2: The server response a SYN+ACK with TCP Fast Open option included with a cookie.</li>
+<li>Step 3: In the subsequent connection, the client sends a SYN with TFO cookie included (in TCP Fast Open option field in the Options header), and with data!</li>
+<li>Step 4: The server recognizes the valid TFO cookie, accepts the payload data, and replies with its SYN+ACK.</li>
+</ul>
+<p>In Linux, the option can be enabled in <code>net.ipv4.tcp_fastopn</code>, &quot;1&quot; means TFO is only enabled on outgoing connections (client), and &quot;2&quot; indicates it is only available on listening sockets (server). &quot;3&quot; means enable both.</p>
+<p>Fastopen reality: <a href="https://squeeze.isobar.com/2019/04/11/the-sad-story-of-tcp-fast-open/">https://squeeze.isobar.com/2019/04/11/the-sad-story-of-tcp-fast-open/</a></p>
+<h3 id="tcp-establish-parameter-summary">TCP Establish Parameter Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Linux Parameter</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>net.ipv4.tcp_syn_retries</code></td>
+<td>当客户端发起 SYN 包时，可以通过 tcp_syn_retries 控制其重传的次数。</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_synack_retries</code></td>
+<td>服务端回复 SYN+ACK 的重传次数由 tcp_synack_retries 参数控制。</td>
+</tr>
+<tr>
+<td><code>netstat -s</code></td>
+<td>查看半连接队列溢出的情况</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_max_syn_backlog</code> <br> <code>net.core.somaxconn</code> <br> <code>backlog</code> parameter</td>
+<td>如果 SYN 半连接队列溢出情况比较严重，可以通过 tcp_max_syn_backlog、somaxconn、backlog 参数来调整 SYN 半连接队列的大小</td>
+</tr>
+<tr>
+<td><code>ss -lnt</code></td>
+<td>查看服务端进程的 accept 队列长度</td>
+</tr>
+<tr>
+<td><code>net.core.somaxconn</code> <br> <code>backlog</code> parameter</td>
+<td>如果 accpet 队列溢出严重，可以通过 listen 函数的 backlog 参数和 somaxconn 系统参数提高队列大小，accept 队列长度取决于 min(backlog, somaxconn)</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_abort_on_overflow</code></td>
+<td>accept 队列溢出，系统默认丢弃 ACK，如果可以把 tcp_abort_on_overflow 设置为 1 ，表示用 RST 通知客户端连接建立失败</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_syncookies</code></td>
+<td>如果遭受 SYN 攻击，应把 tcp_syncookies 参数设置为 1，表示仅在 SYN 队列满后开启 syncookie 功能，可以保证正常的连接成功建立。</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_fastopn</code></td>
+<td>TCP Fast Open 功能可以绕过三次握手，使得 HTTP 请求减少了 1 个 RTT 的时间</td>
+</tr>
+<tr>
+<td><code>tcp_slow_start_after_idle</code></td>
+<td>This causes communication to start or resume gradually. This is helpful if you are on a variable speed WAN like 3G or 4G (LTE) mobile network. But on a LAN or across a fixed-bandwidth WAN you want the connection to start out going as fast as it can.</td>
+</tr>
+</tbody>
+</table>
+<br>
+<h2 id="tcp-teardown">TCP Teardown</h2>
+<p><img src="images/2022-03-07-15-27-16.png" alt=""></p>
+<p><strong>Full-duplex close</strong>: an application closes both the sending and receiving channels of the TCP socket using <code>close()</code>. 调用了 close 函数的一方的连接叫做「孤儿连接」，如果你用 netstat -p 命令，会发现连接对应的进程名为空。</p>
+<ol>
+<li>The client performs an active close, which causes the client TCP to send a <em>FIN</em> to the server TCP.</li>
+<li>After receipt of the <em>FIN</em>, the server TCP responds with an ACK. Any subsequent attempt by the server to <code>read()</code> from the socket yields end-of-file (i.e., a 0 return).</li>
+<li>When the server later closes its end of the connection, the server TCP sends a <em>FIN</em> to the client TCP.
+<ul>
+<li>step 2 and 3 can be combined into one packet if server has no data to send, and sends (<em>FIN</em>,ACK) in one packet immediately.</li>
+</ul>
+</li>
+<li>The client TCP responds with an ACK to acknowledge the server’s <em>FIN</em>.</li>
+</ol>
+<p>Same as with the <em>SYN</em> flag, and for the same reasons, the <em>FIN</em> flag consumes a byte of the sequence-number space for the connection. This is why we show the acknowledgement of the <em>FIN</em> u segment as ACK u+1</p>
+<p><strong>Half close</strong>: We can use <code>shutdown()</code> to close just one channel of the connection. 我完成了发送数据，所以发送文件结束（FIN）到另一端，但我仍然希望收到来自另一端的数据，直到它发送给我一个文件结束（FIN）</p>
+<ul>
+<li>Specifying <code>showdown()</code>’s argument <code>how</code> as <code>SHUT_WR</code> initiates the TCP connection termination sequence</li>
+<li>Once this sequence has been initiated, the local TCP moves into the <em>FIN_WAIT1</em> state, and then into the <em>FIN_WAIT2</em> state, while the peer TCP moves into the <em>CLOSE_WAIT</em> state</li>
+<li>since the socket file descriptor remains valid and the reading half of the connection remains open, the peer can continue to send data back to us.</li>
+<li>The use of <code>SHUT_RD</code> should be avoided for portable TCP applications.</li>
+</ul>
+<p><img src="images/2022-03-07-19-46-16.png" alt=""></p>
+<p>当客户端收到第二次挥手，也就是收到服务端发送的 ACK 报文后，客户端就会处于 FIN_WAIT2 状态，在这个状态需要等服务端发送第三次挥手，也就是服务端的 FIN 报文。Many systems have introduced a timeout mechanism that restricts how long a TCP connection can remain in the half-closed state. Linux operating system implements a half-close timeout.</p>
+<ul>
+<li>controlled by setting <code>net.ipv4.tcp_fin_timeout</code>， default 60 seconds.</li>
+<li>The manual of <code>net.ipv4.tcp_fin_timeout</code> says: This specifies how many seconds to wait for a final FIN packet before the socket is forcibly closed. This is strictly a violation of the TCP specification, but required to prevent denial-of-service attacks.</li>
+</ul>
+<p><strong>Missing FIN</strong></p>
+<p>如果第一次挥手丢失了，那么客户端迟迟收不到被动方的 ACK ；或者如果服务端的第二次挥手(The ACK of client's FIN)丢失了, 这两种情况都会触发超时重传机制，重传 FIN 报文，重发次数由 <code>tcp_orphan_retries</code> 参数控制。当客户端重传 FIN 报文的次数超过 <code>tcp_orphan_retries</code> 后，就不再发送 FIN 报文，直接进入到 close 状态。</p>
+<p>如果服务端的第三次挥手（FIN sent by the server）丢失，迟迟收不到这个 ACK，或者第四次挥手（last ACK sent by client）丢失，服务端就会重发 FIN 报文，重发次数仍然由 <code>tcp_orphan_retries</code> 参数控制。</p>
+<p><strong>TIME_WAIT</strong></p>
+<p>Good read about <em>TIME_WAIT</em>: <a href="https://vincent.bernat.ch/en/blog/2014-tcp-time-wait-state-linux">https://vincent.bernat.ch/en/blog/2014-tcp-time-wait-state-linux</a>.</p>
+<ul>
+<li><strong>只有主动关闭连接的，才有 TIME_WAIT 状态。</strong></li>
+<li>Purpose:
+<ul>
+<li>Main one: prevent delayed segments from one connection being accepted by a later connection relying on the same quadruplet (source address, source port, destination address, destination port). Explained in details in <a href="https://tools.ietf.org/html/rfc1337">RFC 1337</a>.</li>
+<li>Second one: ensure the remote end has received ACK and closed the connection. Without the <em>TIME-WAIT</em> state, if we attempt to reopen a connection while the remote end still thinks the previous connection is valid, the SYN will be rejected by RST from remote end. If we wait for 2* MSL, we haven’t received a retransmit of FIN from the other side, it most probably means they received our ACK.</li>
+</ul>
+</li>
+<li>Duration: 1 Min on linux
+<ul>
+<li>On Linux, this duration is not tunable and is defined in <code>include/net/tcp.h </code></li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> TCP_TIMEWAIT_LEN (60*HZ) <span class="hljs-comment">/* how long to wait to destroy TIME-WAIT 
+                                  state, about 60 seconds  */</span></span>
+</div></code></pre>
+</li>
+<li>Solution:
+<ul>
+<li>enable <code>net.ipv4.tcp_tw_reuse</code>
+<ul>
+<li>使用这个选项，需要打开对 TCP 时间戳的支持，<code>net.ipv4.tcp_timestamps</code>=1（默认即为 1）.</li>
+<li>该参数是只用于客户端（建立连接的发起方），因为是在调用 connect() 时起作用的，而对于服务端（被动连接方）是没有用的。</li>
+<li>Linux will reuse an existing connection in the <em>TIME_WAIT</em> state longer than 1 second for a new outgoing connection if the new timestamp is strictly bigger than the most recent timestamp recorded for the previous connection.</li>
+</ul>
+</li>
+<li>Disable socket lingering <code>SO_LINGER</code><pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">linger</span> <span class="hljs-title">sl</span>;</span>
+sl.l_onoff = <span class="hljs-number">1</span>;		<span class="hljs-comment">/* non-zero value enables linger option in kernel */</span>
+sl.l_linger = <span class="hljs-number">0</span>;	<span class="hljs-comment">/* timeout interval in seconds */</span>
+<span class="hljs-built_in">setsockopt</span>(sockfd, SOL_SOCKET, SO_LINGER, &amp;sl, <span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(sl));
+</div></code></pre>
+<ul>
+<li>a good reference: <a href="https://notes.shichao.io/unp/ch7/#so_linger-socket-option">https://notes.shichao.io/unp/ch7/#so_linger-socket-option</a></li>
+<li>set SO_LINGER with timeout 0 ，the peer setting this option and calling close() will discard any remaining data in socket send buffer and send a <code>RST</code> packet , skipping 4-way handshake teardown and thus skipping TIME_WAIT. This is not recommended.</li>
+<li>set SO_LINGER with non-zero timeout, a <code>close(2)</code> or <code>shutdown(2)</code> will not return until all queued messages for the socket have been successfully sent or the linger timeout has been reached. When it was done, it sends a FIN to initate a close. (This has nothing to do with disable TIME_WAIT)</li>
+</ul>
+</li>
+<li>setting <code>net.ipv4.tcp_max_tw_buckets</code> (default 18000)
+<ul>
+<li>当系统中处于 TIME_WAIT 的连接一旦超过这个值时，系统就会将后面的 TIME_WAIT 连接状态重置，这个方法比较暴力。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>CLOSE_WAIT</strong></p>
+<p>Socket enters the <em>CLOSE_WAIT</em> state when the remote end terminates the connection sending a packet with the FIN flag set. It then waits in this state for the local application to <code>close()</code> the socket and then sends its own <em>FIN</em> to the client and transitions the socket to the <em>LAST_ACK</em> state.</p>
+<p>If the remote address and port stay constant and the number of connections in the <em>CLOSE_WAIT</em> state keeps growing, it most likely indicates a problem with the application.</p>
+<h3 id="tcp-teardown-parameter-summary">TCP Teardown Parameter Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Linux Parameter</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>net.ipv4.tcp_orphan_retries</code></td>
+<td>1. 主动发起 FIN 的一方，如果迟迟没收到对方的 ACK ，则会重传 FIN 报文，重传的次数由 tcp_orphan_retries 参数决定 <br> 2. 当被动方发送 FIN 报文后，连接就进入 LAST_ACK 状态，在未等到 ACK 时，会在 tcp_orphan_retries 参数的控制下重发 FIN 报文</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_fin_timeout</code></td>
+<td>当主动方收到 ACK 报文后，连接就进入 FIN_WAIT2。如果 tcp_fin_timeout 秒(默认值是 60 秒)内没有收到对方的 FIN 报文，连接就直接关闭。 <br> tcp_fin_timeout只控制对于 close 函数关闭的孤儿连接，如果连接是用 shutdown 函数关闭的，连接可以一直处于 FIN_WAIT2 状态（因为它可能还可以发送或接收数据）</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_max_orphans</code></td>
+<td>为了应对孤儿连接占用太多的资源，tcp_max_orphans 定义了最大孤儿连接的数量。如果孤儿连接数量大于它，新增的孤儿连接将不再走四次挥手，而是直接发送 RST 复位报文强制关闭。</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_max_tw_buckets</code></td>
+<td>主动方连接进入 TIME_WAIT 状态后，这一状态会持续 1 分钟，为了防止 TIME_WAIT 状态占用太多的资源，tcp_max_tw_buckets 定义了最大数量，超过时连接也会直接释放。</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_tw_reuse</code></td>
+<td>当 TIME_WAIT 状态过多时，还可以通过设置 tcp_tw_reuse 和 tcp_timestamps 为 1 ，将 TIME_WAIT 状态的端口复用于作为客户端的新连接，注意该参数只适用于客户端。</td>
+</tr>
+<tr>
+<td><code>net.ipv4.tcp_rfc1337</code></td>
+<td>这个参数是在 <a href="https://datatracker.ietf.org/doc/html/rfc1337">rfc 1337</a> 文档提出来的，目的是避免因为 TIME_WAIT 状态收到 RST 报文而跳过 2MSL 的时间，文档里也给出跳过 2MSL 时间会有什么潜在问题。如果 <code>net.ipv4.tcp_rfc1337</code> 参数为 0，则提前结束 TIME_WAIT 状态，释放连接。如果为 1，则会丢掉该 RST 报文。</td>
+</tr>
+</tbody>
+</table>
+<br>
+<h2 id="tcp-keep-alive">TCP Keep-alive</h2>
+<p>TCP 有一个机制是保活机制。这个机制的原理是这样的：</p>
+<p>定义一个时间段，在这个时间段内，如果没有任何连接相关的活动，TCP 保活机制会开始作用，每隔一个时间间隔，发送一个探测报文，该探测报文包含的数据非常少，如果连续几个探测报文都没有得到响应，则认为当前的 TCP 连接已经死亡，系统内核将错误信息通知给上层应用程序。</p>
+<p>应用程序若想使用 TCP 保活机制需要通过 socket 接口设置 SO_KEEPALIVE 选项才能够生效。</p>
+<pre><code class="language-bash"><div>net.ipv4.tcp_keepalive_time=7200 <span class="hljs-comment"># 7200 秒 (2 小时) 内如果没有任何连接相关的活动，则会启动保活机制</span>
+net.ipv4.tcp_keepalive_intvl=75  <span class="hljs-comment"># 表示每次检测间隔 75 秒；</span>
+net.ipv4.tcp_keepalive_probes=9  <span class="hljs-comment"># 表示检测 9 次无响应，认为对方是不可达的，从而中断本次的连接。</span>
+</div></code></pre>
+<p><strong>HTTP Keep-Alive</strong></p>
+<p>Note TCP Keep-alive is totally different than HTTP Keep-Alive. HTTP Keep-alive is a HTTP application layer feature. 可以使用同一个 TCP 连接来发送和接收多个 HTTP 请求/应答，避免了连接建立和释放的开销，这个方法称为 HTTP 长连接。HTTP 长连接不仅仅减少了 TCP 连接资源的开销，而且这给 HTTP 流水线技术提供了可实现的基础(客户端可以先一次性发送多个请求，而在发送过程中不需先等待服务器的回应，可以减少整体的响应时间)。</p>
+<p>To enable, In the HTTP header, add <code>Connection: Keep-Alive</code>. It is default on since HTTP 1.1.</p>
+<p>web 服务软件一般都会提供 keepalive_timeout 参数，用来指定 HTTP 长连接的超时时间。比如设置了 HTTP 长连接的超时时间是 60 秒，如果客户端在完后一个 HTTP 请求后，在 60 秒内都没有再发起新的请求，定时器的时间一到，就会触发回调函数来释放该连接。</p>
+<h2 id="tcp-nagles-algorithm-and-delayed-ack">TCP Nagle's algorithm and Delayed Ack</h2>
+<p><strong>Nagles algorithm</strong></p>
+<p>On the sending side. When a TCP connection has outstanding data that has not yet been acknowledged, small segments (those smaller than the SMSS) cannot be sent until all outstanding data is acknowledged.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">if</span> there is <span class="hljs-keyword">new</span> data to send then
+    <span class="hljs-keyword">if</span> the window size ≥ MSS <span class="hljs-keyword">and</span> available data is ≥ MSS then
+        send complete MSS segment now
+    <span class="hljs-keyword">else</span>
+        <span class="hljs-keyword">if</span> there is unconfirmed data still in the pipe then
+            enqueue data in the buffer until an acknowledge is received
+        <span class="hljs-keyword">else</span>
+            send data immediately
+        end <span class="hljs-keyword">if</span>
+    end <span class="hljs-keyword">if</span>
+end <span class="hljs-keyword">if</span>
+</div></code></pre>
+<p>Disable Nagles by process using <code>TCP_NODELAY</code> flag:</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">int</span> one = <span class="hljs-number">1</span>;
+<span class="hljs-keyword">int</span> result = <span class="hljs-built_in">setsockopt</span>(sockfd, IPPROTO_TCP, TCP_NODELAY, &amp;one, <span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(one));
+<span class="hljs-keyword">if</span> (result &lt; <span class="hljs-number">0</span>)
+  ... handle the error ...
+</div></code></pre>
+<p><strong>TCP_CORK</strong></p>
+<p><code>TCP_CORK</code> aggressively accumulates data. If set, don't send out partial frames. All queued partial frames are sent when one of the below conditions is met:</p>
+<ul>
+<li>the option is cleared again, or</li>
+<li>socket buffer is accumulated more than MSS, or</li>
+<li>When a 200-millisecond ceiling timer is reached, or</li>
+<li>when socket is closed.</li>
+</ul>
+<p>Until 2.6 kernel, both of these options are mutually exclusive. But in later kernel, both of them can exist together. In such case, <code>TCP_CORK</code> will be given more preference.</p>
+<p><strong>Delayed Ack</strong></p>
+<p>On the receiving side. With delayed ACK, ACKs are not sent immediately but delayed for some time (usually 200 ms, in Linux, 40ms) in the hope that the ACK it needs to send can be combined or &quot;piggybacked&quot; with some data the local application wishes to send in the other direction.</p>
+<p>Acks will only be sent in one of below conditions:</p>
+<ul>
+<li>When recevier has data to reply back to the sender, ACK will be &quot;piggybacked&quot;, or</li>
+<li>Until the delayed timer expires, or</li>
+<li>Another data packet arrives, then ACK will be sent immdiately.</li>
+</ul>
+<p><strong>Delayed Ack and Nagles doesn't play well together.</strong></p>
+<p>Because Delayed ACKs are waiting around to send the ACK while Nagle's is waiting around to receive the ACK!</p>
+<p>Example:</p>
+<ul>
+<li>step1: sender (with nagles on) sends a first packet</li>
+<li>step2: sender wants to send a second small packet, but it can't send due to nagles (since it has unack'ed data)</li>
+<li>step3: receiver gets the first packet, but doesn't send back ACK due to delayed ACK.</li>
+<li>step4: sender can only send out the second packet after receiving ACK from receiver after its delayed ACK timer expires</li>
+</ul>
+<p>Disable Delayed Ack:</p>
+<ul>
+<li><code>setsockopt(sockfd, IPPROTO_TCP, TCP_QUICKACK, (int[]){1}, sizeof(int))</code> after every write().</li>
+</ul>
+<h2 id="so_reuseaddr-and-so_reuseport">SO_REUSEADDR and SO_REUSEPORT</h2>
+<p>If you explicitly bind a socket, it is possible to bind it to port 0, which means &quot;any port&quot;. The system will have to choose a specific port itself in that case (usually from a predefined, OS specific range of source ports).</p>
+<p>You can bind a socket to the wildcard &quot;any address&quot; too, it is <code>INADDR_ANY</code> (<code>0.0.0.0</code>) in case of IPv4. It means &quot;all source IP addresses of all local interfaces&quot;. If the socket is connected later on, depending on the destination address and the content of the routing table, the system will pick an appropriate source address and replace the &quot;any&quot; binding with a binding to the chosen source IP address.</p>
+<p>By default, no two sockets can be bound to the same combination of source address and source port.</p>
+<ul>
+<li>If source port is different, the source address is actually irrelevant.</li>
+<li><strong>This requires <code>SO_REUSEADDR</code> in Linux</strong>: If source address is different, we can bind two socket to the same port. eg. Bind socketA to ipA:portA and socketB to ipB:portA will work.
+<ul>
+<li>An exception: If a socket is bound a wildcast &quot;any address”，eg. <code>0.0.0.0:21</code>, it is bound to all existing local addresses at the same time and no other socket can be bound to port 21, regardless which specific IP address it tries to bind to.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Two usage of <code>SO_REUSEADDR</code>:</strong></p>
+<ol>
+<li><code>SO_REUSEADDR</code> changes the way a socket in state <em>TIME_WAIT</em> are treated when searching for conflicts.
+<ul>
+<li>Without <code>SO_REUSEADDR</code>, Socket in <em>TIME_WAIT</em> is considered to still be bound to the source address and port and any attempt to bind a new socket to the same address and port will fail.</li>
+<li>If <code>SO_REUSEADDR</code> is set for the socket you are trying to bind, another socket bound to the same address and port in state TIME_WAIT is simply ignored, regardless of the <code>SO_REUSEADDR</code> setting for that socket.
+<ul>
+<li>Note that binding a socket to exactly the same address and port as a dying socket in TIME_WAIT state can have unexpected, and usually undesired, side effects.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>BSD only</strong>: <code>SO_REUSEADDR</code> changes the way how wildcard address (&quot;any IP address&quot;) is treated when searching for conflicts.
+<ul>
+<li>Without <code>SO_REUSEADDR</code>, binding socketA to<code> 0.0.0.0:21</code> and then binding socketB to <code>192.168.0.1:21</code> will fail (with error <code>EADDRINUSE</code>)</li>
+<li>With <code>SO_REUSEADDR</code> above case will succeed, since <code>0.0.0.0</code> and <code>192.168.0.1</code> are not exactly the same address when <code>SO_REUSEADDR</code> is in effect.</li>
+<li>Implication for connect(): you can bind two sockets of the same protocol to the same source address and port. This means three of the five tuples are the same for these two sockets. If you try to connect them to the same destination address and port, <code>connect()</code> will fail with the error <code>EADDRINUSE</code> for the second socket you try to connect, as kernel identifies socket by a tuple of five values: <code>{&lt;protocol&gt;, &lt;src addr&gt;, &lt;src port&gt;, &lt;dest addr&gt;, &lt;dest port&gt;}</code></li>
+</ul>
+</li>
+</ol>
+<p><strong><code>SO_REUSEADDR</code> for multicast</strong></p>
+<p>The meaning of <code>SO_REUSEADDR</code> changes for multicast addresses as it allows multiple sockets to be bound to exactly the same combination of source multicast address and port. Actually, the code treats <code>SO_REUSEADDR</code> and <code>SO_REUSEPORT</code> identically for multicast addresses, that means you could say that <code>SO_REUSEADDR</code> implies <code>SO_REUSEPORT</code> for all multicast addresses and the other way round.</p>
+<p><strong><code>SO_REUSEPORT</code></strong></p>
+<p>(Linux v3.9 added the option <code>SO_REUSEPORT</code>)</p>
+<p><code>SO_REUSEPORT</code> allows you to bind an arbitrary number of sockets to exactly the same source address and port as long as <strong>all</strong> prior bound sockets also had <code>SO_REUSEPORT</code> set before they were bound.</p>
+<ul>
+<li>If the first socket that is bound to an address and port without <code>SO_REUSEPORT</code>, no other socket can bind to it. (this is different than <code>SO_REUSEADDR</code> behavior where it only checks the new socket).</li>
+<li>In Linux: To prevent &quot;port hijacking&quot;, all sockets that want to share the same address and port combination must belong to processes that share the same <em>effective user ID</em>!</li>
+</ul>
+<p><code>SO_REUSEPORT</code> can be used with both TCP and UDP sockets.</p>
+<ul>
+<li>With TCP sockets, it allows multiple listening sockets—normally each in a different thread—to be bound to the same port. Each thread can then accept incoming connections on the port by calling accept().
+<ul>
+<li>In Linux: for TCP listening sockets, it tries to distribute incoming connect requests (those accepted by calling <code>accept()</code>) evenly across all sockets. Thus an application can easily open the same port in multiple child processes and then use <code>SO_REUSEPORT</code> to get a very inexpensive load balancing.</li>
+</ul>
+</li>
+<li>For UDP sockets, it allows multiple UDP sockets to be bound to the same port. Each thread could use recv() on its own socket to accept datagrams arriving on the port.
+<ul>
+<li>In Linux: it tries to distribute datagrams evenly across multiple sockets bind to the same address/port.</li>
+</ul>
+</li>
+</ul>
+<h3 id="so_reuseport-kernel-internal">SO_REUSEPORT Kernel Internal</h3>
+<pre><code class="language-C++"><div><span class="hljs-built_in">setsockopt</span>(fd, SOL_SOCKET, SO_REUSEPORT, ...);
+
+<span class="hljs-comment">//file: net/core/sock.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">sock_setsockopt</span><span class="hljs-params">(struct socket *sock, <span class="hljs-keyword">int</span> level, <span class="hljs-keyword">int</span> optname,
+      <span class="hljs-keyword">char</span> __user *optval, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> optlen)</span>
+</span>{
+  ...
+  <span class="hljs-built_in"><span class="hljs-keyword">switch</span></span> (optname) {
+    ...
+    <span class="hljs-keyword">case</span> SO_REUSEPORT:
+      sk-&gt;sk_reuseport = valbool;
+    ...
+  }
+}
+</div></code></pre>
+<p>At the time of bind():</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// When kernel does inet_bind, it calls inet_csk_get_port </span>
+<span class="hljs-comment">//file: net/ipv4/inet_connection_sock.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">inet_csk_get_port</span><span class="hljs-params">(struct sock *sk, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> snum)</span>
+</span>{
+  ...
+  <span class="hljs-comment">//内核通过拉链哈希表的方式来管理所有的 bind 的 socket。这个hash叫绑定表（bhash）</span>
+  <span class="hljs-comment">// 其中 inet_bhashfn 是计算哈希值的函数。</span>
+  head = &amp;hashinfo-&gt;bhash[<span class="hljs-built_in">inet_bhashfn</span>(net, snum,
+    hashinfo-&gt;bhash_size)];
+  <span class="hljs-comment">// 遍历所有的 bind 状态的 socket，目的是为了判断是否冲突。</span>
+  <span class="hljs-built_in">inet_bind_bucket_for_each</span>(tb, &amp;head-&gt;chain)
+    <span class="hljs-comment">//找到了，在一个命名空间下而且端口号一致，表示该端口已经绑定</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">net_eq</span>(<span class="hljs-built_in">ib_net</span>(tb), net) &amp;&amp; tb-&gt;port == snum)
+      <span class="hljs-keyword">goto</span> tb_found;
+  ...
+
+tb_found:
+  <span class="hljs-keyword">if</span> ((
+        (tb-&gt;fastreuse &gt; <span class="hljs-number">0</span> &amp;&amp; sk-&gt;sk_reuse &amp;&amp; sk-&gt;sk_state != TCP_LISTEN) 
+        ||
+        (tb-&gt;fastreuseport &gt; <span class="hljs-number">0</span> &amp;&amp; sk-&gt;sk_reuseport &amp;&amp; <span class="hljs-built_in">uid_eq</span>(tb-&gt;fastuid, uid) <span class="hljs-comment">/*same uid*/</span>)
+      ) &amp;&amp; smallest_size == <span class="hljs-number">-1</span>) {
+    <span class="hljs-keyword">goto</span> success;
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-comment">//绑定冲突</span>
+    ......
+}
+</div></code></pre>
+<p>At the time of accept():</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/ipv4/inet_hashtables.c</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sock</span> *__<span class="hljs-title">inet_lookup_listener</span>(<span class="hljs-keyword">struct</span> <span class="hljs-title">net</span> *<span class="hljs-title">net</span>,
+        <span class="hljs-keyword">struct</span> <span class="hljs-title">inet_hashinfo</span> *<span class="hljs-title">hashinfo</span>,
+        <span class="hljs-title">const</span> __<span class="hljs-title">be32</span> <span class="hljs-title">saddr</span>, __<span class="hljs-title">be16</span> <span class="hljs-title">sport</span>,
+        <span class="hljs-title">const</span> __<span class="hljs-title">be32</span> <span class="hljs-title">daddr</span>, <span class="hljs-title">const</span> <span class="hljs-title">unsigned</span> <span class="hljs-title">short</span> <span class="hljs-title">hnum</span>,
+        <span class="hljs-title">const</span> <span class="hljs-title">int</span> <span class="hljs-title">dif</span>)
+{</span>
+  <span class="hljs-comment">//内核仍然是通过 hash + 拉链的方式来保存所有的 listen 状态的 socket。</span>
+  <span class="hljs-comment">// 所有 listen socket 都在这个 listening_hash 中</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inet_listen_hashbucket</span> *<span class="hljs-title">ilb</span> =</span> &amp;hashinfo-&gt;listening_hash[hash];
+
+begin:
+  result = <span class="hljs-literal">NULL</span>;
+  hiscore = <span class="hljs-number">0</span>;
+  <span class="hljs-comment">// 遍历所有 hash 值相同的 listen 状态的 socket</span>
+  <span class="hljs-built_in">sk_nulls_for_each_rcu</span>(sk, node, &amp;ilb-&gt;head) {
+    <span class="hljs-comment">// 计算匹配分。当有多个 socket 都命中的时候，匹配分高的优先命中。</span>
+    score = <span class="hljs-built_in">compute_score</span>(sk, net, hnum, daddr, dif);
+    <span class="hljs-keyword">if</span> (score &gt; hiscore) {
+      result = sk;
+      hiscore = score;
+      reuseport = sk-&gt;sk_reuseport;
+      <span class="hljs-keyword">if</span> (reuseport) {
+        phash = <span class="hljs-built_in">inet_ehashfn</span>(net, daddr, hnum,
+              saddr, sport);
+        matches = <span class="hljs-number">1</span>;
+      }
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (score == hiscore &amp;&amp; reuseport) {
+      <span class="hljs-comment">// 如果当多个 socket 的匹配分一致，通过调用 next_pseudo_random32 进行随机的选择。</span>
+      matches++;
+      <span class="hljs-keyword">if</span> (((u64)phash * matches) &gt;&gt; <span class="hljs-number">32</span> == <span class="hljs-number">0</span>)
+        result = sk;
+      phash = <span class="hljs-built_in">next_pseudo_random32</span>(phash);
+    }
+  }
+  ...
+  <span class="hljs-keyword">return</span> result;
+}
+
+<span class="hljs-comment">//file: net/ipv4/inet_hashtables.c</span>
+<span class="hljs-comment">// The way to match/score is to match the locally binded IP with the IP that client (connector) connnects to.</span>
+<span class="hljs-comment">// If local IP == connect IP, score is 4</span>
+<span class="hljs-comment">// If local IP != connect IP, score is -1</span>
+<span class="hljs-comment">// If local IP is 0.0.0.0 (INADDR_ANY), score is 2</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-keyword">int</span> <span class="hljs-title">compute_score</span><span class="hljs-params">(struct sock *sk, ...)</span>
+</span>{
+  <span class="hljs-keyword">int</span> score = <span class="hljs-number">-1</span>;
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inet_sock</span> *<span class="hljs-title">inet</span> =</span> <span class="hljs-built_in">inet_sk</span>(sk);
+
+  <span class="hljs-keyword">if</span> (<span class="hljs-built_in">net_eq</span>(<span class="hljs-built_in">sock_net</span>(sk), net) &amp;&amp; inet-&gt;inet_num == hnum &amp;&amp;
+    !<span class="hljs-built_in">ipv6_only_sock</span>(sk)) {
+      <span class="hljs-comment">//如果服务绑定的是 0.0.0.0，那么 rcv_saddr 为假</span>
+      __be32 rcv_saddr = inet-&gt;inet_rcv_saddr;
+      score = sk-&gt;sk_family == PF_INET ? <span class="hljs-number">2</span> : <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">if</span> (rcv_saddr) {
+        <span class="hljs-keyword">if</span> (rcv_saddr != daddr)
+          <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+        score += <span class="hljs-number">4</span>;
+      }
+    ... 
+  }
+  <span class="hljs-keyword">return</span> score;
+}
+</div></code></pre>
+<br>
+<br>
+<h1 id="tcp-flow-control">TCP Flow Control</h1>
+<p>TCP flow-control controls the traffic from a particular sender to a receiver. It makes sure that the receiver will not be overwhelmed with data. <strong>Receiver advertised window is the key to flow control.</strong></p>
+<h2 id="sender-window">Sender Window</h2>
+<p><img src="images/2022-03-07-15-38-26.png" alt=""></p>
+<p>When data is acknowledged, this causes bytes to move from Transmit Category #2 to Category #1, by increasing the value of <em>SND.UNA</em>. Assuming that the send window size doesn't change, this causes the window to slide to the right, permitting more data to be sent.</p>
+<p>Factor to determine Send window (minimum of below factors)</p>
+<ol>
+<li>The upper bound is the receiver’s advertised window, the sender can’t send more than that or data will be discarded.
+<ul>
+<li>The “Window” header field in the packet from peer tells the sender the size to which it should set its send window.</li>
+<li>The &quot;advertised&quot; window can change based on every packet from the peer.</li>
+</ul>
+</li>
+<li><strong>Cwnd</strong>: sender side congest window, sender can’t send seqnum &gt; highest acked seqnum + cwnd, which corresponds to category #3 window</li>
+<li>The send buffer size (<code>SO_SNDBUF</code>)</li>
+</ol>
+<h3 id="congestion-window">Congestion Window</h3>
+<p>The congestion window (<strong>cwnd</strong>) is the sender’s flow control that is based on the network capacity and conditions. It is usually referred to in multiples of maximum segment size (MSS). So an MSS of 1460 and a <em>cwnd</em> of 33 would be ~48k bytes.</p>
+<ul>
+<li>The <em>cwnd</em> at the beginning of a connection is usually 2, 3, or 10 depending on the operating system and kernel version.</li>
+<li>The <em>cwnd</em> is initially increased by TCP Slow Start.</li>
+<li>Once the <em>cwnd</em> reaches the Slow Start threshold (<em>ssthresh</em>) or there is data loss due to congestion, the <em>cwnd</em> growth changes to a congestion avoidance algorithm.</li>
+<li>Eventually the congestion window will increase up to either the network’s limit due to congestion or hit the receiver’s window limit.
+<ul>
+<li>Even if the receiver’s window (rwnd) is 64k, the sender is bound by the <em>cwnd</em>. It might be that the current network conditions do not support having 64k of outstanding data buffered in the network. In this sense, the amount of data the sender can send is the minimum of the rwnd and the <em>cwnd</em>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="receive-window">Receive Window</h2>
+<p>Flow control prevents a fast sender from overwhelming a slow receiver. To implement flow control, the receiving TCP maintains a buffer for incoming data.</p>
+<p><img src="images/2022-03-07-15-43-12.png" alt=""></p>
+<p><strong>Receive Next (RCV.NXT)</strong>: The sequence number of the next byte of data that is expected from the other device.</p>
+<p><strong>Receive Window (RCV.WND)</strong>: The size of the receive window “advertised” to the other device. This refers to the number of bytes the device is willing to accept at one time from its peer, which is usually the size of the buffer allocated for receiving data for this connection.</p>
+<h3 id="silly-window-syndrome">Silly-window syndrome</h3>
+<p>Receiver window opens only	by a small amount, hence sender can send only a small amount of	data at a time</p>
+<ol>
+<li>Packet header overhead</li>
+<li>Small packets cause more	interrupts at busy receiver</li>
+</ol>
+<p>Solution:</p>
+<ul>
+<li>Advertise 0 window early, once the wondow is smaller than <code>min(MSS,  ½*rwnd)</code>.</li>
+<li>Don’t advertise window until it opens “significantly” (&gt; MSS or ½*rwnd)</li>
+<li>Sender sends small packet (usually called <strong>Window Probe Packet</strong>) after “persistence timer” , in case receiver, after zero window advertisement, doesn’t send any other ack message to the sender (or if the ack is lost)</li>
+</ul>
+<p>窗口探测的次数一般为 3 次，每次大约 30-60 秒（不同的实现可能会不一样）。如果 3 次过后接收窗口还是 0 的话，有的 TCP 实现就会发 RST 报文来中断连接。</p>
+<h2 id="tcp-buffer-size-parameters">TCP Buffer Size Parameters</h2>
+<p>Parameters <code>core/rmem_default</code> and <code>core/wmem_default</code> are the system default receive and send tcp buffer sizes, while <code>core/rmem_max</code> and <code>core/wmem_max</code> are the maximum receive and send buffer sizes that can be set using <code>setsockopt()</code>, in bytes</p>
+<pre><code class="language-bash"><div>/proc/sys/net/core/rmem_default
+/proc/sys/net/core/rmem_max
+/proc/sys/net/core/wmem_default
+/proc/sys/net/core/wmem_max
+</div></code></pre>
+<p>Parameters <code>ipv4/tcp_rmem</code> and <code>ipv4/tcp_wmem</code> are the amount of memory in bytes for read (receive) and write (transmit) buffers per open socket. Each contains three numbers: the minimum, default, and maximum values.</p>
+<pre><code class="language-bash"><div>/proc/sys/net/ipv4/tcp_rmem (<span class="hljs-keyword">for</span> <span class="hljs-built_in">read</span>)
+/proc/sys/net/ipv4/tcp_wmem (<span class="hljs-keyword">for</span> write)
+</div></code></pre>
+<blockquote>
+<p>From this <a href="https://stackoverflow.com/a/35438236">post</a>, <code>net.ipv4.tcp_rmem</code> will override <code>net.core.rmem_max</code> in TCP code except when setting <code>SO_RCVBUF</code> where <code>sysctl_rmem_max</code> is used to limit the argument.</p>
+</blockquote>
+<p>Parameter <code>tcp_mem</code> is the amount of memory in <strong>4096-byte pages</strong> totaled across all TCP applications. It contains three numbers: the minimum, pressure, and maximum. The pressure is the threshold at which TCP will start to reclaim buffer memory to move memory use down toward the minimum. You want to avoid hitting that threshold.</p>
+<pre><code class="language-bash"><div>/proc/sys/net/ipv4/tcp_mem (<span class="hljs-keyword">in</span> terms of pages, <span class="hljs-keyword">for</span> sum of all TCP apps)
+</div></code></pre>
+<p>Tuning Strategy:</p>
+<ul>
+<li>Increase the default and maximum for <code>tcp_rmem</code> and <code>tcp_wmem</code>. IBM's High Performance Computing page recommends 4096 87380 16777216.</li>
+<li>For <code>tcp_mem</code>, set it to twice the maximum value for <code>tcp_[rw]mem</code> multiplied by the maximum number of running network applications divided by 4096 bytes per page.</li>
+<li>Increase <code>rmem_max</code> and <code>wmem_max</code> so they are at least as large as the third values of <code>tcp_rmem</code> and <code>tcp_wmem</code>.</li>
+<li>Calculate the <strong>bandwidth delay product</strong> BDP = RTT (in sec) * Bandwidth (in Bytes/sec). This is the total amount of data in transit on the wire. If you don't have buffers this large on the hosts, senders have to stop sending and wait for an acknowledgement, meaning that the network pipe isn't kept full and we're not using the full bandwidth. But If you provide buffers significantly larger than the BDP for connections outbound from your network edge, you are just contributing to buffer congestion across the Internet.</li>
+<li>Dont set SO_SNDBUF or SO_RCVBUF on socket, it will turn off the kernel dynamic buffer adjustment.</li>
+</ul>
+<p><strong>View current buffer size</strong></p>
+<p>the default socket buffers are set when the sock is initialised (in <code>tcp_init_sock()</code>) but the kernel then dynamically sizes them (unless set using <code>setsockopt()</code> with <code>SO_SNDBUF</code>). The actual size of the buffers for currently open sockets may be inspected using the <code>ss</code> command.</p>
+<p>Sample output:</p>
+<pre><code><code><div>State       Recv-Q Send-Q        Local Address:Port        Peer Address:Port
+ESTAB       0      0             192.168.56.102:ssh        192.168.56.1:56328
+skmem:(r0,rb369280,t0,tb87040,f0,w0,o0,bl0,d0)
+</div></code></code></pre>
+<p>Here's a brief explanation of skmem (socket memory) - for more info you'll need to look at the kernel sources (i.e. <a href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/include/net/sock.h">sock.h</a>):</p>
+<pre><code><code><div>r:sk_rmem_alloc
+rb:sk_rcvbuf          # current receive buffer size
+t:sk_wmem_alloc
+tb:sk_sndbuf          # current transmit buffer size
+f:sk_forward_alloc
+w:sk_wmem_queued      # persistent transmit queue size
+o:sk_omem_alloc
+bl:sk_backlog
+d:sk_drops
+</div></code></code></pre>
+<br>
+<h1 id="tcp-congestion-control">TCP Congestion control</h1>
+<p>TCP congestion-control algorithms are designed to prevent a fast sender from overwhelming a network. It prevents the network from getting congested.</p>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc5681">RFC 5681</a>: &quot;TCP Congestion Control&quot; (August 2009)</p>
+<p>This document specifies four TCP congestion control algorithms</p>
+<ul>
+<li>slow start</li>
+<li>congestion avoidance</li>
+<li>fast retransmit</li>
+<li>fast recovery.</li>
+</ul>
+<p>Two main parameters:</p>
+<ul>
+<li><em><strong>Ssthresh</strong></em>: slow-start threshold, determines slow-start algo or congestion avoidance algo</li>
+<li><em><strong>Cwnd</strong></em>: congest window at sender side, sender can’t send seqnum &gt; highest acked seqnum + <em>cwnd</em></li>
+</ul>
+<h2 id="slow-start">Slow Start</h2>
+<ul>
+<li>slowly probe the network to determine the available capacity, in order to avoid congesting the network with an inappropriately large burst of data.</li>
+<li>The slow start algorithm is used for this purpose at the beginning of a transfer, or after repairing loss detected by the retransmission timer.</li>
+</ul>
+<p><strong>Init:</strong></p>
+<ul>
+<li><em>ssthresh</em>=max advertised window;</li>
+<li><em>cwnd</em> = 2 (or 3) * SMSS (depending on SMSS size)</li>
+</ul>
+<p><strong>During slow start:</strong></p>
+<p>a TCP increments <em>cwnd</em> by at most SMSS bytes for each ACK received that cumulatively acknowledges new data. (this is actually exponential growth, 1,2,4 over each RTT)</p>
+<p><strong>Ends:</strong> when <em>cwnd</em> exceeds <em>ssthresh</em></p>
+<blockquote>
+<p>The initial cwnd value (initcwnd) is up for turning, some posts (<a href="http://www.cdnplanet.com/blog/tune-tcp-initcwnd-for-optimum-performance/">here</a> and <a href="http://research.google.com/pubs/pub36640.html">here</a>) suggest increase it to 10.</p>
+</blockquote>
+<h2 id="congestion-avoidance">Congestion avoidance</h2>
+<p>During congestion avoidance, <em>cwnd</em> is incremented by roughly 1 full-sized segment per round-trip time (RTT).</p>
+<p>Congestion avoidance continues until congestion is detected.</p>
+<p>This method both allows TCPs to increase <em>cwnd</em> by one segment per RTT in the face of delayed ACKs</p>
+<h2 id="fast-retransmission">Fast Retransmission</h2>
+<p>The fast retransmit algorithm uses the arrival of 3 duplicate ACKs as an indication that a segment has been lost.  After receiving 3 duplicate ACKs, TCP performs a retransmission without waiting for the retransmission timer to expire.</p>
+<h2 id="fast-recovery-tcp-reno">Fast recovery (TCP Reno)</h2>
+<p>After fast-retransmission, the &quot;fast recovery&quot; algorithm governs the transmission of new data until a non-duplicate ACK arrives.</p>
+<p>The reason for not performing slow-start is that the receipt of the duplicate ACKs not only indicates that a segment has been lost, but also indicates further segments which the receiver cannot acknowledge are still arriving and being buffered. Therefore, there is still flow on the pipe that we can try to preserve.</p>
+<h3 id="fast-retransmission-and-fast-recovery-work-together">Fast retransmission and Fast-Recovery work together</h3>
+<p>After receiving three duplicated ACKs in a row:</p>
+<ol>
+<li>Set <em>ssthresh</em> to half the current send window (<em>cwnd</em>).</li>
+<li>Retransmit the missing segment</li>
+<li>Set <em>cwnd</em>=<em>ssthresh</em> + 3 * SMSS. (3 because we received 3 dup acks)</li>
+<li>Each time the same duplicate ACK arrives, set <em>cwnd</em> += 1 SMSS. Transmit a new packet, if allowed by <em>cwnd</em>.</li>
+<li>If a non-duplicate ACK arrives, then set <em>cwnd</em> = <em>ssthresh</em> and continue with a linear increase of the <em>cwnd</em> (Congestion-Avoidance)</li>
+</ol>
+<h2 id="two-retransmission-types">Two retransmission types</h2>
+<p>Type 1 : Retransmission due to Timeout – In this case congestion possibility is high.</p>
+<ol>
+<li><em>ssthresh</em> is reduced to <em>cwnd</em>/2.</li>
+<li>set <em>cwnd</em> = 1</li>
+<li>start with slow-start phase again.</li>
+</ol>
+<p>Type 2 : Retransmission due to 3 Acknowledgement Duplicates – In this case congestion possibility is less.</p>
+<ol>
+<li><em>ssthresh</em> is reduced to <em>cwnd</em>/2.</li>
+<li>set <em>cwnd</em>= <em>ssthresh</em> + 3 * SMSS</li>
+<li>start with congestion-avoidance phase</li>
+</ol>
+<h2 id="timeout-retransmission">Timeout Retransmission</h2>
+<p>RTO （Retransmission Timeout 超时重传时间）</p>
+<p>超时重传时间 RTO 的值应该略大于报文往返 RTT （Round-Trip Time 往返时延）的值。</p>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc6298">RFC 6289</a> codifies the algorithm for setting the RTO. a TCP MUST NOT be more aggressive than the following algorithms allow.</p>
+<p>a TCP sender maintains two state variables</p>
+<ul>
+<li>SRTT (smoothed round-trip time)</li>
+<li>RTTVAR (round-trip time variation).</li>
+</ul>
+<p>Initial value:</p>
+<ul>
+<li><code>RTO = 1</code></li>
+</ul>
+<p>After the first RTT measurement of R</p>
+<ul>
+<li><code>SRTT = R</code></li>
+<li><code>RTTVAR = R/2</code></li>
+<li><code>RTO = SRTT + 4*RTTVAR</code></li>
+</ul>
+<p>After a subsequent RTT measurement of R2</p>
+<ul>
+<li><code>RTTVAR = (1-β) * RTTVAR + β * |SRTT - R2|, where β = 0.25</code></li>
+<li><code>SRTT = (1 - α) * SRTT + α * R2, where α = 0.125</code></li>
+<li><code>RTO = SRTT + 4*RTTVAR</code></li>
+</ul>
+<p>When RTO timer expires:</p>
+<ul>
+<li>Retransmit the earliest segment that has not been acknowledged.</li>
+<li>The host MUST set <code>RTO = RTO * 2</code> (&quot;back off the timer&quot;).</li>
+<li>Start the retransmission timer again with new RTO.</li>
+<li>If a new RTT measurement is obtained (which can only happen for new data, as we dont take RTT for retranmission packets), a TCP implementation MAY clear SRTT and RTTVAR after backing off the timer multipler times, and reinitalize them with the algorithm for first packet.</li>
+</ul>
+<p>In Liunx, during the TCP established state, TCP retransmits an unacknowledged packet up to <code>net.ipv4.tcp_retries2</code> sysctl setting times (defaults to 15) using an exponential backoff timeout for which each retransmission timeout is between <code>TCP_RTO_MIN</code> (200 ms) and <code>TCP_RTO_MAX</code> (120 seconds).</p>
+<p>The value of <code>TCP_RTO_MIN</code> and <code>TCP_RTO_MAX</code> is hardcoded in the Linux kernel and defined by the following constants:</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> TCP_RTO_MAX ((unsigned)(120*HZ))</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> TCP_RTO_MIN ((unsigned)(HZ/5))</span>
+</div></code></pre>
+<p>Linux 2.6+ uses HZ of 1000ms, so <code>TCP_RTO_MIN</code> is 200 ms and TCP_RTO_MAX is 120 seconds. Given a default value of tcp_retries set to 15, it means that it takes 924.6 seconds to detect a broken connection.</p>
+<p>In Linux,  you can show the current RTO values for your open connections by running the <code>ss -i</code> command</p>
+<h2 id="sack-selective-acknowledgment">SACK Selective Acknowledgment</h2>
+<p>Selective acknowledgment (SACK) is to help alleviate congestion that can arise due to the retransmission of dropped packets, in 1996 from RFC 2018. It allows the endpoints to describe which pieces of the data they have received, in a number of contiguous <em>SACK blocks</em>, so that only the missing pieces need to be retransmitted.</p>
+<p><img src="images/2022-03-10-12-03-27.png" alt=""></p>
+<p>SACK needs to be enabled by both ends, using <code>net.ipv4.tcp_sack</code>, default is on after linux v2.4.</p>
+<p><strong>SACK panic attack</strong></p>
+<p>Detail refer to: <a href="https://lwn.net/Articles/791409/">https://lwn.net/Articles/791409/</a></p>
+<p>The vulnerabilities specifically relate to the Maximum Segment Size (MSS) and TCP Selective Acknowledgement (SACK) capabilities. The most serious, dubbed “SACK Panic,” allows a remotely-triggered kernel panic on recent Linux kernels.</p>
+<p>The struct <a href="https://elixir.bootlin.com/linux/v5.1.12/source/include/net/tcp.h#L797">tcp_skb_cb</a> is a control buffer that tracks various things about a TCP packet, including the number of segments/fragments it has been broken up into. The number of segments is stored in the <code>tcp_gso_segs</code> field, which is a two-byte unsigned integer.</p>
+<p>An attacker can use a small MSS value (perhaps the minimum of 48 bytes, which only leaves eight bytes for actual user data) and cause an overflow of <code>tcp_gso_segs</code> by carefully choosing which segments to acknowledge.</p>
+<h3 id="d-sack">D-SACK</h3>
+<p>The duplicate-SACK option, in 2000 from RFC 2883. The TCP receiver sends a D-ACK to indicate that no segments were lost, and the TCP sender can then reinstate the higher transmission-rate.</p>
+<p>An example: two acks were lost. Sender retransmitted the packet（3000 ~ 3499）after RTO. The Recevier found the data is duplicated, reply with a SACK (3000-3500) with ACK_NUM=4000. This is a D-SACK, it indicates all data before 4000 is received.</p>
+<p><img src="images/2022-03-10-12-07-34.png" alt=""></p>
+<h2 id="timers-used-in-tcp">Timers Used in TCP</h2>
+<ul>
+<li>TIME_WAIT:	 2*MSL</li>
+<li>Persistence timer (to send window probe packet after zero-window)</li>
+<li>RTO (for retransmission)</li>
+<li>keep-alive timer: probe the other side if connection has been idle for “too long”.</li>
+</ul>
+<p>Remember, timer in linux will cause soft irq, so it will take CPU resources.</p>
+<br>
+<br>
+<h1 id="congestion-avoidance-alogrithms">Congestion avoidance alogrithms</h1>
+<p>There are several TCP congestion control algorithms, they are loaded as modules and <code>/proc/sys/net/ipv4/tcp_available_congestion_control</code> will list the currently loaded modules.</p>
+<h2 id="cubic">CUBIC</h2>
+<p>Cubic is a network congestion avoidance algorithm for TCP, used by default in Linux kernels 2.6.19 and above starting in 2006.</p>
+<p>CUBIC increases its window to be real-time dependent, not RTT dependent like BIC. The calculation for cwnd (congestion window) is simpler than BIC, too.</p>
+<p><img src="images/2022-03-07-18-56-17.png" alt=""></p>
+<p>basic idea: after a congestion, large increments at first (cubic increase), which decrease around the window size that caused the last congestion (around middle, recorded when congestion last happened), and then continue to increase with large increments.</p>
+<h2 id="bbr">BBR</h2>
+<p>developed in google in 2016. While most CCAs are loss-based, in that they rely on packet loss to detect congestion and lower rates of transmission, BBR uses the maximum bandwidth and round-trip time at which the network delivered the most recent flight of outbound data packets to build a model of the network.</p>
+<p>BBR has been available for Linux TCP since Linux 4.9</p>
+<p>BBR can provide dramatically better performance on some network paths, while hurting performance on others. BBRv2 is currently in development and promises to fix some of the deficiencies of v1.</p>
+<h2 id="dctcp">DCTCP</h2>
+<p>DataCenter TCP relies on switches configured to emit Explicit Congestion Notification (ECN) marks at a very shallow queue occupancy to rapidly ramp up to the available bandwidth (RFC 8257). This makes DCTCP unsuitable for deployment across the Internet, but in a controlled environment it can improve performance significantly.</p>
+<br>
+<br>
+<p><strong>ip link</strong></p>
+<pre><code><code><div>bash
+#ip link
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 9000 qdisc pfifo_fast state UP qlen 1000
+    link/ether 52:54:00:36:b2:d1 brd ff:ff:ff:ff:ff:ff
+</div></code></code></pre>
+<ul>
+<li>qlen: The transmit queue length value determines the number of packets that can be queued before being transmitted. The default value of 1000 is usually adequate. But you can set it with <code>ip link set dev em1 txqueuelen 2000</code></li>
+<li>mtu: mtu can be checked here.</li>
+</ul>
+<br>
+<br>
+<h1 id="user-space-tcp-stack">User-space TCP stack</h1>
+<p>In general terms, you speak with a NIC using ring buffers in host RAM - the RX, TX, and event/completion queues.</p>
+<ul>
+<li>To send you prepare a TX buffer, post a TX descriptor to the TX queue that points at this buffer, and then poke (door-bell) the NIC over PCIe.  Now the NIC owns the TX buffer and you’re not allowed to write to it.  After this NIC has finished sending that packet it posts a completion message in the event/completion queue.  Now you own the TX buffer again and you can use it for another send.</li>
+<li>RX works about the same but in reverse, where the NIC is giving you (full) RX buffers that you own until you give them back.</li>
+</ul>
+<h2 id="solarflare">Solarflare</h2>
+<p>Solarflare OpenOnload’s <em>ef_vi</em></p>
+<ul>
+<li><em>ef_vi</em> is an OSI level 2 interface that sends and receives raw Ethernet frames.</li>
+<li><em>ef_vi</em> supports a zero‐copy interface because the user process has direct access to memory buffers used by the hardware to receive and transmit data.</li>
+</ul>
+<p>Solarflare provides three ways to use their stack: Onload, TCPDirect, <em>ef_vi</em></p>
+<ul>
+<li>TCPDirect is 200ns better than onload</li>
+<li><em>ef_vi</em> is 50ns better than TCPDirect</li>
+</ul>
+<p><img src="images/2022-03-08-20-37-41.png" alt=""></p>
+<h2 id="mellanox">Mellanox</h2>
+<p>Mellanox OFED ibverbs</p>
+<br>
+<br>
+<h1 id="ip">IP</h1>
+<p><strong>&quot;Classful&quot; Addressing Class</strong>: At the beginning of TCP/IP, The IP address space was split into classes in a way that looking at only the first few bits of any IP address would tell the router where to “draw the line” between the network ID and host ID.</p>
+<p><img src="images/2022-03-12-11-34-56.png" alt=""></p>
+<p>在 IP 地址中，有两个 IP 是特殊的，分别是host ID全为 1 和 全为 0 地址。</p>
+<ul>
+<li>host ID全为 1 指定某个网络下的所有主机，用于广播</li>
+<li>host ID全为 0 指定某个网络</li>
+</ul>
+<p>从 224.0.0.0 ~ 239.255.255.255 都是multicast的可用范围，其划分为以下三类：</p>
+<ul>
+<li>224.0.0.0 ~ 224.0.0.255 为预留的组播地址，只能在局域网中，路由器是不会进行转发的。</li>
+<li>224.0.1.0 ~ 238.255.255.255 为用户可用的组播地址，可以用于 Internet 上。</li>
+<li>239.0.0.0 ~ 239.255.255.255 为本地管理组播地址，可供内部网在内部使用，仅在特定的本地范围内有效。</li>
+</ul>
+<p><strong>CIDR</strong>: Classless Inter-Domain Routing</p>
+<p>In CIDR, the length of the prefix (network ID) is indicated by placing it following a slash after the address. This is called <em>CIDR notation</em> or <em>slash notation</em>.</p>
+<p>For example, 184.13.152.0/22. The “22” means this network has 22 bits for the network ID and 10 bits for the host ID. This is equivalent to specifying a network with an address of 184.13.152.0 and a subnet mask of 255.255.252.0. This network provides a total of 1,022 hosts (210 minus 2).</p>
+<p><img src="images/2022-03-12-13-09-36.png" alt=""></p>
+<p>Another example: 假设对 C 类地址进行子网划分，网络地址 192.168.1.0，使用子网掩码 255.255.255.192 对其进行子网划分。C 类地址中前 24 位是网络号，最后 8 位是主机号，根据子网掩码可知从 8 位主机号中借用 2 位作为子网号。</p>
+<p><img src="images/2022-03-12-13-14-49.png" alt="">
+<img src="images/2022-03-12-13-15-07.png" alt=""></p>
+<p><strong>NAT</strong></p>
+<p>网络地址转换 NAT （Network Address Translation）在IP数据包通过路由器或防火墙时重写来源IP地址或目的IP地址的技术。简单的来说 NAT 就是同个公司、家庭、教室内的主机对外部通信时，把私有 IP 地址转换成公有 IP 地址。</p>
+<p><img src="images/2022-03-12-22-28-10.png" alt=""></p>
+<p>图中有两个客户端 192.168.1.10 和 192.168.1.11 同时与服务器 183.232.231.172 进行通信，并且这两个客户端的本地端口都是 1025。此时，两个私有 IP 地址都转换 IP 地址为公有地址 120.229.175.121，但是以不同的端口号作为区分。于是，生成一个 NAPT (Network Address Port Translation) 路由器的转换表，令客户端 A、B 能同时与服务器之间进行通信。</p>
+<ul>
+<li>这种转换表在 NAT 路由器上自动生成。例如，在 TCP 的情况下，建立 TCP 连接首次握手时的 SYN 包一经发出，就会生成这个表。而后又随着收到关闭连接时发出 FIN 包的确认应答从表中被删除。</li>
+</ul>
+<p>由于 NAT/NAPT 都依赖于自己的转换表，因此会有以下的问题：</p>
+<ul>
+<li>外部无法主动与 NAT 内部服务器建立连接，因为 NAPT 转换表没有转换记录。</li>
+<li>转换表的生成与转换操作都会产生性能开销。</li>
+<li>通信过程中，如果 NAT 路由器重启了，所有的 TCP 连接都将被重置。</li>
+</ul>
+<h2 id="arp">ARP</h2>
+<p>The resolution process that TCP/IP networking (with IPv4) uses to resolve an IP address to a MAC address is called the <em>Address Resolution Protocol (ARP)</em>, which is defined in RFC 826. It is part of IP protocol.</p>
+<p>The ARP process begins when one computer wishes to communicate with another.</p>
+<ul>
+<li>The transmitting computer first checks its ARP cache to see whether it already has the MAC address associated with the IP address of the destination computer.</li>
+<li>If it does not, it sends an <em>ARP request</em> to the data link layer broadcast address ff:ff:ff:ff:ff:ff. The
+packet basically asks, “what is the MAC address of this IP address a.b.c.d? Will whoever has this IP address please respond with your MAC address?”</li>
+<li>This broadcast packet is received by every computer on that particular Ethernet segment. Devices without the destination computer’s IP address simply discard this ARP request, while the destination machine replies to the packet with its MAC address via an <em>ARP reply</em>.</li>
+<li>At this point, the original transmitting computer now has the data link layer addressing information it needs to communicate with the remote computer, and it stores that information in its ARP cache for fast retrieval.
+<ul>
+<li>An ARP cache size is limited by design, and addresses tend to stay in the cache for only a few minutes. It is purged regularly to free up space. This design is also intended for privacy and security.</li>
+</ul>
+</li>
+</ul>
+<p>在 Linux 系统中，我们可以使用 arp -a 命令来查看 ARP 缓存的内容。</p>
+<p><img src="images/2022-03-13-10-51-05.png" alt=""></p>
+<p><strong>ARP in IPv6</strong></p>
+<p>IPv6 doesn’t support broadcast traffic because broadcast is viewed as an inefficient
+mechanism for transmission. Because there is no broadcast, ARP can’t be
+used for hosts to find each other on a network.</p>
+<p>A new feature called <em>neighbor solicitation</em>, a function of Neighbor Discovery Protocol (NDP), which utilizes ICMPv6 to accomplish this task. ICMPv6 uses multicast. Multicast traffic can be identified quickly because it has its own reserved IP space (ff00::/8).</p>
+<p><strong>RARP</strong></p>
+<p>ARP 协议是已知 IP 地址求 MAC 地址，那 RARP 协议正好相反，它是已知 MAC 地址求 IP 地址。例如将打印机服务器等小型嵌入式设备接入到网络时就经常会用得到。</p>
+<p>通常这需要架设一台 RARP 服务器</p>
+<ul>
+<li>新设备会发送一条「我的 MAC 地址是XXXX，请告诉我，我的IP地址应该是什么」的请求信息。</li>
+<li>RARP 服务器接到这个消息后返回「MAC地址为 XXXX 的设备，IP地址为 XXXX」的信息给这个设备。</li>
+<li>最后，新设备就根据从 RARP 服务器所收到的应答信息设置自己的 IP 地址。</li>
+</ul>
+<h2 id="icmp">ICMP</h2>
+<p>ICMP （Internet Control Message Protocol）is a supporting protocol in the IP protocol suite. It is defined in RFC 792. Two main purposes of ICMP:</p>
+<ul>
+<li>Error reporting when data can't reach the destination. For example, if a packet of data is too large for a router, the router will drop the packet and send an ICMP message back to the original source for the data.</li>
+<li>Perform network diagnostics.
+<ul>
+<li><code>traceroute</code> is implemented by transmitting IP datagrams (UDP packet) with specially set IP TTL header fields, and looking for ICMP time exceeded in transit and Destination unreachable messages generated in response. <code>traceroute</code> also reports the time required for each hop along the way.</li>
+<li>ping is a simplified version of <code>traceroute</code> (ping is used to check for packet loss and delay within a network, but it does not provide data about routing or hops). Ping is implemented using the ICMP <em>echo request</em> and <em>echo reply</em> messages.</li>
+</ul>
+</li>
+</ul>
+<p>ICMP is not a transport-layer protocol, it is connectionless protocol, it doesn't bind to port either.</p>
+<p>The ICMP header starts after the IPv4 header and is identified by IP protocol number '1'.</p>
+<p><img src="images/2022-03-13-00-08-04.png" alt=""></p>
+<ul>
+<li>Type: 1 byte</li>
+<li>Code: 1 byte (sub-type)</li>
+<li>Checksum: 2 byte, calculated from the ICMP header and data with value 0 substituted for this field.</li>
+<li>Rest of header: Four-byte field, contents vary based on the ICMP type and code.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 – Echo Reply</td>
+<td>0</td>
+<td>Echo reply (used by ping)</td>
+</tr>
+<tr>
+<td>3 – Destination Unreachable</td>
+<td>0 <br> 1 <br> 2 <br> 3 <br> 4 <br>...</td>
+<td>Destination network unreachable <br> Destination host unreachable <br> Destination protocol unreachable <br> Destination port unreachable <br> Fragmentation required, but DF (Don't Frag) flag set <br>...</td>
+</tr>
+<tr>
+<td>5 – Redirect Message</td>
+<td>0 <br> 1 <br> ...</td>
+<td>Redirect Datagram for the Network <br> Redirect Datagram for the Host <br> ..</td>
+</tr>
+<tr>
+<td>8 – Echo Request</td>
+<td>0</td>
+<td>Echo request (used by ping)</td>
+</tr>
+<tr>
+<td>9 – Router Advertisement</td>
+<td>0</td>
+<td>Router Advertisement</td>
+</tr>
+<tr>
+<td>11 – Time Exceeded</td>
+<td>0 <br> 1</td>
+<td>TTL expired in transit <br>		Fragment reassembly time exceeded</td>
+</tr>
+<tr>
+<td>13 – Timestamp</td>
+<td>0</td>
+<td>Timestamp is used for time synchronization.</td>
+</tr>
+<tr>
+<td>14 – Timestamp Reply</td>
+<td>0</td>
+<td>Timestamp Reply replies to a Timestamp message.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>For a full list of available ICMP types and codes, see <a href="http://www.iana.org/assignments/icmp-parameters/">http://www.iana.org/assignments/icmp-parameters/</a>.</p>
+</blockquote>
+<h3 id="how-traceroute-works">How traceroute works</h3>
+<ol>
+<li>
+<p>作用1：故意设置特殊的 TTL，来追踪去往目的地时沿途经过的路由器。利用 IP 包的TTL 从 1 开始按照顺序递增的同时发送 UDP 包，强制接收 ICMP 超时消息。</p>
+<ul>
+<li>将 TTL 设置 为 1，则遇到第一个路由器，就牺牲了，接着返回 ICMP 差错报文网络包，类型是<strong>时间超时</strong>。</li>
+<li>接下来将 TTL 设置为 2，第一个路由器过了，遇到第二个路由器也牺牲了，也同时返回了 ICMP 差错报文数据包，如此往复，直到到达目的主机。</li>
+<li>如果判断 UDP 包到达了目的主机？traceroute 在发送 UDP 包时，会填入一个不可能的端口号值作为 UDP 目标端口号（大于 3000 ）。当目的主机，收到 UDP 包后，会返回 ICMP 差错报文消息，但这个差错报文消息的类型是<strong>端口不可达</strong>。所以，当差错报文类型是端口不可达时，说明发送方发出的 UDP 包到达了目的主机。</li>
+</ul>
+</li>
+<li>
+<p>作用2：故意设置不分片，从而确定路径的 MTU。</p>
+<ul>
+<li>首先在发送端主机发送 IP 数据报时，将 IP 包首部的分片禁止标志（DF Flag）位设置为 1。根据这个标志位，途中的路由器不会对大数据包进行分片，而是将包丢弃。</li>
+<li>随后，通过一个Destination Unreachable type的ICMP msg将数据链路上 MTU 的值一起给发送主机，Destination Unreachable的code为 4 - Fragmentation required, but DF (Don't Frag) flag set。</li>
+<li>发送主机端每次收到 ICMP 差错报文时就减少包的大小，以此来定位一个合适的 MTU 值，以便能到达目标主机。</li>
+</ul>
+</li>
+</ol>
+<p><strong>ICMP flood attack</strong></p>
+<p>A ping flood or ICMP flood is when the attacker attempts to overwhelm a targeted device with ICMP echo-request packets. The target has to process and respond to each packet, consuming its computing resources until legitimate users cannot receive service.</p>
+<p><strong>Ping of death attack</strong></p>
+<p>A ping of death attack is when the attacker sends a ping larger than the maximum allowable size for a packet to a targeted machine, causing the machine to freeze or crash. The packet gets fragmented on the way to its target, but when the target reassembles the packet into its original maximum-exceeding size, the size of the packet causes a buffer overflow.</p>
+<p>The ping of death attack is largely historical at this point. However, older networking equipment could still be susceptible to it.</p>
+<p><strong>Smurf attack</strong></p>
+<p>In a Smurf attack, the attacker sends an ICMP packet with a spoofed source IP address. Networking equipment replies to the packet, sending the replies to the spoofed IP and flooding the victim with unwanted ICMP packets. Like the 'ping of death,' today the Smurf attack is only possible with legacy equipment.</p>
+<h2 id="igmp">IGMP</h2>
+<p>IGMP (Internet Group Management Protocol) is a network layer IP protocol used by hosts and adjacent routers on IPv4 networks to establish multicast group memberships. Specifically, IGMP allows devices to join and leave a multicasting group.</p>
+<p>A host requests membership to a group through its local router while a router listens for these requests and periodically sends out subscription queries. A single router per subnet is elected to perform this querying function.</p>
+<p>Three versions of IGMP are backwards compatible.</p>
+<p>The ICMP msg starts after the IPv4 header and is identified by IP protocol number '2'. It usually carries TTL=1 so that it is only used in local network.</p>
+<p><img src="images/2022-03-13-00-34-56.png" alt=""></p>
+<ul>
+<li>Type: Indicates the message type as follows
+<ul>
+<li>0x11: Membership Query</li>
+<li>0x12: IGMPv1 Membership Report</li>
+<li>0x16: IGMPv2 Membership Report</li>
+<li>0x22: IGMPv3 Membership Report</li>
+<li>0x17: Leave Group</li>
+</ul>
+</li>
+<li>Max Resp Time: Specifies the required responsiveness of replies to a Membership Query (0x11). Only used in this msg type, in unit of 0.1 sec.</li>
+</ul>
+<p>ICMP is sent to following IP destination addresses:</p>
+<ul>
+<li>General Query:	All hosts (<code>224.0.0.1</code>)</li>
+<li>Group-Specific Query:	The group being queried</li>
+<li>Membership Report (all IGMP versions):	The group being reported</li>
+<li>Leave Group	All routers (<code>224.0.0.2</code>)</li>
+</ul>
+<p>常规查询与响应工作机制</p>
+<ol>
+<li>路由器会周期性发送目的地址为 <code>224.0.0.1</code>（表示同一网段内所有主机和路由器） IGMP 常规查询报文。</li>
+<li>主机1 和 主机 3 收到这个查询，随后会启动「报告延迟计时器」，计时器的时间是随机的，通常是 0~10 秒，计时器超时后主机就会发送 IGMP 成员关系报告报文（源 IP 地址为自己主机的 IP 地址，目的 IP 地址为组播地址）。如果在定时器超时之前，收到同一个组内的其他主机发送的成员关系报告报文，则自己不再发送，这样可以减少网络中多余的 IGMP 报文数量。</li>
+<li>路由器收到主机的成员关系报文后，就会在 IGMP 路由表中加入该组播组，后续网络中一旦该组播地址的数据到达路由器，它会把数据包转发出去。</li>
+</ol>
+<p>离开组播组工作机制</p>
+<ol>
+<li>主机 1 要离开组 224.1.1.1，发送 IGMPv2 离组报文，报文的目的地址是 224.0.0.2（表示发向网段内的所有路由器）</li>
+<li>路由器 收到该报文后，以 1 秒为间隔连续发送 IGMP 特定组查询报文（共计发送 2 个），以便确认该网络是否还有 224.1.1.1 组的其他成员。</li>
+<li>如果有主机仍然是组 224.1.1.1 的成员，它会立即响应这个特定组查询。路由器知道该网络中仍然存在该组播组的成员，于是继续向该网络转发 224.1.1.1 的组播数据包。</li>
+<li>如果此时在该网段内，组 224.1.1.1 已经没有其他成员了，因此没有主机响应这个查询。一定时间后，路由器认为该网段中已经没有 224.1.1.1 组播组成员了，将不会再向这个网段转发该组播地址的数据包。</li>
+</ol>
+<h2 id="quic-and-http3">QUIC and HTTP/3</h2>
+<p>QUIC is a network protocol designed by Jim Roskind at Google as a higher-performing, lowerlatency
+alternative to TCP, optimized for HTTP and TLS [Roskind 12]. QUIC is built upon UDP,
+and provides several features on top of it, including:</p>
+<ul>
+<li>The ability to multiplex several application-defined streams on top of the same “connection.”</li>
+<li>A TCP-like reliable in-order stream transport that can be optionally turned off for individual substreams.</li>
+<li>Connection resumption when a client changes its network address, based on cryptographic authentication of connection IDs.</li>
+<li>Full encryption of the payload data, including QUIC headers.</li>
+<li>0-RTT connection handshakes including cryptography (for peers that have previously communicated).</li>
+</ul>
+<p>QUIC is in heavy use by the Chrome web browser.</p>
+<p>While QUIC was initially developed by Google, the Internet Engineering Task Force (IETF) is in
+the process of standardizing both the QUIC transport itself, and the specific configuration of
+using HTTP over QUIC (the latter combination is named HTTP/3).</p>
+<br>
+<h1 id="upper-layer-protocols">Upper layer protocols</h1>
+<h3 id="dns">DNS</h3>
+<p>The Domain Name System (DNS) protocol (an level-7 application layer protocol) is an important part of the web's infrastructure, serving as the Internet's phone book: every time you visit a website, your computer performs a DNS lookup. DNS translates domain names to IP addresses so browsers can load Internet resources.</p>
+<h3 id="dhcp">DHCP</h3>
+<p>DHCP is an application-layer protocol to allow a device to automatically obtain an IP address (and addresses of other important network assets, such as DNS servers and routers). DHCP relies on UDP as its transport layer protocol.</p>
+<p>The primary goal of DHCP is to assign addresses to clients during the initialization
+process. The renewal process takes place between a single client
+and a DHCP server, The DHCP initialization process is often referred to as the DORA process
+because it uses four types of DHCP packets: discover, offer, request, and
+acknowledgment.</p>
+<p><img src="images/2022-03-13-22-15-19.png" alt=""></p>
+<ol>
+<li>The Discover packet: the first packet is sent from 0.0.0.0 (as we dont have a IP yet) on port 68 (fixed port) to 255.255.255.255 (broadcast address to ensure the packet is sent to every node in the network) on port 67 (fixed port) from client.  this first packet is sent in an attempt to find a DHCP server that will listen.</li>
+<li>The offer packet is sent by the DHCP server in order to offer its services
+to the client. It does so by supplying information about itself and the addressing
+it wants to provide the client (also with the lease time length, such as 10 min).
+<ul>
+<li>The client doesn’t actually have the offered address yet (even though the offer packet's IP header is set with the new IP), the DHCP server will first attempt to communicate with the client using its
+hardware address, as provided by ARP. If communication isn’t possible,
+the server will simply broadcast the offer to communicate.</li>
+</ul>
+</li>
+<li>The request packet: Once the client receives an offer from the DHCP server, it should accept it
+with a DHCP request packet</li>
+<li>The Acknowledgment Packet: as the final step, the DHCP server sends the requested IP
+addresses to the client in an acknowledgment packet and records that information in itself. The client now has an IP address and can use it to begin communicating on the network.</li>
+</ol>
+<p>In the case of a lease renewal, only the request and acknowledgment steps are needed.</p>
+<p>因为路由器不会转发广播包，就出现了 <strong>DHCP 中继代理</strong> （通常是路由器实现这个功能）。有了 DHCP 中继代理以后，对不同网段的 IP 地址分配也可以由一个 DHCP 服务器统一进行管理。DHCP 客户端会向 DHCP 中继代理发送 DHCP 请求包，而 DHCP 中继代理在收到这个广播包以后，再以单播的形式发给 DHCP 服务器。</p>
+<br>
+<br>
+<h1 id="ipv6">IPv6</h1>
+<p>IPv6 地址长度是 128 位，是以每 16 位作为一组，每组用冒号 「:」 隔开。</p>
+<p>如果出现连续的 0 时还可以将这些 0 省略，并用两个冒号 「::」隔开。但是，一个 IP 地址中只允许出现一次两个连续的冒号。</p>
+<p>IPv6 的地址主要有以下类型地址：</p>
+<ul>
+<li>单播地址，用于一对一的通信<br>
+对于一对一通信的 IPv6 地址，主要划分了三类单播地址，每类地址的有效范围都不同。
+<ul>
+<li>在同一链路单播通信，不经过路由器，可以使用链路本地单播地址，IPv4 没有此类型</li>
+<li>在内网里单播通信，可以使用唯一本地地址，相当于 IPv4 的私有 IP</li>
+<li>在互联网通信，可以使用全局单播地址，相当于 IPv4 的公有 IP</li>
+</ul>
+</li>
+<li>组播地址，用于一对多的通信</li>
+<li>任播地址，用于通信最近的节点，最近的节点是由路由协议决定</li>
+<li>没有广播地址</li>
+</ul>
+<p><img src="images/2022-03-12-13-39-10.png" alt=""></p>
+<p><strong>IPv6 Header</strong></p>
+<p>IPv6 包头包首部长度采用固定的值 40 字节，去掉了包头校验和，简化了首部结构，减轻了路由器负荷，大大提高了传输的性能。</p>
+<p><img src="images/2022-03-12-13-35-34.png" alt=""></p>
+<p>IPv6 相比 IPv4 的首部改进：</p>
+<ul>
+<li>取消了首部校验和字段。 因为在数据链路层和传输层都会校验，因此 IPv6 直接取消了 IP 的校验。</li>
+<li>取消了分片/重新组装相关字段。 分片与重组是耗时的过程，IPv6 不允许在中间路由器进行分片与重组，这种操作只能在源与目标主机，这将大大提高了路由器转发的速度。</li>
+<li>取消选项字段。 选项字段不再是标准 IP 首部的一部分了，但它并没有消失，而是可能出现在 IPv6 首部中的「下一个首部」指出的位置上。删除该选项字段使的 IPv6 的首部成为固定长度的 40 字节。</li>
+</ul>
+<br>
+<br>
+        <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+        
+    </body>
+    </html>

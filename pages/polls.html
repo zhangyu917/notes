@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Linux netowrk internals and poll implementations</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{text-rendering:auto;font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.13.24"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+#button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <!-- title: Linux netowrk internals and poll implementations -->
+<p><a href="#" class="to-top">➤</i></a></p>
+<ul>
+<li><a href="#socket-kernel-internal">Socket Kernel Internal</a>
+<ul>
+<li><a href="#socket-read-internal">Socket Read Internal</a>
+<ul>
+<li><a href="#udp-recvfrom-system-call">UDP <code>recvfrom()</code> system call</a></li>
+<li><a href="#tcp-recv-system-call">TCP <code>recv()</code> system call</a></li>
+<li><a href="#network-data-arriving">Network data arriving</a></li>
+<li><a href="#how-skb-and-rx-ringbuffer-works-together">How skb and RX ringbuffer works together</a></li>
+</ul>
+</li>
+<li><a href="#socket-send-internal">Socket Send Internal</a></li>
+<li><a href="#socket-connect-internal">Socket Connect Internal</a></li>
+<li><a href="#socket-listen-internal">Socket listen internal</a></li>
+</ul>
+</li>
+<li><a href="#iptables">Iptables</a></li>
+<li><a href="#routing-tables">routing tables</a></li>
+<li><a href="#epoll">Epoll</a>
+<ul>
+<li><a href="#epoll-vs-select">Epoll vs select</a></li>
+<li><a href="#epoll-implementation">Epoll Implementation</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="socket-kernel-internal">Socket Kernel Internal</h1>
+<p><img src="images/2022-03-15-09-22-40.png" alt=""></p>
+<p><img src="images/2022-03-14-12-59-57.png" alt=""></p>
+<p><code>struct socket</code>中的<code>const struct proto_ops*</code>对应的是协议的方法集合。每个协议都会实现不同的方法集，对于IPv4 Internet协议族来说,每种协议都有对应的处理方法，如下。对于udp来说，是通过<code>inet_dgram_ops</code>来定义的，其中注册了<code>inet_recvmsg</code>方法。</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/ipv4/af_inet.c</span>
+<span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">proto_ops</span> <span class="hljs-title">inet_stream_ops</span> =</span> {
+    ......
+    .recvmsg       = inet_recvmsg,
+    .mmap          = sock_no_mmap,
+    ......
+}
+
+<span class="hljs-keyword">const</span> struct proto_ops inet_dgram_ops = {
+    ......
+    .sendmsg       = inet_sendmsg,
+    .recvmsg       = inet_recvmsg,
+    ......
+}
+</div></code></pre>
+<p><code>struct socket</code>中的另一个数据结构<code>struct sock *sk</code>是一个非常大，非常重要的子结构体。其中的<code>sk_prot</code>又定义了二级处理函数。对于UDP协议来说，会被设置成UDP协议实现的方法集<code>udp_prot</code>。</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/ipv4/udp.c</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">proto</span> <span class="hljs-title">udp_prot</span> =</span> {
+    .name          = <span class="hljs-string">&quot;UDP&quot;</span>,
+    .owner         = THIS_MODULE,
+    .close         = udp_lib_close,
+    .connect       = ip4_datagram_connect,
+    ......
+    .sendmsg       = udp_sendmsg,
+    .recvmsg       = udp_recvmsg,
+    .sendpage      = udp_sendpage,
+    ......
+}
+</div></code></pre>
+<p><code>struct socket</code> 对象中有一个重要的成员 - <code>file</code> 内核对象指针。这个指针初始化的时候是空的。在 <code>accept()</code> 方法里会调用 <code>sock_alloc_file()</code> 来申请内存并初始化。</p>
+<br>
+<br>
+<h2 id="socket-read-internal">Socket Read Internal</h2>
+<hr>
+<p>Reference:</p>
+<ul>
+<li><a href="https://mp.weixin.qq.com/s/GoYDsfy9m0wRoXi_NCfCmg">https://mp.weixin.qq.com/s/GoYDsfy9m0wRoXi_NCfCmg</a></li>
+<li><a href="https://blog.packagecloud.io/monitoring-tuning-linux-networking-stack-receiving-data/">https://blog.packagecloud.io/monitoring-tuning-linux-networking-stack-receiving-data/</a></li>
+<li><a href="https://blog.packagecloud.io/illustrated-guide-monitoring-tuning-linux-networking-stack-receiving-data/">https://blog.packagecloud.io/illustrated-guide-monitoring-tuning-linux-networking-stack-receiving-data/</a></li>
+<li><a href="https://blog.packagecloud.io/monitoring-tuning-linux-networking-stack-sending-data/">https://blog.packagecloud.io/monitoring-tuning-linux-networking-stack-sending-data/</a></li>
+<li><a href="https://github.com/leandromoreira/linux-network-performance-parameters">https://github.com/leandromoreira/linux-network-performance-parameters</a></li>
+</ul>
+<h3 id="udp-recvfrom-system-call">UDP <code>recvfrom()</code> system call</h3>
+<p><code>recvfrom()</code>是一个glibc的库函数，该函数在执行后会将用户进行陷入到内核态，进入到Linux实现的系统调用<code>sys_recvfrom()</code>。sys_revvfrom的实现过程如下：</p>
+<p><img src="images/2022-03-14-13-02-48.png" alt=""></p>
+<p>在inet_recvmsg调用了sk-&gt;sk_prot-&gt;recvmsg。</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/ipv4/af_inet.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">inet_recvmsg</span><span class="hljs-params">(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,<span class="hljs-keyword">size_t</span> size, <span class="hljs-keyword">int</span> flags)</span></span>{  
+    ......
+    <span class="hljs-comment">// 对于udp协议的socket来说，这个sk_prot就是net/ipv4/udp.c下的struct proto udp_prot。由此我们找到了udp_recvmsg方法。</span>
+    err = sk-&gt;sk_prot-&gt;<span class="hljs-built_in">recvmsg</span>(iocb, sk, msg, size, flags &amp; MSG_DONTWAIT,
+                   flags &amp; ~MSG_DONTWAIT, &amp;addr_len);
+    <span class="hljs-keyword">if</span> (err &gt;= <span class="hljs-number">0</span>)
+        msg-&gt;msg_namelen = addr_len;
+    <span class="hljs-keyword">return</span> err;
+}
+
+<span class="hljs-comment">//file:net/core/datagram.c:</span>
+<span class="hljs-built_in">EXPORT_SYMBOL</span>(__skb_recv_datagram);
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sk_buff</span> *__<span class="hljs-title">skb_recv_datagram</span>(<span class="hljs-keyword">struct</span> <span class="hljs-title">sock</span> *<span class="hljs-title">sk</span>, <span class="hljs-title">unsigned</span> <span class="hljs-title">int</span> <span class="hljs-title">flags</span>,<span class="hljs-title">int</span> *<span class="hljs-title">peeked</span>, <span class="hljs-title">int</span> *<span class="hljs-title">off</span>, <span class="hljs-title">int</span> *<span class="hljs-title">err</span>){</span>
+    ......
+    <span class="hljs-comment">// 读取过程，就是访问sk-&gt;sk_receive_queue。如果没有数据，且用户也允许等待，则将调用wait_for_more_packets()执行等待操作，它加入会让用户进程进入睡眠状态。</span>
+    <span class="hljs-keyword">do</span> {
+        <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sk_buff_head</span> *<span class="hljs-title">queue</span> =</span> &amp;sk-&gt;sk_receive_queue;
+        <span class="hljs-built_in">skb_queue_walk</span>(queue, skb) {
+            ......
+        }
+
+        <span class="hljs-comment">/* User doesn&#x27;t want to wait */</span>
+        error = -EAGAIN;
+        <span class="hljs-keyword">if</span> (!timeo)
+            <span class="hljs-keyword">goto</span> no_packet;
+    } <span class="hljs-keyword">while</span> (!<span class="hljs-built_in">wait_for_more_packets</span>(sk, err, &amp;timeo, last));
+}
+</div></code></pre>
+<h3 id="tcp-recv-system-call">TCP <code>recv()</code> system call</h3>
+<p>Refer to： <a href="https://mp.weixin.qq.com/s/cIcw0S-Q8pBl1-WYN0UwnA">https://mp.weixin.qq.com/s/cIcw0S-Q8pBl1-WYN0UwnA</a></p>
+<p><img src="images/2022-03-17-14-24-34.png" alt=""></p>
+<ol>
+<li><code>recv()</code> system call.</li>
+<li><code>socket-&gt;ops-&gt;recvmsg</code> function pointer points to <code>inet_recvmsg</code> (defined in <code>net/ipv4/af_inet.c</code>).</li>
+<li><code>sock-&gt;sk_prot-&gt;recvmsg</code> points to <code>tcp_recvmsg</code> (defined in <code>net/ipv4/tcp.c</code>).</li>
+<li>Inside <code>tcp_recvmsg()</code>, <code>skb_queue_walk()</code> loops the socket recv queue</li>
+<li>如果没有收到数据，或者收到不足够多，则调用 <code>sk_wait_data()</code> 把当前进程阻塞掉。</li>
+<li>最后再调用 <code>sk_wait_event()</code> 让出 CPU，进程将进入睡眠状态，这会导致一次进程上下文的开销。</li>
+</ol>
+<p>Details steps of step 5: 再来详细看下 <code>sk_wait_data()</code> 是怎么把当前进程给阻塞掉的。</p>
+<p><img src="images/2022-03-17-14-34-33.png" alt=""></p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/core/sock.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">sk_wait_data</span><span class="hljs-params">(struct sock *sk, <span class="hljs-keyword">long</span> *timeo)</span>
+</span>{
+   <span class="hljs-comment">//当前进程(current)关联到所定义的等待队列项上</span>
+   <span class="hljs-built_in">DEFINE_WAIT</span>(wait);
+
+   <span class="hljs-comment">// 调用 sk_sleep 获取 sock 对象下的 wait</span>
+   <span class="hljs-comment">// 并准备挂起，将进程状态设置为可打断 INTERRUPTIBLE</span>
+   <span class="hljs-built_in">prepare_to_wait</span>(<span class="hljs-built_in">sk_sleep</span>(sk), &amp;wait, TASK_INTERRUPTIBLE);
+   <span class="hljs-built_in">set_bit</span>(SOCK_ASYNC_WAITDATA, &amp;sk-&gt;sk_socket-&gt;flags);
+
+   <span class="hljs-comment">// 通过调用schedule_timeout让出CPU，然后进行睡眠</span>
+   rc = <span class="hljs-built_in">sk_wait_event</span>(sk, timeo, !<span class="hljs-built_in">skb_queue_empty</span>(&amp;sk-&gt;sk_receive_queue));
+...
+</div></code></pre>
+<ul>
+<li>5.1. 首先在 <code>DEFINE_WAIT</code> 宏下，定义了一个等待队列项 <code>wait</code>。在这个新的等待队列项上，注册了回调函数 <code>autoremove_wake_function</code>，并把当前进程描述符 <code>current</code> 关联到其 <code>.private</code>成员上。</li>
+<li>5.2. 调用 <code>sk_sleep</code> 获取 sock 对象的等待队列列表头 <code>sock.socket_wq</code> (of type <code>wait_queue_head_t*</code>)</li>
+<li>5.3. 调用 <code>prepare_to_wait</code> 来把新定义的等待队列项 <code>wait</code> 插入到 <code>sock.socket_wq</code>.</li>
+</ul>
+<p>这样后面当内核收完数据产生就绪时间的时候，就可以查找 socket 等待队列上的等待项，进而就可以找到回调函数和在等待该 socket 就绪事件的进程了。</p>
+<p>Refer to <a href="#tcp_v4_rcv">this section</a> for how softirq delivers the packet to socket recv queue and wake up the process for receiving.</p>
+<h3 id="network-data-arriving">Network data arriving</h3>
+<p>为了解决频繁中断带来的性能开销，Linux 内核在 2.6 版本中引入了<strong>NAPI 机制</strong>，它是混合「中断和轮询」的方式来接收网络包，它的核心概念就是不采用中断的方式读取数据，而是首先采用中断唤醒数据接收的服务程序，然后 poll 的方法来轮询数据。The design of NAPI allows the driver to go into a polling mode instead of being hard-interrupted for every required packet receive.</p>
+<p>In summary:</p>
+<ol>
+<li>Packets arrive at the NIC, NIC will verify MAC (if not on promiscuous mode) and FCS and decide to drop or to continue.</li>
+<li>NIC will DMA packets at RAM, in a region previously prepared (mapped) by the driver.</li>
+<li>NIC will enqueue references to the packets at receive ring buffer queue rx</li>
+<li>NIC will raise a hard IRQ</li>
+<li>CPU响应中断请求 and run the IRQ handler. IRQ handler (which is driver's code) will 用<code>netif_rx_schedule</code>注册 poll, clear the hard IRQ, and raise a soft IRQ (<code>NET_RX_SOFTIRQ</code>)</li>
+<li>软中断(直接被硬中断调用or from ksoftirqd)开始调用驱动的poll函数收包</li>
+<li>poll函数从Ring Buffer中拷贝数据到内核 <code>struct sk_buff</code> 缓冲区中，从而可以作为一个网络包交给网络协议栈进行逐层处理。收到的包送到协议栈注册的<code>ip_rcv</code>函数中</li>
+<li><code>ip_rcv</code>函数再讲包送到<code>udp_rcv</code>函数中（对于tcp包就送到<code>tcp_rcv</code>）</li>
+<li>软中断轮询处理数据，直到没有新数据时才恢复中断，这样一次中断处理多个网络包
+<br>below parameters determins how long NAPI polling runs, NAPI Polling ends after <code>netdev_budget_usecs</code> have elapsed or <code>netdev_budget</code> has been reached.
+<ul>
+<li><code>net.core.netdev_budget</code>: Maximum number of packets received in one NAPI polling cycle, total for all interfaces/CPUs.</li>
+<li><code>net.core.netdev_budget_usecs</code>: Time in microseconds of one NAPI polling cycle.</li>
+</ul>
+</li>
+</ol>
+<p><img src="images/2022-03-14-11-06-55.png" alt=""></p>
+<p><img src="images/2022-03-14-12-58-50.png" alt=""></p>
+<br>
+<p>Before everything starts, the initialization of the softIRQ system is as follows:</p>
+<ul>
+<li>the <code>softnet_data</code> structures are created, one per CPU. These structures hold references to important data structures for processing network data. One we’ll see again is the <code>poll_list</code>. The <code>poll_list</code> is where NAPI poll worker structures will be added by <code>napi_schedule()</code> or other NAPI APIs from device drivers.</li>
+<li><code>net_dev_init</code> then registers the <code>NET_RX_SOFTIRQ</code> softirq with the handler function called <strong><code>net_rx_action</code></strong>. This is the function the softirq kernel threads will execute to process packets.</li>
+</ul>
+<br>
+<ol>
+<li>
+<p>首先当数据帧从网线到达网卡上的时候，第一站是网卡的接收队列。网卡在分配给自己的RingBuffer中寻找可用的内存位置，找到后DMA引擎会把数据DMA到内存里。</p>
+</li>
+<li>
+<p>当DMA操作完成以后，网卡会像CPU发起一个硬中断，通知CPU有数据到达。例子里网卡的硬中断注册的处理函数是igb_msix_ring。Linux在硬中断里只完成简单必要的工作，剩下的大部分的处理都是转交给软中断的。</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: drivers/net/ethernet/intel/igb/igb_main.c</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">irqreturn_t</span> <span class="hljs-title">igb_msix_ring</span><span class="hljs-params">(<span class="hljs-keyword">int</span> irq, <span class="hljs-keyword">void</span> *data)</span></span>{
+
+   <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">igb_q_vector</span> *<span class="hljs-title">q_vector</span> =</span> data;
+   <span class="hljs-comment">//...</span>
+   <span class="hljs-built_in">napi_schedule</span>(&amp;q_vector-&gt;napi);
+   <span class="hljs-keyword">return</span> IRQ_HANDLED;
+}
+
+<span class="hljs-comment">/* Called with irq disabled */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> ____napi_schedule(struct softnet_data *sd,
+                     struct napi_struct *napi){
+   <span class="hljs-comment">// list_add_tail修改了CPU变量softnet_data里的poll_list，将驱动napi_struct传过来的poll_list添加了进来。</span>
+   <span class="hljs-comment">// poll_list是一个双向列表，其中的设备都带有输入帧等着被处理。</span>
+   <span class="hljs-built_in">list_add_tail</span>(&amp;napi-&gt;poll_list, &amp;sd-&gt;poll_list);
+   __raise_softirq_irqoff(NET_RX_SOFTIRQ);
+}
+
+<span class="hljs-comment">//file: include/linux/irq_cpustat.h</span>
+<span class="hljs-keyword">void</span> __raise_softirq_irqoff(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> nr){
+   <span class="hljs-built_in">trace_softirq_raise</span>(nr);
+   <span class="hljs-built_in">or_softirq_pending</span>(<span class="hljs-number">1UL</span> &lt;&lt; nr);
+}
+<span class="hljs-comment">// 写入标记 &quot;NET_RX_SOFTIRQ&quot;</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> or_softirq_pending(x)  (local_softirq_pending() |= (x))</span>
+</div></code></pre>
+</li>
+<li>
+<p>ksoftirqd内核线程处理软中断</p>
+</li>
+</ol>
+<p><img src="images/2022-03-14-11-41-18.png" alt=""></p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">ksoftirqd_should_run</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> cpu)</span></span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">local_softirq_pending</span>();
+}
+<span class="hljs-comment">// 因为硬中断中设置了NET_RX_SOFTIRQ,这里能读取到</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> local_softirq_pending() \    __IRQ_STAT(smp_processor_id(), __softirq_pending)</span>
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run_ksoftirqd</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> cpu)</span></span>{
+    <span class="hljs-built_in">local_irq_disable</span>();
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">local_softirq_pending</span>()) {
+        __do_softirq();
+        <span class="hljs-built_in">rcu_note_context_switch</span>(cpu);
+        <span class="hljs-built_in">local_irq_enable</span>();
+        <span class="hljs-built_in">cond_resched</span>();
+        <span class="hljs-keyword">return</span>;
+    }
+    <span class="hljs-built_in">local_irq_enable</span>();
+}
+
+<span class="hljs-comment">// 在__do_softirq中，判断根据当前CPU的软中断类型，调用其注册的action方法。</span>
+asmlinkage <span class="hljs-keyword">void</span> __do_softirq(<span class="hljs-keyword">void</span>){
+    <span class="hljs-keyword">do</span> {
+        <span class="hljs-keyword">if</span> (pending &amp; <span class="hljs-number">1</span>) {
+            <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> vec_nr = h - softirq_vec;
+            <span class="hljs-keyword">int</span> prev_count = <span class="hljs-built_in">preempt_count</span>();
+            ...
+            <span class="hljs-built_in">trace_softirq_entry</span>(vec_nr);
+            <span class="hljs-comment">// 在网络子系统初始化中， 我们为NET_RX_SOFTIRQ注册了处理函数net_rx_action。所以net_rx_action函数就会被执行到了。</span>
+            h-&gt;<span class="hljs-built_in">action</span>(h);
+            <span class="hljs-built_in">trace_softirq_exit</span>(vec_nr);
+            ...
+        }
+        h++;
+        pending &gt;&gt;= <span class="hljs-number">1</span>;
+    } <span class="hljs-keyword">while</span> (pending);
+}
+
+<span class="hljs-comment">// 核心逻辑是获取到当前CPU变量softnet_data，对其poll_list进行遍历, 然后执行到网卡驱动注册到的poll函数。对于igb网卡来说，就是igb驱动力的igb_poll函数了。</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">net_rx_action</span><span class="hljs-params">(struct softirq_action *h)</span></span>{
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">softnet_data</span> *<span class="hljs-title">sd</span> =</span> &amp;__get_cpu_var(softnet_data);
+    
+    <span class="hljs-comment">// time_limit和budget是用来控制net_rx_action函数主动退出的，目的是保证网络包的接收不霸占CPU不放。</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> time_limit = jiffies + <span class="hljs-number">2</span>;
+    <span class="hljs-keyword">int</span> budget = netdev_budget;
+    <span class="hljs-keyword">void</span> *have;
+
+    <span class="hljs-built_in">local_irq_disable</span>();
+    <span class="hljs-keyword">while</span> (!<span class="hljs-built_in">list_empty</span>(&amp;sd-&gt;poll_list)) {
+        ......
+        n = <span class="hljs-built_in">list_first_entry</span>(&amp;sd-&gt;poll_list, struct napi_struct, poll_list);
+
+        work = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">test_bit</span>(NAPI_STATE_SCHED, &amp;n-&gt;state)) {
+            work = n-&gt;<span class="hljs-built_in">poll</span>(n, weight);
+            <span class="hljs-built_in">trace_napi_poll</span>(n);
+        }
+        budget -= work;
+    }
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">igb_poll</span><span class="hljs-params">(struct napi_struct *napi, <span class="hljs-keyword">int</span> budget)</span></span>{
+    ...
+    <span class="hljs-keyword">if</span> (q_vector-&gt;tx.ring)
+        clean_complete = <span class="hljs-built_in">igb_clean_tx_irq</span>(q_vector);
+
+    <span class="hljs-keyword">if</span> (q_vector-&gt;rx.ring)
+        clean_complete &amp;= <span class="hljs-built_in">igb_clean_rx_irq</span>(q_vector, budget);
+    ...
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">igb_clean_rx_irq</span><span class="hljs-params">(struct igb_q_vector *q_vector, <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> budget)</span></span>{
+    ...
+    <span class="hljs-keyword">do</span> {
+        <span class="hljs-comment">/* retrieve a buffer from the ring */</span>
+        skb = <span class="hljs-built_in">igb_fetch_rx_buffer</span>(rx_ring, rx_desc, skb);
+
+        <span class="hljs-comment">/* fetch next buffer in frame if non-eop */</span>
+        <span class="hljs-comment">// 有可能帧要占多多个RingBuffer，所以是在一个循环中获取的，直到帧尾部。</span>
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">igb_is_non_eop</span>(rx_ring, rx_desc))
+            <span class="hljs-keyword">continue</span>;
+        }
+
+        <span class="hljs-comment">/* verify the packet layout is correct */</span>
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">igb_cleanup_headers</span>(rx_ring, rx_desc, skb)) {
+            skb = <span class="hljs-literal">NULL</span>;
+            <span class="hljs-keyword">continue</span>;
+        }
+
+        <span class="hljs-comment">/* populate checksum, timestamp, VLAN, and protocol */</span>
+        <span class="hljs-built_in">igb_process_skb_fields</span>(rx_ring, rx_desc, skb);
+
+        <span class="hljs-built_in">napi_gro_receive</span>(&amp;q_vector-&gt;napi, skb);
+}
+
+<span class="hljs-comment">//file: net/core/dev.c</span>
+<span class="hljs-comment">/* this deals with possible Generic Receive Offloading.
+* Generic Receive Offloading (GRO) is a software implementation of a hardware optimization that is known as Large Receive Offloading (LRO).
+* Packets are either held for GRO and the call chain ends here or packets are passed on to netif_receive_skb to proceed up toward the protocol stacks.
+* It can be viewed/changed using $ ethtool -k eth0 | grep generic-receive-offload
+*/</span>
+<span class="hljs-function"><span class="hljs-keyword">gro_result_t</span> <span class="hljs-title">napi_gro_receive</span><span class="hljs-params">(struct napi_struct *napi, struct sk_buff *skb)</span></span>{
+    <span class="hljs-built_in">skb_gro_reset_offset</span>(skb);
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">napi_skb_finish</span>(<span class="hljs-built_in">dev_gro_receive</span>(napi, skb), skb);
+}
+
+<span class="hljs-comment">//file: net/core/dev.c</span>
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">gro_result_t</span> <span class="hljs-title">napi_skb_finish</span><span class="hljs-params">(<span class="hljs-keyword">gro_result_t</span> ret, struct sk_buff *skb)</span></span>{
+    <span class="hljs-built_in"><span class="hljs-keyword">switch</span></span> (ret) {
+    <span class="hljs-keyword">case</span> GRO_NORMAL:
+        <span class="hljs-comment">// 在netif_receive_skb中，数据包将被送到协议栈中。</span>
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">netif_receive_skb</span>(skb))
+            ret = GRO_DROP;
+        <span class="hljs-keyword">break</span>;
+    ......
+}
+</div></code></pre>
+<p>3.1. Network stack code. This is still done as part of softirq.</p>
+<p><code>netif_receive_skb</code>函数会根据包的协议，假如是udp包，会将包依次送到ip_rcv(),udp_rcv()协议处理函数中进行处理。</p>
+<p><img src="images/2022-03-14-12-06-00.png" alt=""></p>
+<p><strong>Receive Packet Steering (RPS)</strong></p>
+<p>Normally, a single CPU processes the hardware interrupt and polls for packets to process incoming data.</p>
+<p>Receive Side Scaling (RSS): Some NICs support multiple queues at the hardware level. This means incoming packets can be hashed and DMA’d to a separate memory region for each queue, thus multiple CPUs will handle interrupts from the device and also process packets. This hash may be based on the IP address and TCP port numbers, so that packets from the same connection end up being processed by the same CPU.</p>
+<p>Receive Packet Steering (RPS) is a software implementation of RSS. It is done here, after the packet is taken from poll loop and rx ring buffer.</p>
+<p>RPS works by generating a hash for incoming data to determine which CPU should process the data. The data is then enqueued to the per-CPU receive <strong>network backlog</strong> to be processed. An Inter-processor Interrupt (IPI) is delivered to the CPU owning the backlog to kick-start backlog processing if it is not currently processing data. ie. <code>netif_receive_skb()</code> will either continue sending network data up the networking stack, or hand it over to RPS for processing on a different CPU.</p>
+<p>For RPS to work, it must be enabled in the <a href="https://github.com/torvalds/linux/blob/v3.13/Documentation/networking/scaling.txt#L138-L164">kernel configuration</a>, and a bitmask describing which CPUs should process packets for a given interface and RX queue.</p>
+<p><strong>Receive Flow Steering (RFS)</strong></p>
+<p>Receive flow steering (RFS) is used in conjunction with RPS (must enable RPS first). Use RFS to help increase cache hit rates by directing packets for the same flow to the same CPU for processing. RFS keeps track of a global hash table of all flows.</p>
+<p>Accelerated Receive Flow Steering: This achieves RFS in hardware, for NICs that support
+this functionality. It involves updating the NIC with flow information so that it can determine
+which CPU to interrupt.</p>
+<p><strong>enqueue_to_backlog</strong></p>
+<p>If RPS is enabled, <code>netif_receive_skb</code>()  will call <code>enqueue_to_backlog()</code>. The function gets a pointer to the remote CPU’s <code>softnet_data</code> structure, which contains a pointer to the input_pkt_queue. The length of the remote input_pkt_queue is checked against <code>net.core.netdev_max_backlog</code>. If queue is full, the data is simply dropped.</p>
+<p>The per-CPU backlog queue plugs into NAPI the same way a device driver does, the remote CPU’s NAPI poll worker structure is added to that CPU’s <code>poll_list</code>. An <code>IPI</code> is queued which will trigger the softIRQ kernel thread on the remote CPU to wake-up if it is not running already.  When the <code>ksoftirqd</code> kernel thread on the remote CPU runs, the registered <code>poll</code> function is <code>process_backlog</code>, each piece of data on the backlog queue is removed from the backlog queue and passed on to <code>__netif_receive_skb()</code>.</p>
+<p>Parameters to tune:</p>
+<ul>
+<li><code>net.core.netdev_max_backlog</code>: Maximum number of packets can be put into backlog queue. help prevent drops in <code>enqueue_to_backlog</code> by increasing the <code>netdev_max_backlog</code> if you are using RPS or if your driver calls <code>netif_rx</code>.</li>
+<li><code>net.core.dev_weight</code>: adjust the weight of the backlog’s NAPI poller. Maximum number of packets the driver can receive during a NAPI interrupt, per CPU.</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/core/dev.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">netif_receive_skb</span><span class="hljs-params">(struct sk_buff *skb)</span></span>{
+<span class="hljs-meta">#<span class="hljs-meta-keyword">ifdef</span> CONFIG_RPS <span class="hljs-comment">//RPS处理逻辑</span></span>
+    cpu = <span class="hljs-built_in">get_rps_cpu</span>(skb-&gt;dev, skb, &amp;rflow); <span class="hljs-comment">// determine CPU taking into account of RFS</span>
+    <span class="hljs-keyword">if</span> (cpu &gt;= <span class="hljs-number">0</span>) {
+        ret = <span class="hljs-built_in">enqueue_to_backlog</span>(skb, cpu, &amp;rflow-&gt;last_qtail);
+        <span class="hljs-built_in">rcu_read_unlock</span>();
+        <span class="hljs-keyword">return</span> ret;
+    }
+<span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span>
+    <span class="hljs-keyword">return</span> __netif_receive_skb(skb);
+}
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> __netif_receive_skb(struct sk_buff *skb) {
+    ......  
+    ret = __netif_receive_skb_core(skb, <span class="hljs-literal">false</span>);
+}
+    
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> __netif_receive_skb_core(struct sk_buff *skb, <span class="hljs-keyword">bool</span> pfmemalloc) {
+    ......
+    <span class="hljs-comment">//pcap逻辑，这里会将数据送入抓包点。tcpdump就是从这个入口获取包的    </span>
+    <span class="hljs-built_in">list_for_each_entry_rcu</span>(ptype, &amp;ptype_all, list) {
+        <span class="hljs-keyword">if</span> (!ptype-&gt;dev || ptype-&gt;dev == skb-&gt;dev) {
+            <span class="hljs-keyword">if</span> (pt_prev)
+                ret = <span class="hljs-built_in">deliver_skb</span>(skb, pt_prev, orig_dev);
+            pt_prev = ptype;
+        }
+    }
+    ......
+    <span class="hljs-comment">// 从数据包中取出协议信息，然后遍历注册在这个协议上的回调函数列表。</span>
+    <span class="hljs-comment">// ptype_base 是一个 hash table，在协议注册小节我们提到过。ip_rcv 函数地址就是存在这个 hash table中的。</span>
+    <span class="hljs-built_in">list_for_each_entry_rcu</span>(ptype,
+            &amp;ptype_base[<span class="hljs-built_in">ntohs</span>(type) &amp; PTYPE_HASH_MASK], list) {
+        <span class="hljs-keyword">if</span> (ptype-&gt;type == type &amp;&amp;
+            (ptype-&gt;dev == null_or_dev || ptype-&gt;dev == skb-&gt;dev ||
+             ptype-&gt;dev == orig_dev)) {
+            <span class="hljs-keyword">if</span> (pt_prev)
+                ret = <span class="hljs-built_in">deliver_skb</span>(skb, pt_prev, orig_dev);
+            pt_prev = ptype;
+        }
+    }
+}
+
+<span class="hljs-comment">//file: net/core/dev.c</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-keyword">int</span> <span class="hljs-title">deliver_skb</span><span class="hljs-params">(struct sk_buff *skb,
+                  struct packet_type *pt_prev,
+                  struct net_device *orig_dev)</span></span>{
+    ......
+    <span class="hljs-comment">// pt_prev-&gt;func这一行就调用到了协议层注册的处理函数了。对于ip包来讲，就会进入到ip_rcv（比如是arp包的话，会进入到arp_rcv）</span>
+    <span class="hljs-keyword">return</span> pt_prev-&gt;<span class="hljs-built_in">func</span>(skb, skb-&gt;dev, pt_prev, orig_dev);
+}
+</div></code></pre>
+<p>Now go on to IP layer.</p>
+<p>There are two netfilter hooks here:</p>
+<ul>
+<li>PREROUTING</li>
+<li>LOCAL_IN</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/ipv4/ip_input.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">ip_rcv</span><span class="hljs-params">(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev)</span></span>{
+    ......
+    <span class="hljs-comment">// NF_HOOK是一个钩子函数，NF_HOOK 这个函数会执行 iptables 中 &quot;PREROUTING&quot; 里的各种表注册的各种规则。</span>
+    <span class="hljs-comment">// 当执行完注册的钩子后就会执行到最后一个参数指向的函数ip_rcv_finish。</span>
+    <span class="hljs-comment">// since routing is done inside ip_rcv_finish, this netfilter is called &quot;PREROUTING&quot;</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">NF_HOOK</span>(NFPROTO_IPV4, NF_INET_PRE_ROUTING, skb, dev, <span class="hljs-literal">NULL</span>,
+               ip_rcv_finish);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">ip_rcv_finish</span><span class="hljs-params">(struct sk_buff *skb)</span></span>{
+    ......
+    <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">skb_dst</span>(skb)) {
+       <span class="hljs-comment">// ip_route_input_noref calls ip_route_input_mc() to decide forwarding or local.</span>
+       <span class="hljs-comment">// If it is local, 函数ip_local_deliver被赋值给了dst.input</span>
+        <span class="hljs-keyword">int</span> err = <span class="hljs-built_in">ip_route_input_noref</span>(skb, iph-&gt;daddr, iph-&gt;saddr,
+                           iph-&gt;tos, skb-&gt;dev);
+        ...
+    }
+    ......
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">dst_input</span>(skb);
+}
+
+<span class="hljs-comment">/* Input packet from network to transport.  */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-keyword">int</span> <span class="hljs-title">dst_input</span><span class="hljs-params">(struct sk_buff *skb)</span></span>{
+   <span class="hljs-comment">// skb_dst(skb)-&gt;input调用的input方法就是路由子系统赋的ip_local_deliver。</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">skb_dst</span>(skb)-&gt;<span class="hljs-built_in">input</span>(skb);
+}
+
+<span class="hljs-comment">//file: net/ipv4/ip_input.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">ip_local_deliver</span><span class="hljs-params">(struct sk_buff *skb)</span></span>{
+
+    <span class="hljs-comment">/* Reassemble IP fragments. */</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">ip_is_fragment</span>(<span class="hljs-built_in">ip_hdr</span>(skb))) {
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">ip_defrag</span>(skb, IP_DEFRAG_LOCAL_DELIVER))
+            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    }
+
+    <span class="hljs-comment">// 这里会执行 LOCAL_IN 钩子，这也就是我们说的netfilter INPUT 链</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">NF_HOOK</span>(NFPROTO_IPV4, NF_INET_LOCAL_IN, skb, skb-&gt;dev, <span class="hljs-literal">NULL</span>,
+               ip_local_deliver_finish);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">ip_local_deliver_finish</span><span class="hljs-params">(struct sk_buff *skb)</span></span>{
+    ......
+    <span class="hljs-keyword">int</span> protocol = <span class="hljs-built_in">ip_hdr</span>(skb)-&gt;protocol;
+    <span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">net_protocol</span> *<span class="hljs-title">ipprot</span>;</span>
+
+   <span class="hljs-comment">// inet_protos中保存着tcp_rcv()和udp_rcv()的函数地址。这里将会根据包中的协议类型选择进行分发,在这里skb包将会进一步被派送到更上层的协议中，udp和tcp。</span>
+    ipprot = <span class="hljs-built_in">rcu_dereference</span>(inet_protos[protocol]);
+    <span class="hljs-keyword">if</span> (ipprot != <span class="hljs-literal">NULL</span>) {
+        ret = ipprot-&gt;<span class="hljs-built_in">handler</span>(skb);
+    }
+}
+</div></code></pre>
+<p>Now go to UDP layer</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/ipv4/udp.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">udp_rcv</span><span class="hljs-params">(struct sk_buff *skb)</span></span>{
+    <span class="hljs-keyword">return</span> __udp4_lib_rcv(skb, &amp;udp_table, IPPROTO_UDP);
+}
+<span class="hljs-keyword">int</span> __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
+           <span class="hljs-keyword">int</span> proto){
+    <span class="hljs-comment">// __udp4_lib_lookup_skb是根据skb来寻找对应的socket，当找到以后将数据包放到socket的缓存队列里。如果没有找到，则发送一个目标不可达的icmp包。</span>
+    sk = __udp4_lib_lookup_skb(skb, uh-&gt;source, uh-&gt;dest, udptable);
+    <span class="hljs-keyword">if</span> (sk != <span class="hljs-literal">NULL</span>) {
+        <span class="hljs-keyword">int</span> ret = <span class="hljs-built_in">udp_queue_rcv_skb</span>(sk, skb
+    }
+    <span class="hljs-built_in">icmp_send</span>(skb, ICMP_DEST_UNREACH, ICMP_PORT_UNREACH, <span class="hljs-number">0</span>);
+}
+
+<span class="hljs-comment">//file: net/ipv4/udp.c</span>
+
+<span class="hljs-keyword">int</span> <span class="hljs-built_in">udp_queue_rcv_skb</span>(struct sock *sk, struct sk_buff *skb){  
+    ......
+    <span class="hljs-comment">// sk_rcvqueues_full接收队列如果满了的话，将直接把包丢弃。接收队列大小受内核参数net.core.rmem_max和net.core.rmem_default影响。</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">sk_rcvqueues_full</span>(sk, skb, sk-&gt;sk_rcvbuf))
+        <span class="hljs-keyword">goto</span> drop;
+
+    rc = <span class="hljs-number">0</span>;
+
+    <span class="hljs-built_in">ipv4_pktinfo_prepare</span>(skb);
+    <span class="hljs-built_in">bh_lock_sock</span>(sk);
+    <span class="hljs-comment">//sock_owned_by_user判断的是用户是不是正在这个socker上进行系统调用（socket被占用），如果没有，那就可以直接放到socket的接收队列中。</span>
+    <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">sock_owned_by_user</span>(sk))
+        rc = __udp_queue_rcv_skb(sk, skb);
+    <span class="hljs-comment">// 如果有，那就通过sk_add_backlog把数据包添加到backlog队列。当用户释放的socket的时候，内核会检查backlog队列，如果有数据再移动到接收队列中。</span>
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">sk_add_backlog</span>(sk, skb, sk-&gt;sk_rcvbuf)) {
+        <span class="hljs-built_in">bh_unlock_sock</span>(sk);
+        <span class="hljs-keyword">goto</span> drop;
+    }
+    <span class="hljs-built_in">bh_unlock_sock</span>(sk);
+    <span class="hljs-keyword">return</span> rc;
+}
+</div></code></pre>
+<p><a name="tcp_v4_rcv"></a></p>
+<p>假如是 tcp 的包的话就会执行到 <code>tcp_v4_rcv</code> 函数, It finds the right socket, and it goes to the tcp finite state machine.</p>
+<p><img src="images/2022-03-17-14-42-42.png" alt=""></p>
+<p>我们假设处理的是 ESTABLISH 状态下的包，这样就又进入 tcp_rcv_established 函数中进行处理。</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/ipv4/tcp_input.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">tcp_rcv_established</span><span class="hljs-params">(struct sock *sk, struct sk_buff *skb,
+   <span class="hljs-keyword">const</span> struct tcphdr *th, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> len)</span>
+</span>{
+   ......
+   <span class="hljs-comment">//将接收数据放到 socket 的接收队列上。</span>
+   eaten = <span class="hljs-built_in">tcp_queue_rcv</span>(sk, skb, tcp_header_len, &amp;fragstolen);
+
+   <span class="hljs-comment">//数据 ready，唤醒 socket 上阻塞掉的进程</span>
+   <span class="hljs-comment">// 这又是一个函数指针。在创建 socket 执行到 sock_init_data 时，把 sk_data_ready 设置成 sock_def_readable，这是默认的数据就绪处理函数。</span>
+   sk-&gt;<span class="hljs-built_in">sk_data_ready</span>(sk, <span class="hljs-number">0</span>);
+   ......
+}
+
+<span class="hljs-comment">//file: net/ipv4/tcp_input.c</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> __must_check <span class="hljs-title">tcp_queue_rcv</span><span class="hljs-params">(struct sock *sk, struct sk_buff *skb, <span class="hljs-keyword">int</span> hdrlen,
+    <span class="hljs-keyword">bool</span> *fragstolen)</span>
+</span>{
+   <span class="hljs-comment">//把接收到的数据放到 socket 的接收队列的尾部</span>
+   <span class="hljs-keyword">if</span> (!eaten) {
+      __skb_queue_tail(&amp;sk-&gt;sk_receive_queue, skb);
+      <span class="hljs-built_in">skb_set_owner_r</span>(skb, sk);
+   }
+   <span class="hljs-keyword">return</span> eaten;
+}
+
+<span class="hljs-comment">//file: net/core/sock.c</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">sock_def_readable</span><span class="hljs-params">(struct sock *sk, <span class="hljs-keyword">int</span> len)</span>
+</span>{
+   <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">socket_wq</span> *<span class="hljs-title">wq</span>;</span>
+
+   <span class="hljs-built_in">rcu_read_lock</span>();
+   wq = <span class="hljs-built_in">rcu_dereference</span>(sk-&gt;sk_wq);
+
+   <span class="hljs-comment">//有进程在此 socket 的等待队列</span>
+   <span class="hljs-keyword">if</span> (<span class="hljs-built_in">wq_has_sleeper</span>(wq))
+   <span class="hljs-comment">//唤醒等待队列上的进程</span>
+   <span class="hljs-built_in">wake_up_interruptible_sync_poll</span>(&amp;wq-&gt;wait, POLLIN | POLLPRI |
+         POLLRDNORM | POLLRDBAND);
+   <span class="hljs-built_in">sk_wake_async</span>(sk, SOCK_WAKE_WAITD, POLL_IN);
+   <span class="hljs-built_in">rcu_read_unlock</span>();
+}
+
+<span class="hljs-comment">//file: include/linux/wait.h</span>
+<span class="hljs-comment">// 这里传入的1 是wake_up_common()的参数 nr_exclusive ，这里指的是即使是有多个进程都阻塞在同一个 socket 上，也只唤醒 1 个进程。其作用是为了避免惊群。</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> wake_up_interruptible_sync_poll(x, m)    \
+ __wake_up_sync_key((x), TASK_INTERRUPTIBLE, 1, (void *) (m))</span>
+
+</div></code></pre>
+<h3 id="how-skb-and-rx-ringbuffer-works-together">How skb and RX ringbuffer works together</h3>
+<p>Ring Buffer位于NIC和IP层之间，是一个典型的FIFO（先进先出）环形队列。Ring Buffer没有包含数据本身，而是包含了指向sk_buff（socket kernel buffers）的描述符。</p>
+<p><img src="images/2022-03-19-11-12-00.png" alt=""></p>
+<ol>
+<li>驱动在内存中分配一片缓冲区用来接收数据包，叫做sk_buffer;</li>
+<li>将上述缓冲区的地址和大小（即接收描述符），加入到rx ring buffer。描述符中的缓冲区地址是DMA使用的物理地址;</li>
+<li>驱动通知网卡有一个新的描述符;</li>
+<li>网卡从rx ring buffer中取出描述符，从而获知缓冲区的地址和大小;</li>
+<li>网卡收到新的数据包;</li>
+<li>网卡将新数据包通过DMA直接写到sk_buffer中。</li>
+</ol>
+<p><img src="images/2022-03-21-09-07-30.png" alt=""></p>
+<p>网卡多队列就是指的有多个RingBuffer，每个RingBufffer可以由一个core来处理</p>
+<p><img src="images/2022-03-19-11-22-13.png" alt=""></p>
+<br>
+<br>
+<h2 id="socket-send-internal">Socket Send Internal</h2>
+<hr>
+<p>Refer to: <a href="https://mp.weixin.qq.com/s/wThfD9th9e_-YGHJJ3HXNQ">https://mp.weixin.qq.com/s/wThfD9th9e_-YGHJJ3HXNQ</a></p>
+<p><strong>Overall Socket Send diagram</strong></p>
+<p><img src="images/2022-03-15-09-24-23.png" alt=""></p>
+<p>A bit more detailed diagram</p>
+<p><img src="images/2022-03-15-13-07-17.png" alt=""></p>
+<p><strong>Send system call</strong></p>
+<p><code>send</code> 系统调用的源码位于文件 <code>net/socket.c</code> 中。在这个系统调用里，内部其实真正使用的是 <code>sendto</code> 系统调用。整个调用链主要只干了两件简单的事情:</p>
+<ul>
+<li>第一是在内核中把真正的 socket 找出来，在这个对象里记录着各种协议栈的函数地址。</li>
+<li>第二是构造一个 <code>struct msghdr</code> 对象，把用户传入的数据，比如 buffer地址、数据长度啥的，统统都装进去.</li>
+</ul>
+<p><img src="images/2022-03-15-09-25-19.png" alt=""></p>
+<p><strong>传输层处理</strong> (mainly in file <code>net/ipv4/tcp.c</code>)</p>
+<p>在进入到协议栈 <code>inet_sendmsg</code> 以后，内核接着会找到 socket 上的具体协议发送函数。对于 TCP 协议来说，那就是 <code>tcp_sendmsg</code>，</p>
+<p><img src="images/2022-03-15-09-33-31.png" alt=""></p>
+<p>在这个函数中，内核会申请一个内核态的 <code>skb</code> 内存，将用户待发送的数据拷贝进去（<strong>第一次copy</strong>）。</p>
+<p><img src="images/2022-03-15-09-33-47.png" alt=""></p>
+<p>至于内核什么时候真正把 <code>skb</code> 发送出去。在 <code>tcp_sendmsg</code> 中会进行一些判断。只有满足 <code>forced_push(tp)</code> (未发送的数据数据是否已经超过最大窗口的一半了。) 或者 <code>skb == tcp_send_head(sk)</code> 成立的时候，内核才会真正启动发送数据包。</p>
+<p><strong>传输层发送</strong> (mainly in file <code>net/ipv4/tcp_output.c</code>)</p>
+<p>假设现在内核发送条件已经满足了，最终都实际会执行到 <code>tcp_write_xmit()</code>。这个函数处理了传输层的拥塞控制、滑动窗口相关的工作。</p>
+<p><img src="images/2022-05-09-13-40-01.png" alt=""></p>
+<p>Some of these components include:</p>
+<ul>
+<li>Pacing: This controls when to send packets, spreading out transmissions (pacing) to avoid
+bursts that may hurt performance (this may help avoid TCP micro-bursts that can lead to
+queueing delay, or even cause network switches to drop packets. It may also help with the
+incast problem, when many end points transmit to one at the same time [Fritchie 12]).</li>
+<li>TCP Segmentation offload (TSO): If the NIC and driver support TCP segmentation offload (TSO), generic segmentation offload (GSO) leaves splitting to the device, improving network stack throughput.</li>
+<li>TCP Small Queues (TSQ): This controls (reduces) how much is queued by the network
+stack to avoid problems including bufferbloat [Bufferbloat 20].</li>
+<li>Byte Queue Limits (BQL): These automatically size the driver queues large enough to avoid
+starvation, but also small enough to reduce the maximum latency of queued packets, and
+to avoid exhausting NIC TX descriptors [Hrubý 12]. It works by pausing the addition of
+packets to the driver queue when necessary, and was added in Linux 3.3 [Siemon 13].</li>
+<li>Earliest Departure Time (EDT): This uses a timing wheel instead of a queue to order
+packets sent to the NIC. Timestamps are set on every packet based on policy and rate
+configuration. This was added in Linux 4.20, and has BQL- and TSQ-like capabilities
+[Jacobson 18].
+These algorithms often work in combination to improve performance. A TCP sent packet can be
+processed by any of the congestion controls, TSO, TSQ, pacing, and queueing disciplines, before
+it ever arrives at the NIC</li>
+</ul>
+<p>当满足窗口要求的时候，会调用<code>tcp_transmit_skb</code>。</p>
+<p><code>tcp_transmit_skb()</code></p>
+<ul>
+<li>第一件事是先克隆一个新的 skb（<strong>第二次copy</strong>），这个新的skb 在后续调用网络层，最后到达网卡发送完成的时候会被释放掉。原来的skb则需要用来支持丢失重传，在收到对方的 ACK 之前，不能被删除。</li>
+<li>第二件事是修改 skb 中的 TCP header，根据实际情况把 TCP 头设置好。skb 内部其实包含了网络协议中所有的 header。在设置 TCP 头的时候，只是把指针指向 skb 的合适位置。后面再设置 IP 头的时候，在把指针挪一挪就行。</li>
+<li><code>tcp_transmit_skb</code> 是发送数据位于传输层的最后一步，接下来就可以进入到网络层进行下一层的操作了。调用了网络层提供的发送接口<code>icsk-&gt;icsk_af_ops-&gt;queue_xmit()</code>, <code>queue_xmit</code> 其实指向的是 <code>ip_queue_xmit</code> 函数。</li>
+</ul>
+<p><strong>网络层发送处理</strong> (mainly in file <code>net/ipv4/ip_output.c</code>)</p>
+<p>在网络层里主要处理以下几项工作，处理完这些工作后会交给更下层的邻居子系统来处理。</p>
+<ul>
+<li>IP 头设置, set length field and checksum field. Checksum field calcuation in x86-64 is in assembly: <a href="https://github.com/torvalds/linux/blob/v3.13/arch/x86/include/asm/checksum_64.h#L40-L73">https://github.com/torvalds/linux/blob/v3.13/arch/x86/include/asm/checksum_64.h#L40-L73</a></li>
+<li>netfilter 过滤: 在 <code>ip_local_out()</code> =&gt;<code> __ip_local_out()</code> =&gt; <code>nf_hook()</code> 会执行 netfilter 过滤。这里是<strong>netfilter的NF_INET_LOCAL_OUT (OUTPUT链) 链</strong>。如果你使用 iptables 配置了一些规则，那么这里将检测是否命中规则。如果你设置了非常复杂的 netfilter 规则，在这个函数这里将会导致你的进程 CPU 开销会极大增加。</li>
+<li>路由项查找： 在 Linux 上通过 <code>route -n</code>命令可以看到你本机的路由配置。在路由表中，可以查到某个目的网络应该通过哪个 Iface（网卡），哪个 Gateway（网卡）发送出去。查找出来以后缓存到 socket 上，下次再发送数据就不用查了。
+<ul>
+<li>如果目的是 127.0.0.1 ，在 local 路由表中就能够找到了，对于是本机的网络请求，设备将全部都使用 net-&gt;loopback_dev,也就是 lo 虚拟网卡。</li>
+</ul>
+</li>
+<li><code>dst_output()</code> 找到到这个 skb 的路由表（dst 条目） ，然后调用路由表的 output 方法。这又是一个函数指针，指向的是 <code>ip_output()</code> 方法。在 <code>ip_output()</code> 中再次执行 netfilter 过滤, 这里是<strong>netfilters的POSTROUTING链</strong>。</li>
+<li>skb 切分: 在<code>ip_finish_output()</code>，如果数据大于 MTU 的话，是会执行分片的 （需要分片的话会有<strong>第三次copy</strong>）。</li>
+</ul>
+<p><img src="images/2022-03-15-12-35-05.png" alt=""></p>
+<p><strong>邻居子系统</strong></p>
+<p>邻居子系统是位于网络层和数据链路层中间的一个系统，其作用是对网络层提供一个封装，让网络层不必关心下层的地址信息，让下层来决定发送到哪个 MAC 地址。邻居子系统并不位于协议栈 net/ipv4/ 目录内，而是位于 net/core/neighbour.c。因为无论是对于 IPv4 还是 IPv6 ，都需要使用该模块。</p>
+<p>在邻居子系统里主要是查找或者创建邻居项，在创造邻居项的时候，有可能会发出实际的 arp 请求。然后封装一下 MAC 头，将发送过程再传递到更下层的网络设备子系统。</p>
+<p><img src="images/2022-03-15-12-42-31.png" alt=""></p>
+<p><strong>网络设备子系统</strong></p>
+<p>邻居子系统通过 <code>dev_queue_xmit</code> 进入到网络设备子系统中来。</p>
+<p><strong>qdisc</strong></p>
+<p>Linux supports a feature called <a href="http://tldp.org/HOWTO/Traffic-Control-HOWTO/intro.html">traffic control</a>. The traffic control system contains several different sets of queuing systems that provide different features for controlling traffic flow. Each queuing system is called <em><strong>qdisc</strong></em> and also known as <em>queuing disciplines</em>. You can think of qdiscs as schedulers; qdiscs decide when and how packets are transmit.</p>
+<ul>
+<li>Every interface has a default qdisc associated with it. For single transmit queue hardware, default qdisc <em>pfifo_fast</em>. multiple transmit queue hardware default qdisc is <em>mq</em>. You can check your system by running <code>tc qdisc</code>.</li>
+</ul>
+<p><strong>Parameters to tune:</strong></p>
+<ul>
+<li><code>net.core.dev_weight</code>: adjust the weight of <code>__qdisc_run</code> loop which will cause more calls to <code>__netif_schedule</code> to be executed. The result will be the current qdisc added to the output_queue list for the current CPU more times, which should result in additional processing of transmit packets.</li>
+<li><code>txqueuelen</code>: You can adjust this parameter to increase the number of bytes that may be queued by a qdisc. It can be viewed by <code>ifconfig</code>; and changed by <code>$ sudo ifconfig eth0 txqueuelen 10000 </code></li>
+</ul>
+<p>网卡是有多个发送队列的, <code>netdev_pick_tx()</code> 函数的调用就是选择一个队列进行发送。<code>netdev_pick_tx</code> 发送队列的选择受 XPS(Transmit Packet Steering) 等配置的影响，而且还有缓存，也是一套小复杂的逻辑。</p>
+<blockquote>
+<p>XPS: Transmit Packet Steering: For NICs with multiple transmit queues, this supports transmission by multiple CPUs to the queues.</p>
+</blockquote>
+<p>先调用 <code>q-&gt;enqueue</code> 把 skb 添加到队列里。然后调用 <code>__qdisc_run</code> 开始发送。在<code>__qdisc_run</code>中，我们看到 while 循环不断地从队列中取出 skb 并进行发送。注意，这个时候其实都占用的是用户进程的系统态时间(sy)。只有当 quota 用尽或者其它进程需要 CPU 的时候才触发 NET_TX_SOFTIRQ 软中断进行发送。</p>
+<blockquote>
+<p>这就是为什么一般服务器上查看 <code>/proc/softirqs</code>，一般 <code>NET_RX</code> 都要比 <code>NET_TX</code> 大的多的另外一个原因。对于read来说，都是要经过 <code>NET_RX</code> 软中断，而对于send来说，只有系统态配额用尽才让软中断上。</p>
+</blockquote>
+<p><strong>loopback的处理</strong></p>
+<p>对于loopback来说（<code>q-&gt;enqueue</code> 判断为 false），就没有队列的问题，直接进入 <code>dev_hard_start_xmit</code>。接着进入回环设备的虚拟“驱动”（<code>drivers/net/loopback.c</code>）里的发送回调函数 <code>loopback_xmit</code>，将 skb “发送”出去。</p>
+<ul>
+<li>在本机网络 IO 发送的过程中，传输层下面的 skb 就不需要释放了，直接给接收方传过去就行了。</li>
+<li>本机网络 “发送”其实就是把skb 在 <code>enqueue_to_backlog</code> 把要发送的 skb 插入 <code>softnet_data-&gt;input_pkt_queue</code> 队列中并调用 <code>____napi_schedule</code> 来触发软中断。接收方在软中断里取出这个skb</li>
+</ul>
+<p><img src="images/2022-03-15-12-44-16.png" alt=""></p>
+<p><strong>软中断调度</strong></p>
+<p>如果系统态 CPU 发送网络包不够用的时候，会调用 <code>__netif_schedule</code> 触发一个软中断，由它来实际发出 <code>NET_TX_SOFTIRQ</code> 类型软中断。the <code>__netif_schedule</code> function will add the qdisc to the softnet_data’s output queue for processing.</p>
+<p>软中断是由内核线程来运行的，该线程会进入到 <code>net_tx_action</code> 函数，在该函数中能获取到发送队列，并也最终调用到驱动程序里的入口函数 <code>dev_hard_start_xmit</code>。</p>
+<blockquote>
+<p>注意：这里发送数据消耗的 CPU 就都显示在 si 这里了，不会消耗用户进程的系统时间了。</p>
+</blockquote>
+<p><img src="images/2022-03-15-12-53-58.png" alt=""></p>
+<p><strong>igb 网卡驱动发送</strong></p>
+<p>前面看到，无论是对于用户进程的内核态，还是对于软中断上下文，都会调用到网络设备子系统中的 dev_hard_start_xmit 函数。这个函数主要包括步骤：</p>
+<ul>
+<li>the vlan tag will be checked and if the device can’t offload VLAN tagging, __vlan_put_tag will be used to do this in software</li>
+<li><code>netif_needs_gso()</code> is used to determine whether or not an skb itself needs segmentation at all.</li>
+<li>If packet is not checksummed and device does not support checksumming for this protocol, complete checksumming here</li>
+<li><strong>Packet taps</strong>: hands packets which are about to be transmit over to the packet taps (if there are any).</li>
+</ul>
+<p>在这个函数中，会调用到驱动里的发送函数 igb_xmit_frame。在驱动函数里，将 skb 会挂到 RingBuffer上，驱动调用完毕后，数据包将真正从网卡发送出去。</p>
+<p><img src="images/2022-03-15-12-56-07.png" alt=""></p>
+<p><strong>发送完成硬中断</strong></p>
+<p>当数据发送完成以后，工作并没有结束。因为内存还没有清理。当发送完成的时候，网卡设备会触发一个硬中断来释放内存。</p>
+<blockquote>
+<p>这里有个很有意思的细节，depending on the device, 无论硬中断是因为是有数据要接收，还是说发送完成通知，从硬中断触发的软中断都是 <code>NET_RX_SOFTIRQ</code>。这个我们在第一节说过了，这是软中断统计中 RX 要高于 TX 的另一个主要原因。</p>
+</blockquote>
+<p>Another implication: the <code>NET_RX</code> softirq runs to process both incoming packets and transmit completions. Since both operations share the same IRQ, only a single IRQ handler function can be registered and it must deal with both possible cases. In igb driver, the function does that is <code>igb_poll()</code>, it processes TX completions before processing incoming data. Since the entire NAPI poll loop runs within a hard coded time slice, high load of TX completions may eat more of the time slice than receiving data.</p>
+<p><img src="images/2022-03-15-13-00-16.png" alt=""></p>
+<br>
+<br>
+<h2 id="socket-connect-internal">Socket Connect Internal</h2>
+<hr>
+<p>Refer to: <a href="https://mp.weixin.qq.com/s/C-Eeoeh9GHxugF4J30fz1A">https://mp.weixin.qq.com/s/C-Eeoeh9GHxugF4J30fz1A</a></p>
+<p>客户端建立连接前需要确定一个端口，该端口会在两个位置进行确定。</p>
+<p>第一个位置，也是最主要的确定时机是 connect 系统调用执行过程。在 connect 的时候，会随机地从 ip_local_port_range 选择一个位置开始循环判断。找到可用端口后，发出 syn 握手包。</p>
+<ul>
+<li>如果端口查找失败，会报错 “Cannot assign requested address”。这个时候你应该首先想到去检查一下服务器上的 <code>net.ipv4.ip_local_port_range</code> 参数(默认值是 32768 - 61000)，是不是可以再放的多一些。</li>
+<li>如果你因为某种原因不希望某些端口被使用到，那么就把它们写到 ip_local_reserved_ports 这个内核参数中就行了，内核在选择的时候会跳过这些端口。</li>
+</ul>
+<p>第二个位置，如果在 connect 之前使用了 bind，将会使得 connect 时的端口选择方式无效。转而使用 bind 时确定的端口。bind 时如果传入了端口号，会尝试首先使用该端口号，如果传入了 0 ，也会自动选择一个。但默认情况下一个端口只会被使用一次。所以对于客户端角色的 socket，不建议使用 bind 。</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//file: net/socket.c</span>
+<span class="hljs-built_in">SYSCALL_DEFINE3</span>(connect, <span class="hljs-keyword">int</span>, fd, struct sockaddr __user *, uservaddr,
+  <span class="hljs-keyword">int</span>, addrlen)
+{
+   <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">socket</span> *<span class="hljs-title">sock</span>;</span>
+
+   <span class="hljs-comment">//根据用户 fd 查找内核中的 socket 对象</span>
+   sock = <span class="hljs-built_in">sockfd_lookup_light</span>(fd, &amp;err, &amp;fput_needed);
+
+   <span class="hljs-comment">//进行 connect</span>
+   <span class="hljs-comment">// sock-&gt;ops-&gt;connect 其实调用的是 inet_stream_connect 函数。</span>
+   err = sock-&gt;ops-&gt;<span class="hljs-built_in">connect</span>(sock, (struct sockaddr *)&amp;address, addrlen,
+      sock-&gt;file-&gt;f_flags);
+   ...
+}
+
+<span class="hljs-comment">//file: ipv4/af_inet.c</span>
+<span class="hljs-keyword">int</span> __inet_stream_connect(struct socket *sock, ...)
+{
+   <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sock</span> *<span class="hljs-title">sk</span> =</span> sock-&gt;sk;
+
+   <span class="hljs-built_in"><span class="hljs-keyword">switch</span></span> (sock-&gt;state) {
+   <span class="hljs-keyword">case</span> SS_UNCONNECTED:
+      <span class="hljs-comment">//  sk-&gt;sk_prot-&gt;connect 实际上对应的是 tcp_v4_connect 方法。</span>
+      err = sk-&gt;sk_prot-&gt;<span class="hljs-built_in">connect</span>(sk, uaddr, addr_len);
+      sock-&gt;state = SS_CONNECTING;
+      <span class="hljs-keyword">break</span>;
+   }
+   ...
+}
+
+<span class="hljs-comment">//file: net/ipv4/tcp_ipv4.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">tcp_v4_connect</span><span class="hljs-params">(struct sock *sk, struct sockaddr *uaddr, <span class="hljs-keyword">int</span> addr_len)</span>
+</span>{
+   <span class="hljs-comment">//设置 socket 状态为 TCP_SYN_SENT</span>
+   <span class="hljs-built_in">tcp_set_state</span>(sk, TCP_SYN_SENT);
+
+   <span class="hljs-comment">//动态选择一个端口</span>
+   err = <span class="hljs-built_in">inet_hash_connect</span>(&amp;tcp_death_row, sk);
+
+   <span class="hljs-comment">//函数用来根据 sk 中的信息，构建一个完成的 syn 报文，并将它发送出去。</span>
+   err = <span class="hljs-built_in">tcp_connect</span>(sk);
+}
+
+
+<span class="hljs-comment">//file:net/ipv4/inet_hashtables.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">inet_hash_connect</span><span class="hljs-params">(struct inet_timewait_death_row *death_row,
+        struct sock *sk)</span>
+</span>{
+   <span class="hljs-keyword">return</span> __inet_hash_connect(death_row, sk, <span class="hljs-built_in">inet_sk_port_offset</span>(sk),
+      __inet_check_established, __inet_hash_nolisten);
+}
+
+<span class="hljs-comment">//file:net/ipv4/tcp_output.c</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">tcp_connect</span><span class="hljs-params">(struct sock *sk)</span>
+</span>{
+   <span class="hljs-comment">//申请并设置 skb</span>
+   buff = <span class="hljs-built_in">alloc_skb_fclone</span>(MAX_TCP_HEADER + <span class="hljs-number">15</span>, sk-&gt;sk_allocation);
+   <span class="hljs-built_in">tcp_init_nondata_skb</span>(buff, tp-&gt;write_seq++, TCPHDR_SYN);
+
+   <span class="hljs-comment">//添加到发送队列 sk_write_queue 上</span>
+   <span class="hljs-built_in">tcp_connect_queue_skb</span>(sk, buff);
+
+   <span class="hljs-comment">//实际发出 syn</span>
+   err = tp-&gt;fastopen_req ? <span class="hljs-built_in">tcp_send_syn_data</span>(sk, buff) :
+         <span class="hljs-built_in">tcp_transmit_skb</span>(sk, buff, <span class="hljs-number">1</span>, sk-&gt;sk_allocation);
+
+   <span class="hljs-comment">//启动重传定时器</span>
+   <span class="hljs-built_in">inet_csk_reset_xmit_timer</span>(sk, ICSK_TIME_RETRANS,
+         <span class="hljs-built_in">inet_csk</span>(sk)-&gt;icsk_rto, TCP_RTO_MAX);
+}
+
+</div></code></pre>
+<p>确定端口Work done in <code>__inet_hash_connect()</code>:</p>
+<ul>
+<li>首先判断了 <code>inet_sk(sk)-&gt;inet_num</code>，如果我们调用过 <code>bind</code>，那么这个函数会选择好端口并设置在 <code>inet_num</code> 上</li>
+<li>接着调用 <code>inet_get_local_port_range()</code>读取 <code>net.ipv4.ip_local_port_range</code></li>
+<li>接下来进入到了 for 循环中。根据连接的目的 IP 和端口等信息生成一个随机数。从随机数开始循环，把整个可用端口范围来遍历一遍。直到找到可用的端口后停止。
+<ul>
+<li>首先看是否在 <code>net.ipv4.ip_local_reserved_ports</code> 内</li>
+<li>整个系统中会维护一个所有使用过的端口的哈希表 <code>hinfo-&gt;bhash</code>。如果在哈希表中没有找到，那么说明这个端口是可用的。
+<ul>
+<li>这里的match检测是查看连接的四元组。对客户端来说，即使source ip/port完全一样，只有server的ip或者port不一样，port依然可用，可以connect</li>
+</ul>
+</li>
+<li>遍历完所有端口都没找到合适的，就返回 <code>-EADDRNOTAVAIL</code> （errno 99， “Cannot assign requested address”）,</li>
+</ul>
+</li>
+</ul>
+<br>
+<br>
+<h2 id="socket-listen-internal">Socket listen internal</h2>
+<p>Refer to: <a href="https://mp.weixin.qq.com/s/hv2tmtVpxhVxr6X-RNWBsQ">https://mp.weixin.qq.com/s/hv2tmtVpxhVxr6X-RNWBsQ</a></p>
+<br>
+<br>
+<h1 id="iptables">Iptables</h1>
+<p><em>iptables</em> is a command line utility to configure the IP packet filter rules of the Linux kernel firewall, implemented as different Netfilter modules.</p>
+<p><img src="images/2022-03-17-23-30-06.png" alt=""></p>
+<p>数据接收过程走的是 1 和 2，发送过程走的是 4 、5，转发过程是 1、3、5。有了这张图，我们能更清楚地理解 iptables 和内核的关系。</p>
+<ul>
+<li>接收数据的处理流程是：PREROUTING链 -&gt; 路由判断（是本机）-&gt; INPUT链</li>
+<li>发送数据包流程是：路由选择 -&gt; OUTPUT链 -&gt; POSTROUTING链</li>
+<li>转发数据过程：PREROUTING链 -&gt; 路由判断（不是本设备，找到下一跳） -&gt; FORWARD链 -&gt; POSTROUTING链</li>
+</ul>
+<p>每一个链(chain)上都可能是由许多个规则(rule)组成的。在 NF_HOOK 执行到这个链的时候，就会把规则按照优先级挨个过一遍。这些规则根据用途的不同，又可以raw、mangle、nat 和 filter。</p>
+<ul>
+<li>raw 表(table)的作用是将命中规则的包，跳过其它表的处理，它的优先级最高。
+<ul>
+<li>raw 表目的是跳过其它表，所以只需要在接收和发送两大过程的最开头处把关，所以只需要用到 PREROUTING 和 OUTPUT 两个钩子。</li>
+</ul>
+</li>
+<li>mangle 表的作用是根据规则修改数据包的一些标志位，比如 TTL (如若不想让本次路由影响 ttl，便可以在 mangel 表中加个 1)
+<ul>
+<li>Mangle 表有可能会在任意位置都有可能会修改网络包，所以它是用到了全部的钩子位置。</li>
+</ul>
+</li>
+<li>nat 表的作用是实现网络地址转换
+<ul>
+<li>NAT 分为 SNAT（Source NAT 源地址替换）和 DNAT（Destination NAT）两种，可能会工作在 PREROUTING、INPUT、OUTPUT、POSTROUTING 四个位置。</li>
+</ul>
+</li>
+<li>filter 表的作用是过滤某些包，这是防火墙工作的基础. Filter 只在 INPUT、OUTPUT 和 FORWARD 这三步中工作就够了。</li>
+</ul>
+<p><img src="images/2022-03-17-23-58-00.png" alt=""></p>
+<br>
+<br>
+<h1 id="routing-tables">routing tables</h1>
+<p>在 Linux 内核中，对于发送过程和接收过程都会涉及路由选择，其中接收过程的路由选择是为了判断是该本地接收还是将它转发出去。</p>
+<p><img src="images/2022-03-18-00-03-04.png" alt=""></p>
+<p>默认有 local 和 main 两个路由表，不过如果安装的 linux 开启了 CONFIG_IP_MULTIPLE_TABLES 选项的话，最多能支持 255 张路由表。</p>
+<p>查看某个路由表的配置，通过使用 ip route list table {表名} 来查看。</p>
+<pre><code class="language-bash"><div><span class="hljs-comment">#ip route list table local</span>
+<span class="hljs-built_in">local</span> 10.143.x.y dev eth0 proto kernel scope host src 10.143.x.y
+<span class="hljs-built_in">local</span> 127.0.0.1 dev lo proto kernel scope host src 127.0.0.1
+</div></code></pre>
+<p>如果是查看 main 路由表，也可以直接使用 route 命令</p>
+<pre><code class="language-bash"><div><span class="hljs-comment"># route -n</span>
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        10.*.*.254      255.0.0.0       UG    0      0        0 eth0
+10.*.*.0        0.0.0.0         255.255.248.0   U     0      0        0 eth0
+</div></code></pre>
+<br>
+<br>
+<h1 id="epoll">Epoll</h1>
+<h2 id="epoll-vs-select">Epoll vs select</h2>
+<p>sample <code>select</code> sample</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">int</span> fds[] = ...<span class="hljs-comment">// 存放需要监听的socket</span>
+fd_set read_fds, temp_read_fds; 
+<span class="hljs-built_in">FD_ZERO</span>(&amp;read_fds);
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; fds.count; ++i) {
+   <span class="hljs-built_in">FD_SET</span>(fds[i], &amp;read_fds);
+}
+
+<span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>){
+   <span class="hljs-comment">// kernel uses fd_set as output parameter, this is to reset the input parameter</span>
+   temp_read_fds = read_fds;
+
+    <span class="hljs-keyword">int</span> n = <span class="hljs-built_in">select</span>(..., temp_read_fds, ...)
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>; i &lt; fds.count; i++){
+        <span class="hljs-keyword">if</span>(<span class="hljs-built_in">FD_ISSET</span>(fds[i], &amp;temp_read_fds)){
+            <span class="hljs-comment">//fds[i]的数据处理</span>
+        }
+    }
+}
+</div></code></pre>
+<p>sample <code>epoll</code> usage:</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">int</span> epfd = <span class="hljs-built_in">epoll_create</span>(...);
+<span class="hljs-built_in">epoll_ctl</span>(epfd, EPOLL_CTL_ADD, ...); <span class="hljs-comment">//将所有需要监听的socket添加到epfd中</span>
+
+<span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>){
+    <span class="hljs-keyword">int</span> n = <span class="hljs-built_in">epoll_wait</span>(...)
+    <span class="hljs-keyword">for</span>(接收到数据的socket){
+        <span class="hljs-comment">//处理</span>
+    }
+}
+</div></code></pre>
+<p>Good article about how epoll works (and details about file descriptor (per process), file description (in kernel), inode relationship) <a href="https://copyconstruct.medium.com/the-method-to-epolls-madness-d9d2d6378642">https://copyconstruct.medium.com/the-method-to-epolls-madness-d9d2d6378642</a></p>
+<ol>
+<li>epoll maintains a ready list
+<ul>
+<li>the cost of select/poll is O(N), every time select/poll is called, even if there might only be a small number of events that actually occurred, the kernel still needs to scan every descriptor in the list.</li>
+<li>Since epoll monitors the underlying file description, every time the open file description becomes ready for I/O, the kernel adds it to the ready list without waiting for a process to call epoll_wait to do this. When a process does call epoll_wait, the kernel simply returns (copy) all the information about the ready list it’s been maintaining all along.</li>
+</ul>
+</li>
+<li>How to pass in file descriptor
+<ul>
+<li>Every call to select/poll requires passing the kernel the information about the descriptors we want to monitor. (This is obvious from the signature to both calls.) Then the kernel returns all the file descriptors passed, we need to examine (by scanning all the descriptors) to find out which ones are ready for I/O.</li>
+<li>With epoll, we add the file descriptors to the epoll instance’s interest list only once using the epoll_ctl call, (no need everytime in epoll_wait). The kernel again only returns back information about those descriptors which are ready for I/O</li>
+</ul>
+</li>
+<li>Epoll is linux specific, select is more portable</li>
+<li>select() can monitor only file descriptors numbers that are less than FD_SETSIZE (a macro definition of 1024 in kernel); poll(2) and epoll(7) do not have this limitation.<pre><code class="language-C++"><div><span class="hljs-comment">// include/uapi/linux/posix_types.h</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __FD_SETSIZE    1024</span>
+<span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> {</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> fds_bits[__FD_SETSIZE / (<span class="hljs-number">8</span> * <span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(<span class="hljs-keyword">long</span>))];
+} __kernel_fd_set;
+</div></code></pre>
+</li>
+</ol>
+<p><strong>History</strong></p>
+<ul>
+<li>1983，socket and select 发布在 Unix(4.2 BSD)</li>
+<li>1994，Linux的1.0，已经支持socket和select</li>
+<li>1997，poll 发布在 Linux 2.1.23</li>
+<li>2002，epoll发布在 Linux 2.5.44</li>
+</ul>
+<br>
+<br>
+<h2 id="epoll-implementation">Epoll Implementation</h2>
+<ol>
+<li>创建epoll对象: 当某个进程调用epoll_create方法时，内核会创建一个<code>struct eventpoll</code>对象，因为内核要维护“就绪列表”等数据，“就绪列表”可以作为<code>eventpoll</code>的成员。</li>
+<li>维护监视列表: 用<code>epoll_ctl</code>添加或删除所要监听的socket。如下图，<code>epoll_ctl</code>添加sock1、sock2和sock3的监视，内核会将eventpoll fd添加到这三个socket的等待队列中。</li>
+<li>阻塞和唤醒进程: 在进程A运行到了<code>epoll_wait</code>时，内核会将进程A放入eventpoll的等待队列中，阻塞进程。</li>
+<li>接收数据: 当socket接收到数据，中断程序会给做以下操作：
+<ul>
+<li>一方面在eventpoll的rdlist添加socket引用。如下图sock2和sock3收到数据后，中断程序让rdlist引用这两个socket。</li>
+<li>另一方面唤醒eventpoll等待队列中的进程，进程A再次进入运行状态。也因为rdlist的存在，进程A可以知道哪些socket发生了变化。</li>
+</ul>
+</li>
+</ol>
+<p><img src="images/2022-03-14-10-02-56.png" alt=""></p>
+<p><img src="images/2022-03-15-22-44-47.png" alt=""></p>
+<p><code>struct eventpoll</code> is defiend in <code>fs/eventpoll.c</code>, 包含了wq（等待队列），rdlist(就绪列表)，rbr(维护监视队列)等成员。</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// file：fs/eventpoll.c</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">eventpoll</span> {</span>
+    <span class="hljs-comment">//等待队列链表。软中断数据就绪的时候会通过 wq 来找到阻塞在 epoll 对象上的用户进程。</span>
+    <span class="hljs-keyword">wait_queue_head_t</span> wq;
+    
+    <span class="hljs-comment">/* 
+    就绪的描述符的链表。当有的连接就绪的时候，内核会把就绪的连接放到 rdllist 链表里。这样应用进程只需要判断链表就能找出就绪进程，而不用去遍历整棵树。
+    - rdlist应能够快速的插入数据。程序可能随时调用epoll_ctl添加或删除socket，当删除时，若该socket已经存放在就绪列表中，它也应该被移除。所以就绪列表应是一种能够快速插入和删除的数据结构。epoll使用双向链表来实现就绪队列。
+    - rdlist并非直接引用socket，而是通过epitem间接引用，红黑树的节点也是epitem对象。
+    */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">rdllist</span>;</span>
+    
+    <span class="hljs-comment">//通过红黑树树来管理用户进程下添加进来的所有 socket 连接。需要方便的添加和移除，还要便于搜索，以避免重复添加，所以使用红黑树作为索引结构</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rb_root</span> <span class="hljs-title">rbr</span>;</span>
+    ......
+}
+</div></code></pre>
+<p><strong><code>epoll_ctl</code> 添加 socket</strong></p>
+<p>在使用 epoll_ctl 注册每一个 socket 的时候(defined in <code>SYSCALL_DEFINE4(epoll_ctl)</code> in <code>fs/eventpoll.c</code>)，内核会主要做如下三件事情：</p>
+<ol>
+<li>分配一个红黑树节点对象 epitem （用<code>kmem_cache_alloc</code>），并对其做一些初始化。</li>
+<li>添加等待事件到 socket 的等待队列中，其回调函数是 <code>ep_poll_callback</code>。数据来了的时候软中断将数据收到 socket 的接收队列后，会通过注册的这个 <code>ep_poll_callback</code> 函数来回调，进而通知到 epoll 对象。</li>
+<li>将 epitem 插入到 epoll 对象的红黑树里</li>
+</ol>
+<p><img src="images/2022-03-15-21-56-03.png" alt=""></p>
+<p><strong><code>epoll_wait</code> 等待接收</strong></p>
+<ul>
+<li>如果<code>eventpoll-&gt;rdllist</code> 链表里有数据就返回</li>
+<li>如果没有数据就创建一个等待队列项 (回调函数是 <code>default_wake_function</code>。其 private 是 <code>current</code> （当前进程）), 并且将其添加到 eventpoll 的等待队列上，然后把自己阻塞掉就完事。
+<ul>
+<li>注意：<code>epoll_wait</code>的等待队列项是挂在 epoll 对象上的，而<code>epoll_ctl</code> 添加 socket 时也创建了等待队列项则是挂在 socket 对象上的。</li>
+</ul>
+</li>
+</ul>
+<p><strong>数据来啦</strong></p>
+<p><img src="images/2022-03-15-22-29-12.png" alt=""></p>
+<ol>
+<li>软中断处理网络帧，in tcp code (defined in <code>net/ipv4/tcp_input.c</code>)
+<ol>
+<li>call chain: <code>tcp_v4_rcv()-&gt;tcp_v4_do_rcv()-&gt;tcp_rcv_established()-&gt;tcp_queue_rcv()</code>,  skb is enqueued into sock-&gt;sk_receive_queue.</li>
+<li><code>sk_data_ready</code> 来唤醒在 socket上等待的用户进程。这又是一个函数指针, 内核将以 sock_def_readable 这个函数为入口，找到 epoll_ctl 添加 socket 时在其上设置的回调函数 ep_poll_callback。</li>
+</ol>
+</li>
+<li>在 <code>ep_poll_callback</code> 根据等待任务队列项上的额外的 <code>base</code> 指针可以找到 <code>epitem，</code> 进而也可以找到 eventpoll对象。
+<ol>
+<li>第一件事把自己的 <strong>epitem 添加到 epoll 的就绪队列中</strong>。</li>
+<li>然后查看 eventpoll 对象上的等待队列里是否有等待项，如果有，就需要唤醒<code>epoll_wait</code>。在<code>default_wake_function</code> (<code>epoll_wait</code>时传入的)中找到等待队列项里的进程描述符（<code>epoll_wait</code>时传入的<code>current</code>进程），然后调用<code>try_to_wake_up</code>唤醒之。</li>
+</ol>
+</li>
+</ol>
+<br>
+<br>
+
+        <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+        
+    </body>
+    </html>

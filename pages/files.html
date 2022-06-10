@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Summary of I&sol;O buffering</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{text-rendering:auto;font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.13.24"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+#button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <ul>
+<li><a href="#summary-of-io-buffering">Summary of I/O buffering</a></li>
+<li><a href="#file-system-caches">File System Caches</a>
+<ul>
+<li><a href="#page-cache">Page cache</a></li>
+<li><a href="#dentry-cache">Dentry Cache</a></li>
+<li><a href="#inode-cache">Inode Cache</a></li>
+</ul>
+</li>
+<li><a href="#file-monitoring">File monitoring</a></li>
+<li><a href="#file-io-interfaces">File IO Interfaces</a>
+<ul>
+<li><a href="#pread-and-pwrite">pread() and pwrite()</a></li>
+<li><a href="#readv-and-writev">readv() and writev()</a></li>
+<li><a href="#setvbuffile-stream-char-buf-int-mode-size_t-size">setvbuf(FILE *stream, char *buf, int mode, size_t size)</a></li>
+<li><a href="#fflush">fflush()</a></li>
+<li><a href="#fsyncint-fd--sync--fdatasync">fsync(int fd) / sync() / fdatasync()</a></li>
+<li><a href="#posix_fadvise">posix_fadvise()</a></li>
+<li><a href="#stat-and-lstat">stat() and lstat()</a></li>
+<li><a href="#raw-and-direct-io">Raw and Direct I/O</a></li>
+</ul>
+</li>
+<li><a href="#file-attributes">File attributes</a>
+<ul>
+<li><a href="#file-timestamps">File timestamps</a>
+<ul>
+<li><a href="#system-calls-and-library-calls-changing-the-timestamp">System calls and library calls changing the timestamp:</a></li>
+</ul>
+</li>
+<li><a href="#file-ownership">File ownership</a></li>
+<li><a href="#file-permission">File permission</a>
+<ul>
+<li><a href="#permission-on-directories">Permission on directories</a></li>
+<li><a href="#permission-for-symbolic-link">Permission for symbolic link</a></li>
+<li><a href="#sticky-bit">Sticky bit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#file-system">File System</a>
+<ul>
+<li><a href="#i-node">I-node</a></li>
+<li><a href="#file-descriptor-vs-file-description-vs-i-node">File descriptor vs file description vs i-node</a></li>
+<li><a href="#directories-and-links">Directories and Links</a>
+<ul>
+<li><a href="#hard-links">Hard links</a></li>
+<li><a href="#symbol-links">Symbol links</a></li>
+<li><a href="#symbol-link-vs-hard-link">Symbol link vs hard link</a></li>
+<li><a href="#remove-library-function">remove() library function</a></li>
+<li><a href="#readlink-system-call">readlink() system call</a></li>
+<li><a href="#realpath-library-function">realpath() library function</a></li>
+<li><a href="#dirname-and-basename">dirname() and basename()</a></li>
+</ul>
+</li>
+<li><a href="#virtual-file-system-vfs">Virtual file system (VFS)</a></li>
+<li><a href="#devfd">/dev/fd</a></li>
+<li><a href="#file-locks">File locks</a>
+<ul>
+<li><a href="#running-just-one-instance-of-a-program">Running Just One Instance of a Program</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#kernel-internals">Kernel Internals</a>
+<ul>
+<li><a href="#superblock-object">superblock object</a></li>
+<li><a href="#inode-object">Inode object</a></li>
+<li><a href="#dentry-object">dentry object</a></li>
+<li><a href="#file-object">File object</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="summary-of-io-buffering">Summary of I/O buffering</h1>
+<p>Two level of buffering:</p>
+<ul>
+<li>the transfer of user data by the stdio library functions to the stdio buffer, which is maintained in user memory space.</li>
+<li>When the stdio buffer is filled, the stdio library invokes the <code>write()</code> system call, which transfers the data into the kernel buffer cache (maintained in kernel memory).</li>
+<li>Eventually, the kernel initiates a disk operation to transfer the data to the disk.</li>
+</ul>
+<p><img src="images/2022-02-14-19-03-18.png" alt=""></p>
+<ul>
+<li>The left side of Figure 13-1 shows the calls that can be used at any time to explicitly force a flush of either of the buffers.</li>
+<li>The right side shows the calls that can be used to make flushing automatic, either by disabling buffering in the stdio library or by making file output system calls synchronous, so that each <code>write()</code> is immediately flushed to the disk.</li>
+</ul>
+<p><strong>Buffering in stdio library</strong> <br></p>
+<ul>
+<li>Buffering of data into large blocks to reduce system calls is exactly what is done by the C library I/O functions (e.g., <code>fprintf(), fscanf(), fgets(), fputs(), fputc(), fgetc()</code>) when operating on disk files.</li>
+</ul>
+<p><strong>Kernel buffer cache</strong></p>
+<ul>
+<li>the <code>read()</code> and <code>write(</code>) system calls copy data between a user-space buffer and a buffer in the kernel buffer cache.</li>
+<li>from kernel 2.4 onward, Linux no longer maintains a separate buffer cache. Instead, file I/O buffers are included in the page cache</li>
+</ul>
+<br>
+<br>
+<h1 id="file-system-caches">File System Caches</h1>
+<p>Nowadays, Linux has multiple different cache types.</p>
+<p><img src="images/2022-05-09-11-19-05.png" alt=""></p>
+<h2 id="page-cache"><a href="cache.html#page-cache">Page cache</a></h2>
+<h2 id="dentry-cache">Dentry Cache</h2>
+<p>The <em>dentry cache</em> (<strong>Dcache</strong>) remembers mappings from directory entry (struct dentry) to VFS inode. The Dcache improves the performance of path name lookups. The Dcache entries are stored in a hash table for fast lookup (hashed by the parent dentry and directory entry name).</p>
+<p>The Dcache also performs <em>negative caching</em>, which remembers lookups for nonexistent entries.
+This improves the performance of failed lookups, which commonly occur when searching for
+shared libraries.</p>
+<p>The Dcache performance has been further improved with the read-copy-updatewalk (<em>RCU-walk</em>) algorithm. This attempts to walk the path name without updating dentry reference counts, which were causing scalability issues due to cache coherency with high rates of path name lookups on multi-CPU systems. If a dentry is encountered that isn’t in the cache, RCU-walk reverts to the slower reference-count walk (ref-walk), since reference counts will be necessary during file system lookup and blocking.</p>
+<p>The Dcache grows dynamically, shrinking via LRU (least recently used) when the system needs
+more memory. Its size can be seen via <code>/proc</code>.</p>
+<h2 id="inode-cache">Inode Cache</h2>
+<p><em>Inode cache</em> contains VFS inodes (struct inodes), each describing properties of a file system object. These properties are frequently accessed for file system workloads, such as checking permissions when opening files, or updating timestamps during modification. These VFS inodes are stored in a hash table for fast and scalable lookup (hashed by inode number and file system superblock), although most of the lookups will be done via the Dentry cache.</p>
+<p>The inode cache grows dynamically, holding at least all inodes mapped by the Dcache. Its size can be seen via the <code>/proc/sys/fs/inode*</code> files.</p>
+<br>
+<h1 id="file-monitoring">File monitoring</h1>
+<p>如果file descriptor占满了，会发生 too many open files。Linux 对可打开的文件描述符的数量分别作了三个方面的限制：</p>
+<ul>
+<li>系统级：当前系统可打开的最大数量，通过 <code>cat /proc/sys/fs/file-max</code> 查看；</li>
+<li>用户级：指定用户可打开的最大数量，通过 <code>cat /etc/security/limits.conf</code> 查看；</li>
+<li>进程级：单个进程可打开的最大数量，通过 <code>cat /proc/sys/fs/nr_open</code> 查看；</li>
+</ul>
+<br>
+<h1 id="file-io-interfaces">File IO Interfaces</h1>
+<h2 id="pread-and-pwrite">pread() and pwrite()</h2>
+<p>The file I/O is performed at the location specified by offset, rather than at the current
+file offset. The file offset is left unchanged by these calls.</p>
+<p>Calling pread() is equivalent to <strong>atomically</strong> performing the following calls:</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">off_t</span> orig;
+orig = <span class="hljs-built_in">lseek</span>(fd, <span class="hljs-number">0</span>, SEEK_CUR); <span class="hljs-comment">/* Save current offset */</span>
+<span class="hljs-built_in">lseek</span>(fd, offset, SEEK_SET);
+s = <span class="hljs-built_in">read</span>(fd, buf, len);
+<span class="hljs-built_in">lseek</span>(fd, orig, SEEK_SET); <span class="hljs-comment">/* Restore original file offset */</span>
+</div></code></pre>
+<p>multiple threads can simultaneously perform I/O on the same file descriptor without being affected by changes made to the file offset by other threads.</p>
+<ul>
+<li>Applies same to multiple processes have file descriptors referring to the same open file description.)</li>
+</ul>
+<h2 id="readv-and-writev">readv() and writev()</h2>
+<p>Scatter input and gatter output.
+Read into an array of buffers, write from user buffers into file.</p>
+<p><img src="images/2022-02-14-19-20-08.png" alt=""></p>
+<h2 id="setvbuffile-stream-char-buf-int-mode-size_t-size">setvbuf(FILE *stream, char *buf, int mode, size_t size)</h2>
+<p>controls the form of buffering employed by the stdio library</p>
+<ul>
+<li>buf
+<ul>
+<li>If supplied, should be statically allocated or dynamically allocated on heap.</li>
+<li>If not supplied, stdio library automatically allocates a buffer for use.</li>
+</ul>
+</li>
+<li>mode:
+<ul>
+<li>_IONBF: dont buffer. Default for stderr.</li>
+<li>_IOLBF: line buffer. Default for terminal devices</li>
+<li>_IOFBF: default for disk files.</li>
+</ul>
+</li>
+</ul>
+<h2 id="fflush">fflush()</h2>
+<p><code>fflush()</code> is a library function that forces the data in a stdio output stream to be written (i.e., flushed to a kernel buffer via <code>write()</code>).</p>
+<ul>
+<li>A stdio buffer is automatically flushed when the corresponding stream is closed.</li>
+<li>In glibc, an implicit <code>fflush(stdout)</code> is performed whenever input is read from stdin.</li>
+<li>C99 requirements:
+<ul>
+<li>an output operation can’t be directly followed by an input operation without an intervening call to <code>fflush()</code> or one of the file-positioning functions (eg, <code>fseek()</code>)</li>
+<li>an input operation can’t be directly followed by an output operation without an intervening call to one of the file-positioning functions.</li>
+</ul>
+</li>
+</ul>
+<h2 id="fsyncint-fd--sync--fdatasync">fsync(int fd) / sync() / fdatasync()</h2>
+<p>The <code>fsync()</code> system call causes the buffered data in the kernel buffer and all metadata associated with the open file descriptor fd to be flushed to disk.</p>
+<ul>
+<li>Returns only after the transfer to the disk device (or at least its cache) has completed.</li>
+</ul>
+<p><strong><code>sync()</code></strong> <br>
+The <code>sync()</code> system call causes all kernel buffers containing updated file information (i.e., data blocks, pointer blocks, metadata, and so on) to be flushed to disk.</p>
+<ul>
+<li>In Linux, <code>sync()</code> returns only after all data has been transferred to the disk device (or at least to its cache, i.e. modern disk drives have large internal caches).</li>
+<li>A permanently running kernel thread, called <code>pdflush</code>, ensures that modified kernel buffers are flushed to disk if they are not explicitly synchronized within 30 seconds.
+<ul>
+<li><code>/proc/sys/vm/dirty_expire_centisecs</code> specifies the age (in hundredths of a second) that a dirty buffer must reach before it is flushed by pdflush.</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>fdatasync()</code></strong> <br>
+Very similar to <code>fsync()</code>, but writes to disk only the buffers that contain the file’s data, not those that contain inode information. Because Linux 2.6 does not have a specific file method for fdatasync( ), this system call uses the fsync method and is thus identical to fsync( ).</p>
+<h2 id="posix_fadvise">posix_fadvise()</h2>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">posix_fadvise</span><span class="hljs-params">(<span class="hljs-keyword">int</span> fd, <span class="hljs-keyword">off_t</span> offset, <span class="hljs-keyword">off_t</span> len, <span class="hljs-keyword">int</span> advice)</span></span>;
+</div></code></pre>
+<p>The <code>posix_fadvise()</code> system call allows a process to inform the kernel about its likely
+pattern for accessing file data. The kernel may (but is not obliged to) use the information to optimize its use of the <a href="cache.html#buffer-cache">buffer cache</a>, thereby improving I/O performance for the process. The <em>advice</em> argument:</p>
+<ul>
+<li>POSIX_FADV_NORMAL: No special advise, this is the default. On Linux, this operation sets the file read-ahead window to the default size (128 kB).</li>
+<li>POSIX_FADV_SEQUENTIAL: The process expects to read data sequentially. On Linux, this operation sets the file read-ahead window to the twice the default size.</li>
+<li>POSIX_FADV_RANDOM: access the data in random order. On Linux, this disables file read-ahead.</li>
+<li>POSIX_FADV_WILLNEED: The process expects to access the specified file region in the near future. The
+kernel performs read-ahead to populate the buffer cache with file data in the range. Subsequent read() calls don’t block on disk I/O; instead, they simply fetch data from the buffer cache. However,  The kernel provides no guarantees about how long the data fetched from the file will remain resident in the buffer cache, especially when memory pressure is high.</li>
+<li>POSIX_FADV_DONTNEED:  The process expects not to access the specified file region in the near
+future. This advises the kernel that it can free the corresponding cache
+pages (if there are any). On Linux, this operation is performed in two
+steps. First, the kernel flushes any modified pages in the
+specified region. Second, the kernel attempts to free any cache pages for
+the region. The first step will succeed only if the device’s write queue was not congested. Since congestion on the device can’t be controlled by the application, an alternate way
+of ensuring that the cache pages can be freed is to precede the
+POSIX_FADV_DONTNEED operation with a <code>sync()</code> or <code>fdatasync()</code> call that specifies fd.</li>
+<li>POSIX_FADV_NOREUSE: On Linux, this operation currently is a no-op.</li>
+</ul>
+<p>defined in <code>&lt;mm/fadvise.c&gt;</code></p>
+<h2 id="stat-and-lstat">stat() and lstat()</h2>
+<ul>
+<li><code>stat()</code> returns information about a named file, if it is a symbolic link, it follows the link to the file.</li>
+<li><code>lstat()</code> is similar to <code>stat()</code>, except that if it is a symbolic link, information about the link itself is returned, rather than the file to which the link points.</li>
+<li>In Linux, symbolic links are implemented as i-nodes.</li>
+</ul>
+<h2 id="raw-and-direct-io">Raw and Direct I/O</h2>
+<p><strong>Raw I/O</strong> is issued directly to disk offsets, bypassing the file system altogether. It has been used
+by some applications, especially databases, that can manage and cache their own data better
+than the file system cache. A drawback is more complexity in the software, and administration
+difficulties: the regular file system toolset can’t be used for backup/restore or observability.</p>
+<p><strong>Direct I/O</strong> allows applications to use a file system but bypass the file system cache, for example,
+by using the <code>O_DIRECT</code> open(2) flag on Linux. This is similar to synchronous writes (but
+without the guarantees that <code>O_SYNC</code> offers), and it works for reads as well. It isn’t as direct as
+raw device I/O, since mapping of file offsets to disk offsets must still be performed by file system
+code, and I/O may also be resized to match the size used by the file system for on-disk layout (its
+record size) or it may error (EINVAL). Depending on the file system, this may not only disable
+read caching and write buffering but may also disable prefetch.</p>
+<p><strong>synchronous I/O</strong>: Write I/O is synchronous when a file is opened using the flag <code>O_SYNC</code> or one of the variants, <code>O_DSYNC</code> and <code>O_RSYNC</code> (which as of Linux 2.6.31 are mapped by glibc to <code>O_SYNC</code>).</p>
+<br>
+<h1 id="file-attributes">File attributes</h1>
+<h2 id="file-timestamps">File timestamps</h2>
+<p>The st_atime, st_mtime, and st_ctime fields of the stat structure contain file timestamps.</p>
+<ul>
+<li>st_atime: last file access</li>
+<li>st_mtime: last file modification</li>
+<li>st_ctime: last file status change (ie. i-node info change)</li>
+</ul>
+<p>Table 15-2 shows the effect of various system calls on file timestamps.</p>
+<h3 id="system-calls-and-library-calls-changing-the-timestamp">System calls and library calls changing the timestamp:</h3>
+<p><strong><code>utime()</code></strong> and <strong><code>utimes()</code></strong><br>
+System call utime() can change st_atime and st_mtime information stored in i-node.</p>
+<ul>
+<li>In Linux, utimes() system call allows time values to be specified in microseconds.</li>
+<li>Programs such as tar(1) and unzip(1) use these system calls to reset file timestamps when unpacking an archive</li>
+</ul>
+<p>Glibc library functions:</p>
+<ul>
+<li><strong><code>futimes()</code></strong>: use fd to specify the file</li>
+<li><strong><code>lutimes()</code></strong>: if it is a symbol link, it doesn’t dereference it, it changes the timestamp of the link itself.</li>
+</ul>
+<p>Improved functions:</p>
+<ul>
+<li><strong><code>utimensat()</code></strong> system call in kernel 2.6+</li>
+<li><strong><code>futimens()</code></strong> glic library call in glibc 2.6
+<ul>
+<li>Set timestamps with nanosecond precision.</li>
+<li>It is possible to set the timestamps (atime and mtime) independently.</li>
+</ul>
+</li>
+</ul>
+<h2 id="file-ownership">File ownership</h2>
+<p>New file ownership.</p>
+<ul>
+<li>user ID is taken from the effective user ID of the process.</li>
+<li>group ID is more complicated, as below table.</li>
+</ul>
+<p><img src="images/2022-02-15-15-28-40.png" alt=""></p>
+<p><strong><code>chown()</code></strong>, <strong><code>lchown()</code></strong>, and <strong><code>fchown()</code></strong> system calls<br>
+Change the owner (user ID) and group (group ID) of a file.</p>
+<ul>
+<li><code>lchown()</code> changes the link itself.</li>
+<li><code>fchown()</code> uses the fd to refer to a file.</li>
+<li>If the owner or group of a file is changed, then the set-user-ID and set-group-ID permission bits are both turned off. This is a security precaution
+<ul>
+<li>In Linux, with root login, then, after calling <code>chown(2)</code>, the chown command uses the chmod() system call to reenable the set-user-ID and set-group-ID bits.)</li>
+</ul>
+</li>
+</ul>
+<h2 id="file-permission">File permission</h2>
+<p>Layout of st_mode bit mask in i-node</p>
+<p><img src="images/2022-02-15-15-30-19.png" alt=""></p>
+<ul>
+<li>U: set-user-ID (bit 04000),</li>
+<li>G: set-group-ID (bit 02000)</li>
+<li>T: sticky (bit 01000) bit</li>
+</ul>
+<h3 id="permission-on-directories">Permission on directories</h3>
+<ul>
+<li>Read: The contents (i.e., the list of filenames) of the directory may be <strong>listed</strong> (e.g., by ls).
+<ul>
+<li>Some ls options, such as ls -F require access to i-node information for files in the directory, which requires execute permission on the directory.</li>
+</ul>
+</li>
+<li>Write: Files may be <strong>created</strong> in and <strong>removed</strong> from the directory.
+<ul>
+<li>Note that it is not necessary to have any permission on a file itself in order to be able to delete it.</li>
+</ul>
+</li>
+<li>Execute: Files within the directory may be <strong>accessed</strong>.
+<ul>
+<li>sometimes called <strong>search</strong> permission.</li>
+<li>if we have execute permission on a directory, but not read permission, then we can access a file in the directory if we know its name, but we can’t list the contents of (i.e., the other filenames in) the directory. This is a simple and frequently used technique to control access to the contents of a public directory.</li>
+</ul>
+</li>
+</ul>
+<h3 id="permission-for-symbolic-link">Permission for symbolic link</h3>
+<p>A symbolic link is always created with read, write, and execute permissions enabled for all users, and these permissions can’t be changed. These permissions are ignored when dereferencing the link.</p>
+<h3 id="sticky-bit">Sticky bit</h3>
+<p>Deprecated: dn older UNIX implementations, If the sticky bit was set on a program file, then the first time the program was executed, a copy of the program text was saved in the swap area—thus it sticks in swap, and loads faster on subsequent executions.</p>
+<p>In modern Linux, for directories, the sticky bit acts as the <strong>restricted deletion flag</strong>.</p>
+<ul>
+<li>Setting this bit on a directory means that an unprivileged process can unlink (<code>unlink()</code>, <code>rmdir()</code>) and rename (<code>rename()</code>) files in the directory only if it has write permission on the directory and owns either the file or the directory.</li>
+<li>This makes it possible to create a directory that is shared by many users, who can each create and delete their own files in the directory but can’t delete files owned by other users. Such as <code>/tmp</code> directory.</li>
+<li>Set with <code>chmod +t</code></li>
+</ul>
+<br>
+<h1 id="file-system">File System</h1>
+<p>(The Linux programming interface, Chapter 13-18)</p>
+<p>File system type history: <a href="https://opensource.com/article/18/4/ext4-filesystem">https://opensource.com/article/18/4/ext4-filesystem</a></p>
+<p><img src="images/2022-02-14-15-34-39.png" alt=""></p>
+<ul>
+<li><strong>Boot block</strong>: This is always the first block in a file system, it contains information used to boot the operating system.</li>
+<li><strong>Superblock</strong>: sometimes referred as filesystem metadata, contains parameter information about the file system, including: the size of the i-node table; the size of logical blocks in this file system; and the size of the file system in logical blocks.</li>
+<li><strong>I-node table</strong>: Each file or directory in the file system has a unique entry in the i-node table.</li>
+<li><strong>Data blocks</strong>: The great majority of space in a file system is used for the blocks of data that form the files and directories residing in the file system.</li>
+</ul>
+<h2 id="i-node">I-node</h2>
+<p>The inode (short for index node) object represents all the information needed by the kernel to manipulate a file or directory. one i-node for each file. It contains information of below:</p>
+<ul>
+<li>File type (e.g., regular file, directory, symbolic link, character device).</li>
+<li>Owner (also referred to as the user ID or UID) for the file.</li>
+<li>Group (also referred to as the group ID or GID) for the file.</li>
+<li>Access permissions for three categories of user: owner (sometimes referred to as user), group, and other (the rest of the world).</li>
+<li>Three timestamps: time of last access to the file (shown by ls –lu), time of last modification of the file (the default time shown by ls –l), and time of last status change (last change to i-node information, shown by ls –lc). it is notable that most Linux file systems don’t record the creation time of a file.</li>
+<li>Number of hard links to the file.</li>
+<li>Size of the file in bytes.</li>
+<li>Number of blocks actually allocated to the file, measured in units of 512-byte blocks. There may not be a simple correspondence between this number and the size of the file in bytes, since a file can contain holes (Section 4.7), and thus require fewer allocated blocks than would be expected according to its nominal size in bytes.</li>
+<li>Pointers to the data blocks of the file.</li>
+</ul>
+<p>To locate the file data blocks, the kernel maintains a set of pointers in the i-node. Under ext2, each i-node contains 15 pointers.</p>
+<ul>
+<li>The first 12 of these pointers directly point to the location of the first 12 blocks of the file.</li>
+<li>The 13th pointers points to a data block of pointers (the whole block is composed of pointers)
+<ul>
+<li>For a block size of 4096B in 32bit system, it can have 4096/4(ptr size)=1024 blocks, which is 1024*4096B = 4MB file size.</li>
+</ul>
+</li>
+<li>The 14th pointer is a double indirect pointer, 15th pointer is a triple indirect pointer, which supports to 1024^3*4096 = 4TB file size.</li>
+</ul>
+<blockquote>
+<p>above strategy is used in ext2/3, but it doesn't scale well for large files. It is not used in ext4</p>
+</blockquote>
+<p><a href="#inode-object">Inode Kernel implementation</a></p>
+<h2 id="file-descriptor-vs-file-description-vs-i-node">File descriptor vs file description vs i-node</h2>
+<p><img src="images/2022-02-14-15-37-30.png" alt=""></p>
+<p>Kernel maintains three tables as below:<br></p>
+<p><strong>Per-process open file descriptor table</strong></p>
+<ul>
+<li>a set of flags controlling the operation of the file descriptor (there is just one such flag, the close-on-exec flag)
+<ul>
+<li>the file descriptor flags (i.e., the close-on-exec flag) are private to the process and file descriptor.</li>
+</ul>
+</li>
+<li>a reference to the open file description.</li>
+</ul>
+<p><strong>System-wide open file descriptions</strong> (also referred to as open file table, each entry as open file handle)</p>
+<ul>
+<li>the current file offset (as updated by read() and write(), or explicitly modified using lseek());
+<ul>
+<li>Two different file descriptors that refer to the same open file description share a file offset value, same apply to status flag.</li>
+</ul>
+</li>
+<li>status flags specified when opening the file (i.e., the flags argument to open());</li>
+<li>the file access mode (read-only, write-only, or read-write, as specified in open());</li>
+<li>settings relating to signal-driven I/O (Section 63.3);</li>
+<li>a reference to the i-node object for this file.</li>
+</ul>
+<p>Each file system has <strong>a table of i-nodes</strong> for all files residing in the file system.</p>
+<ul>
+<li>file type (e.g., regular file, socket, or FIFO) and permissions;</li>
+<li>a pointer to a list of locks held on this file</li>
+<li>various properties of the file, including its size and timestamps relating to different types of file operations.</li>
+</ul>
+<p><strong>Cases:</strong><br>
+case 1: Process A, descriptors 1 and 20 both refer to the same open file description (labeled 23).</p>
+<ul>
+<li>This can be a result of a call to dup(), dup2(), or fcntl(oldfd, F_DUPFD, startfd)</li>
+</ul>
+<p>case 2: Descriptor 2 of process A and descriptor 2 of process B refer to a single open file description (73).</p>
+<ul>
+<li>This scenario could occur after a call to fork()</li>
+<li>if one process passed an open descriptor to another process using a UNIX domain socket.</li>
+</ul>
+<p>Case 3: Descriptor 0 of process A and descriptor 3 of process B refer to different open file descriptions, but that these descriptions refer to the same i-node table entry (1976), in other words, to the same file.</p>
+<ul>
+<li>This occurs because each process independently called open() for the same file. A similar situation could occur if a single process opened the same file twice.</li>
+</ul>
+<h2 id="directories-and-links">Directories and Links</h2>
+<p>Directories in i-node entry:</p>
+<ul>
+<li>A directory is marked with a different file type in its i-node entry.</li>
+<li>A directory is a special file, it is a table consisting of filenames and i-node numbers.</li>
+</ul>
+<p><img src="images/2022-02-14-22-52-10.png" alt=""></p>
+<ul>
+<li>The root directory (/) of a file system is always stored in i-node entry 2.
+<ul>
+<li>I-node 1 is used to record bad blocks in the file system.</li>
+</ul>
+</li>
+<li><strong>i-node doesn’t contain a filename</strong>
+<ul>
+<li>It is directories’ data block defines a list of filenames and i-node numbers.</li>
+</ul>
+</li>
+</ul>
+<h3 id="hard-links">Hard links</h3>
+<ul>
+<li>Different filenames (in same or different directories) that refer to the same i-node.</li>
+<li>The link count of the i-node refers to how many names refer to this i-node.
+<ul>
+<li>If the link count thereby falls to 0, deallocates the i-node and the data blocks to which it refers</li>
+</ul>
+</li>
+<li>Hard links are created and removed using <code>link()</code> and <code>unlink()</code></li>
+<li>Hard links can't be made to a directory. This prevents creation of circular links.</li>
+</ul>
+<p>In addition to maintaining a link count for each i-node, the kernel also counts open file descriptions for the file. The file will be removed only no process holding open descriptors to it.</p>
+<ul>
+<li><strong>The <code>unlink()</code> system call removes a link (deletes a filename)</strong> and, if that is the last link to the file, also removes the file itself.</li>
+<li>Useful trick: <code>tmpfile()</code>: create and open a temporary file, unlink it immediately, and then continue to use it within our program, relying on the fact that the file is destroyed only when we close the file descriptor.</li>
+</ul>
+<p><strong>How to find filename from a file descriptor?</strong>
+You can use <code>readlink</code> on /proc/self/fd/NNN where NNN is the file descriptor.</p>
+<pre><code class="language-bash"><div><span class="hljs-comment"># readlink /proc/self/fd/7</span>
+/home/grawity/lib/dotfiles/vim/backup/%home%grawity%.bashrc.swp
+</div></code></pre>
+<h3 id="symbol-links">Symbol links</h3>
+<ul>
+<li>Symbol link has i-node entry, its type is symlink.</li>
+<li>Symbol link i-node data block pointer points to a filename.
+<ul>
+<li>A common optimization in Linux: if filename content is small enough, it will be directly put in the data pointers field (normally 60 bytes?).</li>
+</ul>
+</li>
+<li>a symbolic link is not included in the link count of the file to which it refers.
+<ul>
+<li>Therefore, if the filename to which the symbolic link refers is removed, the symbolic link itself continues to exist, even though it can no longer be dereferenced (followed). The symbolic link becomes dangled.</li>
+</ul>
+</li>
+</ul>
+<h3 id="symbol-link-vs-hard-link">Symbol link vs hard link</h3>
+<ul>
+<li>Symbolic links can refer to directories.</li>
+<li>symbolic links can cross filesystem boundaries
+<ul>
+<li>Because directory entries (hard links) refer to files using just an i-node number, and i-node numbers are unique only within a file system, a hard link must reside on the same file system as the file to which it refers.</li>
+</ul>
+</li>
+<li>Each symbol link has its own i-node entry while hard links all refer to the same i-node.</li>
+</ul>
+<p><img src="images/2022-02-14-22-59-05.png" alt=""></p>
+<h3 id="remove-library-function">remove() library function</h3>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">remove</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span>* pathname)</span>
+</span></div></code></pre>
+<ul>
+<li>If pathname is a file, remove() calls unlink() system call;</li>
+<li>if pathname is a directory, remove() calls rmdir() system call.</li>
+<li>remove() doesn’t dereference symbolic links. If pathname is a symbolic link, remove() removes the link itself</li>
+</ul>
+<h3 id="readlink-system-call">readlink() system call</h3>
+<p>retrieve the content of the link itself—that is, the pathname to which it refers.</p>
+<ul>
+<li><code>readlink()</code> does not append a terminating null byte to buf.  It will (silently) truncate the contents (to a length of bufsiz characters) if the buffer is too small to hold.</li>
+</ul>
+<h3 id="realpath-library-function">realpath() library function</h3>
+<ul>
+<li>expands all symbolic links and resolves references to  /./, /../ and extra '/' characters in the null-terminated string named by path to produce a canonicalized absolute pathname.</li>
+<li>If buffer is specified as NULL, then realpath() uses malloc to allocate a buffer of up to PATH_MAX bytes to hold the resolved pathname. The caller should free() the buffer.</li>
+</ul>
+<h3 id="dirname-and-basename">dirname() and basename()</h3>
+<p><img src="images/2022-02-14-23-03-25.png" alt=""></p>
+<ul>
+<li>Both dirname() and basename() may modify the string pointed to by pathname. Therefore, if we wish to preserve a pathname string, we must pass copies of it</li>
+<li>both dirname() and basename() can return pointers to statically allocated strings that may be modified by future calls to the same functions.</li>
+</ul>
+<br>
+<h2 id="virtual-file-system-vfs">Virtual file system (VFS)</h2>
+<p><img src="images/2022-02-13-15-34-47.png" alt=""></p>
+<p>The VFS defines a generic interface for file-system operations. All programs that work with files specify their operations in terms of this generic interface.</p>
+<ul>
+<li>such as open(), read(), write(), lseek(), close(), truncate(), stat(), mount(), umount(), mmap(), mkdir(), link(), unlink(), symlink(), and rename().</li>
+</ul>
+<p>Each file system provides an implementation for the VFS interface.</p>
+<p><img src="images/2022-02-13-15-35-03.png" alt=""></p>
+<h2 id="devfd">/dev/fd</h2>
+<p><code>/dev/fd</code> is a symbolic link to the Linux-specific <code>/proc/self/fd</code> directory, which is a special case of the Linux-specific <code>/proc/PID/fd</code> directories.</p>
+<ul>
+<li><code>/dev/fd/0</code> refers to the standard input of the current process.
+<ul>
+<li>Example: <code>ls | diff /dev/fd/0 oldfilelist</code></li>
+<li>the names <code>/dev/stdin</code>, <code>/dev/stdout</code>, and <code>/dev/stderr</code> are provided as symbolic links to, respectively, <code>/dev/fd/0</code>, <code>/dev/fd/1</code>, and <code>/dev/fd/2</code>.</li>
+</ul>
+</li>
+</ul>
+<p>Thus,</p>
+<pre><code class="language-base"><code><div>/dev/fd → /proc/self/fd → /dev/PID/fd
+/dev/stdin → /proc/fd/0
+/dev/stdout → /proc/fd/1
+/dev/stderr → /proc/fd/2
+</div></code></code></pre>
+<h2 id="file-locks">File locks</h2>
+<p>File locks allow processes to synchronize access to a file.
+Linux provides two file locking system calls:</p>
+<ul>
+<li>the BSD - derived <code>flock()</code> , also called BSD file lock</li>
+<li>the System V - derived <code>fcntl()</code>,  also called record file lock.</li>
+</ul>
+<p>The <code>flock()</code> system call locks an entire file. Two types of locks may be placed:shared locks and
+exclusive locks</p>
+<p>The <code>fcntl()</code> system call places locks (“record locks”) on any region of a file. Two types of locks may be placed: read locks and write locks (semantically similar to the shared and exclusive lock of <code>flock()</code>).</p>
+<p>The Linux-specific <strong><code>/proc/locks</code></strong> file displays the file locks currently held by all processes on the system.</p>
+<h3 id="running-just-one-instance-of-a-program">Running Just One Instance of a Program</h3>
+<p>many daemons—need to ensure that only one instance of the program is running on the system at a time. A common method of doing this is to have the daemon create a file in a standard directory and place a write lock on it.</p>
+<p>Conventions:</p>
+<ul>
+<li>The <code>/var/run</code> directory is the usual location for such lock files. Or specified in daemon’s configuration file.</li>
+<li>a daemon writes its own process ID into the lock file</li>
+<li>the file is often named with an extension .pid, such as (<code>/var/run/syslogd.pid</code>)</li>
+</ul>
+<p>Code refer to The linux programming interface listing 55-4</p>
+<br>
+<h1 id="kernel-internals">Kernel Internals</h1>
+<p>The four primary object types of the VFS are</p>
+<ul>
+<li>The <code>superblock</code> object, which represents a specific mounted filesystem.</li>
+<li>The <code>inode</code> object, which represents a specific file.</li>
+<li>The <code>dentry</code> object, which represents a directory entry, which is a single component of a path.</li>
+<li>The <code>file</code> object, which represents an open file as associated with a process.</li>
+</ul>
+<p>An operations object is contained within each of these primary objects.These objects
+describe the methods that the kernel invokes against the primary objects:</p>
+<ul>
+<li>The <code>super_operations</code> object, which contains the methods that the kernel can
+invoke on a specific filesystem, such as <code>write_inode</code>() and <code>sync_fs</code>()</li>
+<li>The <code>inode_operations</code> object, which contains the methods that the kernel can
+invoke on a specific file, such as <code>create</code>() and <code>link</code>()</li>
+<li>The <code>dentry_operations</code> object, which contains the methods that the kernel can
+invoke on a specific directory entry, such as <code>d_compare</code>() and <code>d_delete</code>()</li>
+<li>The <code>file_operations</code> object, which contains the methods that a process can
+invoke on an open file, such as <code>read</code>() and <code>write</code>()</li>
+</ul>
+<p>The operations objects are implemented as a structure of pointers to functions that
+operate on the parent object.</p>
+<ul>
+<li>For many methods, the objects can inherit a generic function if basic functionality is sufficient.</li>
+<li>Otherwise, the specific instance of the particular filesystem fills in the pointers with its own filesystem-specific methods.</li>
+</ul>
+<h2 id="superblock-object">superblock object</h2>
+<p>The superblock object is represented by <code>struct super_block</code> and defined in <code>&lt;linux/fs.h&gt;</code>.</p>
+<ul>
+<li>The code for creating, managing, and destroying superblock objects lives in <code>&lt;fs/super.c&gt;</code>.</li>
+<li>A superblock object is created and initialized via the <code>alloc_super()</code> function.</li>
+</ul>
+<p>The most important item in the superblock object is <code>s_op</code>, which is a pointer to the
+superblock operations table. The superblock operations table is represented by <code>struct super_operations</code> and is also defined in <code>&lt;linux/fs.h&gt;</code>.</p>
+<p>When a filesystem needs to perform an operation on its superblock, it follows the
+pointers from its superblock object to the desired method. For example, if a filesystem
+wanted to write to its superblock, it would invoke <code>sb-&gt;s_op-&gt;write_super(sb);</code></p>
+<h2 id="inode-object">Inode object</h2>
+<p>The inode object is represented by <code>struct inode</code> and is defined in <code>&lt;linux/fs.h&gt;</code>.
+Here is the structure, with comments describing each entry</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode</span> {</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">hlist_node</span> <span class="hljs-title">i_hash</span>;</span>   <span class="hljs-comment">/* hash list */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">i_list</span>;</span>    <span class="hljs-comment">/* list of inodes */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">i_sb_list</span>;</span> <span class="hljs-comment">/* list of superblocks */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">i_dentry</span>;</span>  <span class="hljs-comment">/* list of dentries */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> i_ino;        <span class="hljs-comment">/* inode number */</span>
+    <span class="hljs-keyword">atomic_t</span> i_count;           <span class="hljs-comment">/* reference counter */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> i_nlink;       <span class="hljs-comment">/* number of hard links */</span>
+    <span class="hljs-keyword">uid_t</span> i_uid;                <span class="hljs-comment">/* user id of owner */</span>
+    <span class="hljs-keyword">gid_t</span> i_gid;                <span class="hljs-comment">/* group id of owner */</span>
+    <span class="hljs-keyword">kdev_t</span> i_rdev;              <span class="hljs-comment">/* real device node */</span>
+    u64 i_version;              <span class="hljs-comment">/* versioning number */</span>
+    <span class="hljs-keyword">loff_t</span> i_size;              <span class="hljs-comment">/* file size in bytes */</span>
+    <span class="hljs-keyword">seqcount_t</span> i_size_seqcount; <span class="hljs-comment">/* serializer for i_size */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">timespec</span> <span class="hljs-title">i_atime</span>;</span>    <span class="hljs-comment">/* last access time */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">timespec</span> <span class="hljs-title">i_mtime</span>;</span>    <span class="hljs-comment">/* last modify time */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">timespec</span> <span class="hljs-title">i_ctime</span>;</span>    <span class="hljs-comment">/* last change time */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> i_blkbits;     <span class="hljs-comment">/* block size in bits */</span>
+    <span class="hljs-keyword">blkcnt_t</span> i_blocks;          <span class="hljs-comment">/* file size in blocks */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> i_bytes;     <span class="hljs-comment">/* bytes consumed */</span>
+    <span class="hljs-keyword">umode_t</span> i_mode;             <span class="hljs-comment">/* access permissions */</span>
+    <span class="hljs-keyword">spinlock_t</span> i_lock;          <span class="hljs-comment">/* spinlock */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rw_semaphore</span> <span class="hljs-title">i_alloc_sem</span>;</span> <span class="hljs-comment">/* nests inside of i_sem */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">semaphore</span> <span class="hljs-title">i_sem</span>;</span>     <span class="hljs-comment">/* inode semaphore */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode_operations</span> *<span class="hljs-title">i_op</span>;</span> <span class="hljs-comment">/* inode ops table */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_operations</span> *<span class="hljs-title">i_fop</span>;</span> <span class="hljs-comment">/* default inode ops */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">super_block</span> *<span class="hljs-title">i_sb</span>;</span>   <span class="hljs-comment">/* associated superblock */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_lock</span> *<span class="hljs-title">i_flock</span>;</span>  <span class="hljs-comment">/* file lock list */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">address_space</span> *<span class="hljs-title">i_mapping</span>;</span> <span class="hljs-comment">/* associated mapping */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">address_space</span> <span class="hljs-title">i_data</span>;</span> <span class="hljs-comment">/* mapping for device */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dquot</span> *<span class="hljs-title">i_dquot</span>[<span class="hljs-title">MAXQUOTAS</span>];</span> <span class="hljs-comment">/* disk quotas for inode */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">i_devices</span>;</span>  <span class="hljs-comment">/* list of block devices */</span>
+        <span class="hljs-class"><span class="hljs-keyword">union</span> {</span>
+        <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_inode_info</span> *<span class="hljs-title">i_pipe</span>;</span> <span class="hljs-comment">/* pipe information */</span>
+        <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">block_device</span> *<span class="hljs-title">i_bdev</span>;</span> <span class="hljs-comment">/* block device driver */</span>
+        <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">cdev</span> *<span class="hljs-title">i_cdev</span>;</span> <span class="hljs-comment">/* character device driver */</span>
+        };
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> i_dnotify_mask;       <span class="hljs-comment">/* directory notify mask */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dnotify_struct</span> *<span class="hljs-title">i_dnotify</span>;</span>   <span class="hljs-comment">/* dnotify */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">inotify_watches</span>;</span>   <span class="hljs-comment">/* inotify watches */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mutex</span> <span class="hljs-title">inotify_mutex</span>;</span>         <span class="hljs-comment">/* protects inotify_watches */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> i_state;              <span class="hljs-comment">/* state flags */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> dirtied_when;         <span class="hljs-comment">/* first dirtying time */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> i_flags;               <span class="hljs-comment">/* filesystem flags */</span>
+    <span class="hljs-keyword">atomic_t</span> i_writecount;              <span class="hljs-comment">/* count of writers */</span>
+    <span class="hljs-keyword">void</span> *i_security;                   <span class="hljs-comment">/* security module */</span>
+    <span class="hljs-keyword">void</span> *i_private;                    <span class="hljs-comment">/* fs private pointer */</span>
+};
+</div></code></pre>
+<p>the inode_operations member <code>i_op</code> describes the filesystem’s implemented functions that the VFS can invoke on an inode. inode operations are invoked via <code>i-&gt;i_op-&gt;truncate(i)</code>.</p>
+<h2 id="dentry-object">dentry object</h2>
+<p>VFS treats directories as a type of file. Despite this useful unification, the VFS often
+needs to perform directory-specific operations, such as path name lookup.</p>
+<p>To facilitate this, the VFS employs the concept of a directory entry (dentry). A dentry is
+a specific component in a path.</p>
+<ul>
+<li>As an example, in path <code>/bin/vi</code> , <code>/</code>, <code>bin</code>, and <code>vi</code> are all dentry objects. The first two are directories and the last is a regular file.</li>
+</ul>
+<p><strong>The dentry object does not correspond to any on-disk data structure</strong>. The VFS creates it on-the-fly from a string representation of a path name when performing directory operations.</p>
+<p>Dentry objects are represented by <code>struct dentry</code> and defined in <code>&lt;linux/dcache.h&gt;</code>.</p>
+<p><strong>dentry cache</strong></p>
+<p>After the VFS layer goes through the trouble of resolving each element in a path name
+into a dentry object and arriving at the end of the path, the kernel caches dentry objects in the <a href="#dentry-cache">dentry cache or, simply, the <em>dcache</em></a>.</p>
+<p>The dcache also provides the front end to an <a href="#inode-cache"><em>inode cache</em></a>, the icache. Inode objects that
+are associated with dentry objects are not freed because the dentry maintains a positive
+usage count over the inode. This enables dentry objects to &quot;pin&quot; inodes in memory. when a
+path name lookup succeeds from cache, the associated inodes are already cached in memory.</p>
+<h2 id="file-object">File object</h2>
+<p>The file object is used to represent a file opened by a process.</p>
+<p>The file object is the in-memory representation of an open file.The object (but not
+the physical file) is created in response to the <code>open()</code> system call and destroyed in
+response to the <code>close()</code> system call.</p>
+<ul>
+<li>Similar to the dentry object, the file object does not actually correspond to any on-disk data.</li>
+<li>Because multiple processes can open and manipulate a file at the same time, there can be multiple file objects in existence for the same file.</li>
+<li>All these file-related calls are actually methods defined in the file operations table.</li>
+</ul>
+<p>The file object is represented by <code>struct file</code> and is defined in <code>&lt;linux/fs.h&gt;</code>.</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file</span> {</span>
+    <span class="hljs-class"><span class="hljs-keyword">union</span> {</span>
+        <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">fu_list</span>;</span>   <span class="hljs-comment">/* list of file objects */</span>
+        <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rcu_head</span> <span class="hljs-title">fu_rcuhead</span>;</span> <span class="hljs-comment">/* RCU list after freeing */</span>
+    } f_u;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">path</span> <span class="hljs-title">f_path</span>;</span>             <span class="hljs-comment">/* contains the dentry */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_operations</span> *<span class="hljs-title">f_op</span>;</span>   <span class="hljs-comment">/* file operations table */</span>
+    <span class="hljs-keyword">spinlock_t</span> f_lock;              <span class="hljs-comment">/* per-file struct lock */</span>
+    <span class="hljs-keyword">atomic_t</span> f_count;               <span class="hljs-comment">/* file object’s usage count */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> f_flags;           <span class="hljs-comment">/* flags specified on open */</span>
+    <span class="hljs-keyword">mode_t</span> f_mode;                  <span class="hljs-comment">/* file access mode */</span>
+    <span class="hljs-keyword">loff_t</span> f_pos;                   <span class="hljs-comment">/* file offset (file pointer) */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">fown_struct</span> <span class="hljs-title">f_owner</span>;</span>     <span class="hljs-comment">/* owner data for signals */</span>
+    <span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">cred</span> *<span class="hljs-title">f_cred</span>;</span>      <span class="hljs-comment">/* file credentials */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_ra_state</span> <span class="hljs-title">f_ra</span>;</span>      <span class="hljs-comment">/* read-ahead state */</span>
+    u64 f_version;                  <span class="hljs-comment">/* version number */</span>
+    <span class="hljs-keyword">void</span> *f_security;               <span class="hljs-comment">/* security module */</span>
+    <span class="hljs-keyword">void</span> *private_data;             <span class="hljs-comment">/* tty driver hook */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">f_ep_links</span>;</span>    <span class="hljs-comment">/* list of epoll links */</span>
+    <span class="hljs-keyword">spinlock_t</span> f_ep_lock;           <span class="hljs-comment">/* epoll lock */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">address_space</span> *<span class="hljs-title">f_mapping</span>;</span> <span class="hljs-comment">/* page cache mapping */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> f_mnt_write_state; <span class="hljs-comment">/* debugging state */</span>
+};
+</div></code></pre>
+<p>The file object methods are specified in file_operations <code>f_op</code> member. It is and defined in <code>&lt;linux/fs.h&gt;</code>.</p>
+
+        
+        
+    </body>
+    </html>

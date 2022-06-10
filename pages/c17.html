@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>C&plus;&plus;17</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{text-rendering:auto;font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.13.24"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+#button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <!-- title: C++17 -->
+<h1>C++17 Features</h1>
+<p><a href="#" class="to-top">➤</i></a></p>
+<ul>
+<li><a href="#language-features">Language features</a>
+<ul>
+<li><a href="#structured-bindings">Structured bindings</a></li>
+<li><a href="#if-and-switch-with-initialization">if and switch with Initialization</a></li>
+<li><a href="#inline-variable">inline variable</a></li>
+<li><a href="#extension-to-aggregate-initialization">Extension to aggregate initialization</a></li>
+<li><a href="#mandatory-copy-elision">Mandatory Copy Elision</a></li>
+<li><a href="#new-attributes">New Attributes</a></li>
+</ul>
+</li>
+<li><a href="#lambda-extensions">Lambda Extensions</a>
+<ul>
+<li><a href="#constexpr-lambdas">constexpr Lambdas</a></li>
+<li><a href="#passing-copies-of-this-to-lambdas">Passing Copies of <code>this</code> to Lambdas</a></li>
+</ul>
+</li>
+<li><a href="#class-template-argument-deduction-ctad">Class Template Argument Deduction (CTAD)</a>
+<ul>
+<li><a href="#deduction-guides">Deduction Guides</a></li>
+</ul>
+</li>
+<li><a href="#compile-time-if">Compile-Time if</a></li>
+<li><a href="#fold-expressions">Fold Expressions</a></li>
+<li><a href="#other-template-programming-improvements">Other Template Programming Improvements</a>
+<ul>
+<li><a href="#auto-as-non-type-template-parameter"><code>auto</code> as non-type template parameter</a></li>
+<li><a href="#pack-expansions-in-using-clause">Pack expansions in <code>using</code> clause</a></li>
+<li><a href="#stdinvoke"><code>std::invoke&lt;&gt;()</code></a></li>
+<li><a href="#stdbool_constant"><code>std::bool_constant&lt;&gt;</code></a></li>
+<li><a href="#stdvoid_t"><code>std::void_t&lt;&gt;</code></a></li>
+</ul>
+</li>
+<li><a href="#stdoptional"><code>std::optional&lt;&gt;</code></a></li>
+<li><a href="#stdvariant"><code>std::variant&lt;&gt;</code></a>
+<ul>
+<li><a href="#visitor">visitor</a></li>
+</ul>
+</li>
+<li><a href="#stdany"><code>std::any</code></a>
+<ul>
+<li><a href="#stdany-implementation"><code>std::any</code> implementation</a></li>
+</ul>
+</li>
+<li><a href="#stdbyte"><code>std::byte</code></a></li>
+<li><a href="#stdstring_view"><code>std::string_view</code></a></li>
+<li><a href="#filesystem">filesystem</a></li>
+<li><a href="#parallel-stl-alogrithm">Parallel STL Alogrithm</a></li>
+<li><a href="#c17-stl-changes">C++17 STL changes</a>
+<ul>
+<li><a href="#searchers">Searchers</a></li>
+<li><a href="#size-as_const-clamp-sample"><code>size()</code>, <code>as_const()</code>, <code>clamp()</code>, <code>sample()</code></a></li>
+<li><a href="#unordered_map-extract-and-merge">(unordered_)map <code>extract()</code> and <code>merge()</code></a></li>
+<li><a href="#sequential-containers-emplace_back">sequential containers emplace_back()</a></li>
+<li><a href="#unordered_map-try_emplace-and-insert_or_assign">(unordered_)map <code>try_emplace</code> and <code>insert_or_assign()</code></a></li>
+<li><a href="#stdscoped_lock"><code>std::scoped_lock&lt;&gt;</code></a></li>
+<li><a href="#cache-line-sizes">Cache Line Sizes</a></li>
+</ul>
+</li>
+<li><a href="#new-and-delete-for-over-aligned-types">new and delete for <em>over-aligned</em> types</a></li>
+<li><a href="#stdto_chars-and-stdfrom_chars"><code>std::to_chars()</code> and <code>std::from_chars()</code></a></li>
+</ul>
+<p><img src="images/2022-04-05-13-39-34.png" alt=""></p>
+<h1 id="language-features">Language features</h1>
+<h2 id="structured-bindings">Structured bindings</h2>
+<p><a href="https://wg21.link/p0144r0">https://wg21.link/p0144r0</a>, <a href="https://wg21.link/p0217r3">https://wg21.link/p0217r3</a>.</p>
+<p>Structured bindings allow you to initialize multiple entities with the elements or members of an object.</p>
+<p>structured bindings can be used for structures with:</p>
+<ul>
+<li>For <strong>structures</strong> and <strong>classes</strong> where all non-static data members are public, you can bind each non-static
+data member to exactly one name.</li>
+<li>For <strong>raw arrays</strong>, you can bind a name to each element of the array.</li>
+<li><strong>tuple-like objects</strong>: structs with tuple-like API. <code>std::pair&lt;&gt;</code>, <code>std::tuple&lt;&gt;</code>, and <code>std::array&lt;&gt;</code> are examples of types</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MyStruct</span> {</span>
+    <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>;
+    std::string s;
+};
+
+<span class="hljs-comment">// the names u and v are what are called structured bindings. They *decompose* the objects passed for initialization</span>
+<span class="hljs-keyword">auto</span> [u, v] = ms;
+<span class="hljs-keyword">auto</span> [u2, v2] {ms};
+<span class="hljs-keyword">auto</span> [u3, v3] (ms);
+</div></code></pre>
+<p>They can be used to receive return structure's data members.</p>
+<pre><code class="language-C++"><div><span class="hljs-function">MyStruct <span class="hljs-title">getStruct</span><span class="hljs-params">()</span> </span>{ <span class="hljs-keyword">return</span> MyStruct{<span class="hljs-number">42</span>, <span class="hljs-string">&quot;hello&quot;</span>}; }
+<span class="hljs-keyword">auto</span> [id,val] = <span class="hljs-built_in">getStruct</span>(); <span class="hljs-comment">// id and val name i and s of returned struct</span>
+</div></code></pre>
+<ul>
+<li>A typical usage is the direct use of multiple return values returned in one data structure (e.g., <code>map::insert()</code>).<pre><code class="language-C++"><div>std::map&lt;std::string, <span class="hljs-keyword">int</span>&gt; coll;
+<span class="hljs-keyword">auto</span> [pos,ok] = coll.<span class="hljs-built_in">insert</span>({<span class="hljs-string">&quot;new&quot;</span>,<span class="hljs-number">42</span>});
+<span class="hljs-keyword">if</span> (!ok) {
+    <span class="hljs-comment">// if insertion failed, handle error using iterator pos:</span>
+}
+</div></code></pre>
+</li>
+</ul>
+<p>They can simplify the iteration loop of <code>std::map&lt;&gt;</code></p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; [key,val] : mymap) {
+    std::cout &lt;&lt; key &lt;&lt; <span class="hljs-string">&quot;: &quot;</span> &lt;&lt; val &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+}   
+</div></code></pre>
+<p>You can use a very short name such as <code>'_'</code> to skip a data member.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">auto</span> [_,val1] = <span class="hljs-built_in">getStruct</span>(); <span class="hljs-comment">// OK</span>
+<span class="hljs-keyword">auto</span> [_,val2] = <span class="hljs-built_in">getStruct</span>(); <span class="hljs-comment">// ERROR: name _ already used</span>
+</div></code></pre>
+<p><strong>implementation</strong></p>
+<p>A hidden anonymous variable is created, The new names introduced as structured bindings refer to members/elements of this anonymous variable.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// auto [u,v] = ms; is conceptually below, with a new local copy &quot;e&quot;. </span>
+<span class="hljs-comment">// e&#x27;s scope is the same as the structured bindings.</span>
+<span class="hljs-comment">// unless references are used, modifying the value used for initialization has no effect on the names initialized by a structured binding.</span>
+<span class="hljs-keyword">auto</span> e = ms;
+aliasname u = e.i;
+aliasname v = e.s;
+</div></code></pre>
+<p><strong>Using qualifiers</strong></p>
+<p>We can use qualifiers, such as const and references. Again, these qualifiers apply to the anonymous entity
+<code>e</code> as a whole.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Here, the anonymous entity is declared as a const reference</span>
+<span class="hljs-comment">// u and v are the names of the members i and s of the initialized const reference to ms.</span>
+<span class="hljs-comment">// The reference type *only* applies to anonymous entity, decltype(u) is const int and decltype(v) is const std::string</span>
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; [u,v] = ms; 
+
+<span class="hljs-comment">// If the value used to initialize a structured bindings reference is a temporary object, </span>
+<span class="hljs-comment">// as usual, the lifetime of the temporary is extended to the lifetime of the bound structure:</span>
+<span class="hljs-function">MyStruct <span class="hljs-title">getStruct</span><span class="hljs-params">()</span></span>;
+...
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; [a,b] = <span class="hljs-built_in">getStruct</span>();
+std::cout &lt;&lt; <span class="hljs-string">&quot;a: &quot;</span> &lt;&lt; a &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>; <span class="hljs-comment">// OK</span>
+</div></code></pre>
+<p><strong>move semantics</strong></p>
+<pre><code class="language-C++"><div>MyStruct ms = { <span class="hljs-number">42</span>, <span class="hljs-string">&quot;Jim&quot;</span> };
+<span class="hljs-keyword">auto</span> [v,n] = std::<span class="hljs-built_in">move</span>(ms); <span class="hljs-comment">// new anonymous entity with moved-from values from ms, ms lost its value now.</span>
+
+MyStruct ms = { <span class="hljs-number">42</span>, <span class="hljs-string">&quot;Jim&quot;</span> };
+<span class="hljs-keyword">auto</span>&amp;&amp; [v,n] = std::<span class="hljs-built_in">move</span>(ms); <span class="hljs-comment">// anonymous entity is rvalue reference to ms, ms still holds its value at this point.</span>
+</div></code></pre>
+<p><strong>vs. std::tie</strong></p>
+<p>The <code>std::tie</code> is a library hack for a missing language feature of multiple return values. And it has some drawbacks:</p>
+<ul>
+<li>the variables need be declared beforehand</li>
+<li>the variable types must be declared explicitly</li>
+<li>Inefficient or can't be used with types that are not default constructible</li>
+</ul>
+<p>One usage is if you have existing variable names, and you want to assign them new values, you can use <code>std::tie()</code></p>
+<pre><code class="language-C++"><div>std::boyer_moore_searcher bmsearch{sub.<span class="hljs-built_in">begin</span>(), sub.<span class="hljs-built_in">end</span>()};
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> [beg, end] = <span class="hljs-built_in">bmsearch</span>(text.<span class="hljs-built_in">begin</span>(), text.<span class="hljs-built_in">end</span>());
+    beg != text.<span class="hljs-built_in">end</span>();
+    std::<span class="hljs-built_in">tie</span>(beg,end) = <span class="hljs-built_in">bmsearch</span>(end, text.<span class="hljs-built_in">end</span>())) <span class="hljs-comment">// &quot;beg&quot;, &quot;end&quot; are reassigned new values in each loop iteration, and we use std::tie to reuse the existing varaible names.</span>
+{}
+</div></code></pre>
+<p><strong>Providing a Tuple-Like API for Structured Bindings</strong></p>
+<p>You can add support for structured bindings to any type by providing a tuple-like API</p>
+<ul>
+<li><code>std::tuple_size&lt;your_type&gt;::value</code> has to return the number of elements.</li>
+<li><code>std::tuple_element&lt;idx, your_type&gt;::type</code> has to return the type of the idxth element.
+<ul>
+<li>The types specified here are the types <code>decltype</code> yields for the structured bindings.</li>
+</ul>
+</li>
+<li>A global or member <code>get&lt;idx&gt;()</code> has to yield the value of the idxth element.
+<ul>
+<li>For each structured binding, its <code>get&lt;&gt;()</code> function will be called</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Customer</span> {</span>
+<span class="hljs-keyword">private</span>:
+    std::string first;
+    std::string last;
+    <span class="hljs-keyword">long</span> val;
+<span class="hljs-comment">//... omit getters are constructors, etc...</span>
+};
+
+<span class="hljs-comment">// provide a tuple-like API for class Customer for structured bindings:</span>
+
+<span class="hljs-comment">// a specialization of std::tuple_size for type Customer:</span>
+<span class="hljs-keyword">template</span>&lt;&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">std</span>:</span>:tuple_size&lt;Customer&gt; {
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">int</span> value = <span class="hljs-number">3</span>; <span class="hljs-comment">// we have 3 attributes</span>
+};
+
+<span class="hljs-comment">// The type of the third attribute is long, specified as a full specialization for index 2.</span>
+<span class="hljs-keyword">template</span>&lt;&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">std</span>:</span>:tuple_element&lt;<span class="hljs-number">2</span>, Customer&gt; {
+<span class="hljs-keyword">using</span> type = <span class="hljs-keyword">long</span>; <span class="hljs-comment">// last attribute is a long</span>
+};
+<span class="hljs-comment">// The other attributes have type std::string specified as a partial specialization (which has a lower priority than the full specialization).</span>
+<span class="hljs-keyword">template</span>&lt;std::<span class="hljs-keyword">size_t</span> Idx&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">std</span>:</span>:tuple_element&lt;Idx, Customer&gt; {
+<span class="hljs-keyword">using</span> type = std::string; <span class="hljs-comment">// the other attributes are strings</span>
+};
+
+<span class="hljs-comment">// define the corresponding getters as overloads of a function get&lt;&gt;() in the same namespace as type Customer:</span>
+<span class="hljs-comment">// Note that all full specializations of function templates have to use the same signature (including the exact same return type).</span>
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;std::<span class="hljs-keyword">size_t</span>&gt; <span class="hljs-keyword">auto</span> <span class="hljs-title">get</span><span class="hljs-params">(<span class="hljs-keyword">const</span> Customer&amp; c)</span></span>;
+<span class="hljs-keyword">template</span>&lt;&gt; <span class="hljs-keyword">auto</span> get&lt;<span class="hljs-number">0</span>&gt;(<span class="hljs-keyword">const</span> Customer&amp; c) { <span class="hljs-keyword">return</span> c.<span class="hljs-built_in">getFirst</span>(); }
+<span class="hljs-keyword">template</span>&lt;&gt; <span class="hljs-keyword">auto</span> get&lt;<span class="hljs-number">1</span>&gt;(<span class="hljs-keyword">const</span> Customer&amp; c) { <span class="hljs-keyword">return</span> c.<span class="hljs-built_in">getLast</span>(); }
+<span class="hljs-keyword">template</span>&lt;&gt; <span class="hljs-keyword">auto</span> get&lt;<span class="hljs-number">2</span>&gt;(<span class="hljs-keyword">const</span> Customer&amp; c) { <span class="hljs-keyword">return</span> c.<span class="hljs-built_in">getValue</span>(); }
+</div></code></pre>
+<br>
+<br>
+<h2 id="if-and-switch-with-initialization">if and switch with Initialization</h2>
+<p><a href="https://wg21.link/p0305r1">https://wg21.link/p0305r1</a>.</p>
+<p>The <code>if</code> and <code>switch</code> control structures now allow us to specify an initialization clause before the usual
+condition or selection clause. The variable's scope is the whole <code>if</code> statement (including the optional else part). The destructor of variable is called after whole <code>if</code> statement.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">if</span> (std::ofstream strm = <span class="hljs-built_in">getLogStrm</span>(); coll.<span class="hljs-built_in">empty</span>()) {
+    strm &lt;&lt; <span class="hljs-string">&quot;&lt;no data&gt;\n&quot;</span>;
+}
+<span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; elem : coll) {
+        strm &lt;&lt; elem &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+    }
+}
+
+<span class="hljs-comment">// You can have multiple declarations with optional initializations:</span>
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">auto</span> x = <span class="hljs-built_in">qqq1</span>(), y = <span class="hljs-built_in">qqq2</span>(); x != y) {
+    std::cout &lt;&lt; <span class="hljs-string">&quot;return values &quot;</span> &lt;&lt; x &lt;&lt; <span class="hljs-string">&quot; and &quot;</span> &lt;&lt; y &lt;&lt; <span class="hljs-string">&quot; differ\n&quot;</span>;
+}   
+
+<span class="hljs-comment">// can be used as lock RAII too</span>
+<span class="hljs-comment">// IMPORTANT: always gives a name to the lock guard, otherwise, it will be destroyed immediately without locking the scope.</span>
+<span class="hljs-keyword">if</span> (std::lock_guard&lt;std::mutex&gt; <span class="hljs-built_in">lk</span>(mx_); v.<span class="hljs-built_in">empty</span>()) {
+    v.<span class="hljs-built_in">push_back</span>(kInitialValue);
+}
+
+<span class="hljs-comment">// or, a bit simplifed</span>
+<span class="hljs-keyword">if</span> (std::lock_guard _(mx_); v.<span class="hljs-built_in">empty</span>()) { <span class="hljs-comment">// with C++17 Class Template Argument Deduction (CTAD)</span>
+    v.<span class="hljs-built_in">push_back</span>(kInitialValue);
+}
+
+<span class="hljs-comment">// another example:</span>
+std::map&lt;std::string, <span class="hljs-keyword">int</span>&gt; coll;
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">auto</span> [pos,ok] = coll.<span class="hljs-built_in">insert</span>({<span class="hljs-string">&quot;new&quot;</span>,<span class="hljs-number">42</span>}); !ok) {
+    <span class="hljs-comment">// if insert failed, handle error using iterator pos:</span>
+    <span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; [key,val] = *pos;
+    std::cout &lt;&lt; <span class="hljs-string">&quot;already there: &quot;</span> &lt;&lt; key &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+}
+</div></code></pre>
+<br>
+<br>
+<h2 id="inline-variable">inline variable</h2>
+<p><a href="https://wg21.link/n4424">https://wg21.link/n4424</a>, <a href="https://wg21.link/p0386r2">https://wg21.link/p0386r2</a>.</p>
+<p>According to the <em>one definition rule</em> (ODR), a variable or function has to be defined in exactly one translation unit.</p>
+<ul>
+<li>inline functions can be defined in multiple translation units (and must be defined in all translation units in which they are odr­used), but all such definitions must be the same. The same applies to templates functions and variables.</li>
+<li>However, no such facility exists for non-template variables and class data members (with workarounds below).</li>
+</ul>
+<p>workarounds:</p>
+<ul>
+<li>static const data members of literal types (integer, floating-point, pointer types).</li>
+<li>define an inline function that returns a static local variable</li>
+<li>define a static member function that returns the value</li>
+<li>use variable templates (since C++14)</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">WithStaticDataMember</span> {</span>
+    <span class="hljs-comment">// This is a definition, no out-­of-­line definition is required.</span>
+    <span class="hljs-keyword">inline</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *kFoo = <span class="hljs-string">&quot;foo bar&quot;</span>;
+};
+
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt; struct X {
+    <span class="hljs-comment">// This does not require an out-­of-­line definition either.</span>
+    <span class="hljs-keyword">inline</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> x;
+};
+</div></code></pre>
+<p><strong><code>constexpr</code> now implies inline for static members</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">D</span> {</span>
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">int</span> n = <span class="hljs-number">5</span>; <span class="hljs-comment">// C++11/C++14: declaration</span>
+                                <span class="hljs-comment">// since C++17: definition</span>
+};
+<span class="hljs-comment">// Note, in C++11/14, above is good enough if D::n is passed by value (ie., no definition needed), but will result a linker error if it is passed by reference, or you create a pointer to it.</span>
+
+<span class="hljs-comment">// out-of-line definition </span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">int</span> D::n; <span class="hljs-comment">// C++11/C++14: definition</span>
+                    <span class="hljs-comment">// since C++17: redundant declaration (deprecated)</span>
+</div></code></pre>
+<p>Since <a href="https://stackoverflow.com/questions/27123306/is-it-possible-to-use-stdstring-in-a-constexpr">we can't do <code>constexpr std::string</code></a>, we have to explicitly use <code>inline</code> if we don't want to define out-of-line.</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">D</span> {</span>
+    <span class="hljs-keyword">inline</span> <span class="hljs-keyword">static</span> std::string <span class="hljs-keyword">int</span> s = <span class="hljs-string">&quot;hello&quot;</span>; <span class="hljs-comment">// since C++17</span>
+};
+</div></code></pre>
+<p>However, this has a performance cost, compiler will generate an access guard when accessing this static varaible, while out-of-line definition doesn't have this access guard. See <a href="https://www.youtube.com/watch?v=m7hwL0gHuP4">this video for detail</a>.</p>
+<br>
+<br>
+<h2 id="extension-to-aggregate-initialization">Extension to aggregate initialization</h2>
+<p><a href="https://wg21.link/p0017r1">https://wg21.link/p0017r1</a></p>
+<p>Since C++17, aggregates can have base classes, which means list initialization can be used for them, with below restrictions:</p>
+<ul>
+<li>No private or protected base class members</li>
+<li>No private or protected constructors</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Data</span> {</span>
+    <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span>* name;
+    <span class="hljs-keyword">double</span> value;
+};
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">CppData</span> :</span> Data {
+    <span class="hljs-keyword">bool</span> critical;
+};
+
+CppData x{{<span class="hljs-string">&quot;test1&quot;</span>, <span class="hljs-number">6.778</span>}, <span class="hljs-literal">false</span>}; <span class="hljs-comment">// OK since C++17</span>
+CppData x{<span class="hljs-string">&quot;test1&quot;</span>, <span class="hljs-number">6.778</span>, <span class="hljs-literal">false</span>};   <span class="hljs-comment">// also OK since C++17</span>
+CppData x1{};           <span class="hljs-comment">// zero-initialize all elements</span>
+CppData x2{{<span class="hljs-string">&quot;msg&quot;</span>}};    <span class="hljs-comment">// same as {{&quot;msg&quot;,0.0},false}</span>
+CppData x3{{}, <span class="hljs-literal">true</span>};   <span class="hljs-comment">// same as {{nullptr,0.0},true}</span>
+CppData x4;             <span class="hljs-comment">// values of fundamental types are unspecified</span>
+</div></code></pre>
+<p><strong>Backward Incompatibilities</strong>:</p>
+<ul>
+<li>Before C++17, <code>Derived d1{};</code> called the implicitly defined default constructor of <code>Derived</code>, which by default called the default constructor of the base class <code>Base</code>, which is okay becuase <code>Derived</code> is a freind class.</li>
+<li>Since C++17, <code>Derived</code> in below example is an <em>aggregate</em>, with no implicit default constructor at all. You can <em>not</em> use brace initialization because the base class has a private constructor. Whether the base class is a friend is irrelevant.</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Derived</span>;</span>
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Base</span> {</span>
+    <span class="hljs-keyword">friend</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Derived</span>;</span>
+<span class="hljs-keyword">private</span>:
+    <span class="hljs-built_in">Base</span>() {}
+};
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Derived</span> :</span> Base 
+{};
+
+Derived d1{};   <span class="hljs-comment">// OK in C++14, ERROR since C++17</span>
+Derived d2;     <span class="hljs-comment">// still OK (but not initialized)</span>
+</div></code></pre>
+<br>
+<br>
+<h2 id="mandatory-copy-elision">Mandatory Copy Elision</h2>
+<p><a href="https://wg21.link/p0135r0">https://wg21.link/p0135r0</a>, <a href="https://wg21.link/p0135r1">https://wg21.link/p0135r1</a>.</p>
+<p>C++ has permitted the omission (elision) of the copy operations when a temporary object is used to initialize a new object, even if this might impact the behavior of a program (e.g., skipping a print statement in the copy constructor).</p>
+<p>This includes below cases</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(MyClass param)</span> </span>{ <span class="hljs-comment">// param is initialized by passed argument</span>
+    ...
+}
+
+<span class="hljs-function">MyClass <span class="hljs-title">bar</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> MyClass{};   <span class="hljs-comment">// returns temporary</span>
+}
+</div></code></pre>
+<p>The copy elision to initialize objects from temporaries is mandatory since C++17. This means above can compile even <code>MyClass</code> has copy and move constructor deleted.</p>
+<p>However, note that all other optional copy elisions are still optional and require a callable copy or move constructor. For example:</p>
+<pre><code class="language-C++"><div><span class="hljs-function">MyClass <span class="hljs-title">foo</span><span class="hljs-params">()</span>
+</span>{
+    MyClass obj; 
+    ...
+    <span class="hljs-keyword">return</span> obj;  <span class="hljs-comment">// still requires copy/move support, because variable &quot;obj&quot; still has a name (which is an *lvalue* when used).</span>
+}
+
+<span class="hljs-function">MyClass <span class="hljs-title">bar</span><span class="hljs-params">(MyClass obj)</span> <span class="hljs-comment">// copy elision for passed temporaries</span>
+</span>{
+    ...
+    <span class="hljs-keyword">return</span> obj; <span class="hljs-comment">// still requires copy/move support because the returned object still has a name</span>
+}
+</div></code></pre>
+<p>As a side effect of the proposed change to require copy elision for temporaries when initializing new objects, some adjustments were made to value categories. Refer to <a href="storage.html#c17-clarified-the-semantic-meaning-of-value-categories">here</a></p>
+<br>
+<br>
+<h2 id="new-attributes">New Attributes</h2>
+<p><strong>Attribute <code>[[nodiscard]]</code></strong></p>
+<p>Compiler generates warning if the return value of a function is not used.</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">B</span> {</span>
+    [[nodiscard]] <span class="hljs-function"><span class="hljs-keyword">int</span>* <span class="hljs-title">foo</span><span class="hljs-params">()</span></span>;
+};
+
+B b;
+b.<span class="hljs-built_in">foo</span>();        <span class="hljs-comment">// warning</span>
+(<span class="hljs-keyword">void</span>)b.<span class="hljs-built_in">foo</span>();  <span class="hljs-comment">// no warning, use &quot;(void)&quot; cast to suppress warning. </span>
+</div></code></pre>
+<p><strong>Attribute <code>[[maybe_unused]]</code></strong></p>
+<p>To avoid warnings by the compiler for not using a name or entity. It can be applied to the declaration of a class, a type definition with typedef or using, a variable, a non-static data member, a function, an enumeration type, or an enumerator (enumeration value).</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> val, [[maybe_unused]] std::string msg)</span> <span class="hljs-comment">// unsed parameter</span>
+</span>{...}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyStruct</span> {</span>
+    [[maybe_unused]] <span class="hljs-keyword">char</span> makeLargerSize[<span class="hljs-number">100</span>]; <span class="hljs-comment">// unused member</span>
+    ...
+};
+</div></code></pre>
+<p><strong>Attribute <code>[[fallthrough]]</code></strong></p>
+<p>to avoid warnings by the compiler for not having a break statement after a sequence of one or more case labels inside a switch statement.</p>
+<p><strong>Attribute <code>[[deprecated]]</code> new usage</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// deprecate a namespace</span>
+<span class="hljs-keyword">namespace</span> [[deprecated]] DraftAPI { ..
+
+<span class="hljs-comment">// introduce a new enumeration value as a replacement of an existing (now deprecated) enumeration value</span>
+<span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-keyword">class</span> <span class="hljs-title">City</span> {</span> Berlin = <span class="hljs-number">0</span>,
+                  NewYork = <span class="hljs-number">1</span>,
+                  Mumbai = <span class="hljs-number">2</span>, Bombay [[deprecated]] = Mumbai,
+                    ... };
+</div></code></pre>
+<br>
+<br>
+<h1 id="lambda-extensions">Lambda Extensions</h1>
+<h2 id="constexpr-lambdas">constexpr Lambdas</h2>
+<p><a href="https://wg21.link/n4487">https://wg21.link/n4487</a>.</p>
+<p>Since C++17, lambdas are implicitly constexpr if possible. That is, a lambda is considered constexpr and can be used in compile-time
+contexts if the features it uses are valid for compile-time contexts (e.g., only literal types, no static variables, no virtual, no try/catch, no new/delete).</p>
+<p>For an implicit or explicit constexpr lambda, the function call operator is constexpr.</p>
+<table>
+<thead>
+<tr>
+<th>an implicitly constexpr lambda</th>
+<th>converts into the closure type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><pre>// implicitly constexpr since C++17 <br>auto squared = [](auto val) {  <br>     return val*val; <br>}; </pre></td>
+<td><pre> class CompilerSpecificName { <br> public: <br>     ... <br>     template<typename T> <br>     constexpr auto operator() (T val) const { <br>        return val*val;<br>    }<br>}; </pre></td>
+</tr>
+</tbody>
+</table>
+<p>Note the difference between below definitions:</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// squared1 can be used at compile time, but squared1 might be initialized at run time</span>
+<span class="hljs-keyword">auto</span> squared1 = [](<span class="hljs-keyword">auto</span> val) <span class="hljs-keyword">constexpr</span> { <span class="hljs-comment">// compile-time lambda calls, default since C++17</span>
+    <span class="hljs-keyword">return</span> val*val;
+};
+
+<span class="hljs-comment">// the lambda object is initialized when the program starts but the lambda might still be a lambda that can only be used at run time (e.g., using static variables).</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">auto</span> squared2 = [](<span class="hljs-keyword">auto</span> val) { <span class="hljs-comment">// compile-time initialization</span>
+    <span class="hljs-keyword">return</span> val*val;
+};
+
+<span class="hljs-comment">// To combine above two, you might consider declaring:</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">auto</span> squared = [](<span class="hljs-keyword">auto</span> val) <span class="hljs-keyword">constexpr</span> {
+    <span class="hljs-keyword">return</span> val*val;
+};
+</div></code></pre>
+<h2 id="passing-copies-of-this-to-lambdas">Passing Copies of <code>this</code> to Lambdas</h2>
+<p><a href="https://wg21.link/p0018r0">https://wg21.link/p0018r0</a>.</p>
+<p>In C++11 and C++14, inside the lambda, you cannot use members of the object without capturing <code>this</code>, you have to pass <code>this</code> either by value or by reference.</p>
+<p>However, it only captures the underlying object by reference (as only the pointer was copied). This can become a problem if the lifetime of the lambda exceeds the lifetime of <code>this</code> object or simply you want to pass a copy of the object.</p>
+<p>Since C++17, you can explicitly ask to capture a copy of the current object by capturing <code>*this</code>:</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span> {</span>
+<span class="hljs-keyword">private</span>:
+    std::string name;
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-comment">// the capture &quot;*this&quot; means that a copy of the current object is stored in the closure object defined by the lambda</span>
+        <span class="hljs-keyword">auto</span> l1 = [*<span class="hljs-keyword">this</span>] { std::cout &lt;&lt; name &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>; };
+    }
+};
+</div></code></pre>
+<br>
+<br>
+<h1 id="class-template-argument-deduction-ctad">Class Template Argument Deduction (CTAD)</h1>
+<p><a href="https://wg21.link/p0091r3">https://wg21.link/p0091r3</a></p>
+<p>Before C++17, template deduction <em>basically</em> worked in two situations: deduction function parameters in function templates and deducing <code>auto</code> for variables/return types in functions. There was no mechanism to deduce template parameters in class templates. You either have to  (1) explicitly specify the template parameters or (2) write a helper <code>make_*()</code> function that does the deduction for you.</p>
+<p>Since C++17, the constraint of always having to specify all template arguments for class templates has been relaxed. By using <em>class template argument deduction</em> (CTAD), you can omit explicit definition of the template arguments if the compiler is able to deduce all template parameters by:</p>
+<ul>
+<li>constructor, or</li>
+<li>deduction guide</li>
+</ul>
+<pre><code class="language-C++"><div>std::complex c{<span class="hljs-number">5.1</span>,<span class="hljs-number">3.3</span>}; <span class="hljs-comment">// OK: std::complex&lt;double&gt; deduced</span>
+std::complex c2{<span class="hljs-number">5</span>,<span class="hljs-number">3.3</span>};  <span class="hljs-comment">// ERROR: attempts to int and double as T, template parameter has to be unambiguously deducible.</span>
+
+std::mutex mx;
+std::lock_guard lg{mx}; <span class="hljs-comment">// OK: std::lock_guard&lt;std_mutex&gt; deduced</span>
+
+std::vector v1 {<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>} <span class="hljs-comment">// OK: std::vector&lt;int&gt; deduced</span>
+std::vector v2 {<span class="hljs-string">&quot;hello&quot;</span>, <span class="hljs-string">&quot;world&quot;</span>}; <span class="hljs-comment">// OK: std::vector&lt;const char*&gt; deduced</span>
+
+<span class="hljs-function">std::pair <span class="hljs-title">p</span><span class="hljs-params">(<span class="hljs-number">1</span>, <span class="hljs-number">2.0</span>)</span></span>;     <span class="hljs-comment">// pair&lt;int, double&gt;</span>
+<span class="hljs-function">std::tuple <span class="hljs-title">t</span><span class="hljs-params">(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3.0</span>)</span></span>; <span class="hljs-comment">// tuple&lt;int, int, double&gt;</span>
+</div></code></pre>
+<p>It is useful in deducing lambda as class template parameter. Otherwise, you have to use <code>decltype()</code> on an lambda object.</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;class Func&gt;
+class <span class="hljs-title">Foo</span><span class="hljs-params">()</span> </span>{ 
+<span class="hljs-keyword">public</span>: 
+    <span class="hljs-built_in">Foo</span>(Func f) : <span class="hljs-built_in">func</span>(f) {} 
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i)</span> <span class="hljs-keyword">const</span> </span>{ 
+      <span class="hljs-built_in">f</span>(i); 
+    } 
+<span class="hljs-keyword">private</span>: 
+    Func func; 
+};
+for_each(vi.<span class="hljs-built_in">begin</span>(), vi.<span class="hljs-built_in">end</span>(),
+    <span class="hljs-built_in">Foo</span>([&amp;](<span class="hljs-keyword">int</span> i){...})); <span class="hljs-comment">// Foo&lt;some_lambda_type&gt;</span>
+</div></code></pre>
+<p>Note, If class template argument deduction could be interpreted as initializing a copy, this copy interpreation is preferred.</p>
+<ul>
+<li>Refer to <a href="https://brevzin.github.io/c++/2018/09/01/quirks-ctad/">https://brevzin.github.io/c++/2018/09/01/quirks-ctad/</a> - quirk 2</li>
+</ul>
+<pre><code class="language-C++"><div>std::vector v1{<span class="hljs-number">42</span>};     <span class="hljs-comment">// vector&lt;int&gt; with one element</span>
+std::vector v2{v1};     <span class="hljs-comment">// this expression can be interpreted as creating a copy, thus, v2 also is a vector&lt;int&gt;</span>
+std::vector vv{v1, v2}; <span class="hljs-comment">// this expression cannot be interpreted as creating a copy because we pass an initializer list with more than one element. vv is vector&lt;vector&lt;int&gt;&gt;</span>
+
+<span class="hljs-function">std::tuple <span class="hljs-title">a</span><span class="hljs-params">(<span class="hljs-number">1</span>)</span></span>; <span class="hljs-comment">// a&#x27;s type is tuple&lt;int&gt;</span>
+<span class="hljs-function">std::tuple <span class="hljs-title">c</span><span class="hljs-params">(a)</span></span>; <span class="hljs-comment">// c&#x27;s type is tuple&lt;int&gt; because copy takes precedence.</span>
+<span class="hljs-function">std::tuple <span class="hljs-title">b</span><span class="hljs-params">(a, a)</span></span>; <span class="hljs-comment">// b&#x27;s type is tuple&lt;tuple&lt;int&gt;,tuple&lt;int&gt;&gt;</span>
+</div></code></pre>
+<p>Note, class template arguments may not be partially deduced by explicitly specifying only some of the template arguments. You either specify all arguments, or specify none.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2, <span class="hljs-keyword">typename</span> T3 = T2&gt;
+class C
+{...};
+
+<span class="hljs-function">C <span class="hljs-title">c1</span><span class="hljs-params">(<span class="hljs-number">22</span>, <span class="hljs-number">44.3</span>, <span class="hljs-string">&quot;hi&quot;</span>)</span></span>;   <span class="hljs-comment">// OK: T1 is int, T2 is double, T3 is const char*</span>
+<span class="hljs-function">C <span class="hljs-title">c2</span><span class="hljs-params">(<span class="hljs-number">22</span>, <span class="hljs-number">44.3</span>)</span></span>;         <span class="hljs-comment">// OK: T1 is int, T2 and T3 are double</span>
+
+<span class="hljs-function">C&lt;string&gt; <span class="hljs-title">c4</span><span class="hljs-params">(<span class="hljs-string">&quot;hi&quot;</span>, <span class="hljs-string">&quot;my&quot;</span>)</span></span>;   <span class="hljs-comment">// ERROR: only T1 explicitly defined</span>
+C&lt;&gt; <span class="hljs-built_in">c5</span>(<span class="hljs-number">22</span>, <span class="hljs-number">44.3</span>);           <span class="hljs-comment">// ERROR: neither T1 not T2 explicitly defined</span>
+C&lt;&gt; <span class="hljs-built_in">c6</span>(<span class="hljs-number">22</span>, <span class="hljs-number">44.3</span>, <span class="hljs-number">42</span>);       <span class="hljs-comment">// ERROR: neither T1 nor T2 explicitly defined</span>
+
+<span class="hljs-function">std::set&lt;Cust&gt; <span class="hljs-title">coll</span><span class="hljs-params">([](<span class="hljs-keyword">const</span> Cust&amp; x, <span class="hljs-keyword">const</span> Cust&amp; y) { <span class="hljs-comment">// ERROR, &quot;std::set&lt;Cust&gt;&quot; partially specified</span>
+                        <span class="hljs-keyword">return</span> x.getName() &gt; y.getName();
+                        })</span></span>;
+
+<span class="hljs-keyword">auto</span> sortcrit = [](<span class="hljs-keyword">const</span> Cust&amp; x, <span class="hljs-keyword">const</span> Cust&amp; y) {
+                    <span class="hljs-keyword">return</span> x.<span class="hljs-built_in">getName</span>() &gt; y.<span class="hljs-built_in">getName</span>();
+                    };
+<span class="hljs-function">std::set&lt;Cust, <span class="hljs-title">decltype</span><span class="hljs-params">(sortcrit)</span>&gt; <span class="hljs-title">coll</span><span class="hljs-params">(sortcrit)</span></span>; <span class="hljs-comment">// OK, set&lt;class Key, class Compare&gt; both arguments are specified. </span>
+</div></code></pre>
+<h2 id="deduction-guides">Deduction Guides</h2>
+<p>Template deduction guides are patterns associated with a template class that tell the compiler how to translate a set of constructor arguments (and their types) into template parameters for the class.</p>
+<p>The syntax of a user-defined deduction guide is the syntax of a function declaration with a trailing return type, the function name is the name of a class template.</p>
+<p>How it works:</p>
+<ul>
+<li>The deduction guide tells compiler when you call a constructor matching that pattern on the left of <code>-&gt;</code>, it will deduce the template specialization using the code on the right of <code>-&gt;</code>.</li>
+<li>Deduction guides compete with the constructors of a class. Compiler picks the highest priority according to overload resolution. If a constructor and a deduction guide match equally well, the deduction guide is preferred.</li>
+<li>Once that deduction is done (ie, compiler figured out the template parameter type), the compiler proceeds the initialization as if deduction guide is not there. The actual constructor called doesn't need to match the deduction guide. This means you can use deduction guides for aggregates and aggregate initialization (check below).</li>
+</ul>
+<p>A very useful application of deduction guides is to ensure that a template parameter T <em>decays</em> while it is deduced.</p>
+<ul>
+<li><em>Decay</em> means that raw arrays convert to pointers and that top-level qualifiers, such as const, and references are ignored.</li>
+<li>arguments passed by reference does not decay to the corresponding pointer type. (same applies to template parameter deduction)</li>
+<li>arguments passed by value decay.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">C</span> {</span>
+    <span class="hljs-built_in">C</span>(<span class="hljs-keyword">const</span> T&amp;) {
+    }
+    ...
+};
+
+C x{<span class="hljs-string">&quot;hello&quot;</span>}; <span class="hljs-comment">// T deduced as const char[6], decay doesn&#x27;t happy</span>
+
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt; <span class="hljs-title">C</span><span class="hljs-params">(T)</span> -&gt; C&lt;T&gt;</span>; <span class="hljs-comment">// Now with a simple deduction guide</span>
+C x{<span class="hljs-string">&quot;hello&quot;</span>}; <span class="hljs-comment">// T deduced as const char*. Because the deduction guide takes its argument by value and therefore its type decays.</span>
+</div></code></pre>
+<p><strong>Deduction Guides for Aggregates</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">A</span> {</span>
+    T val;
+};
+
+A s2{<span class="hljs-string">&quot;hi&quot;</span>}; <span class="hljs-comment">// ERROR, you have to say &quot;A&lt;std::string&gt; s5 = {&quot;hi&quot;};&quot;</span>
+<span class="hljs-built_in">A</span>(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span>*) -&gt; A&lt;std::string&gt;; <span class="hljs-comment">// now with deduction guides</span>
+A s2{<span class="hljs-string">&quot;hi&quot;</span>}; <span class="hljs-comment">// OK</span>
+</div></code></pre>
+<p>Refer to C++20 improvement: <a href="c20.html#ctad-for-aggregates">CTAD for Aggregates</a></p>
+<p><strong>Deduction Guides for Pairs and Tuples</strong></p>
+<p>Since <code>std::pair</code> and <code>std::tuple</code> have a constructor that takes an object of its template parameter by referece,  deduction guide is needed to ensure that CTAD uses the decayed type of the passed argument.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">namespace</span> std {
+    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pair</span> {</span>
+        ...
+        <span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-title">pair</span><span class="hljs-params">(<span class="hljs-keyword">const</span> T1&amp; x, <span class="hljs-keyword">const</span> T2&amp; y)</span></span>; <span class="hljs-comment">// take argument by-reference</span>
+        ...
+    };
+
+    <span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;
+    <span class="hljs-title">pair</span><span class="hljs-params">(T1, T2)</span> -&gt; pair&lt;T1, T2&gt;</span>; <span class="hljs-comment">// deduce argument types by-value</span>
+}
+
+<span class="hljs-comment">// const char[3] and const char[6] decays to const char*, </span>
+<span class="hljs-comment">// thus it is equivalent to: std::pair&lt;const char*, const char*&gt; p{&quot;hi&quot;, &quot;world&quot;};</span>
+std::pair p{<span class="hljs-string">&quot;hi&quot;</span>, <span class="hljs-string">&quot;world&quot;</span>};  
+</div></code></pre>
+<p><strong>Deduction from std::array&lt;&gt;</strong></p>
+<p>The deduction guide uses the fold expression <code>(is_same_v&lt;T,U&gt; &amp;&amp; ...)</code> to ensure that the types of all passed arguments are the same.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// let std::array&lt;&gt; deduce its number of elements (must have same type):</span>
+<span class="hljs-keyword">namespace</span> std {
+    <span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span>... U&gt;
+    <span class="hljs-title">array</span><span class="hljs-params">(T, U...)</span>
+        -&gt; array&lt;<span class="hljs-keyword">enable_if_t</span>&lt;<span class="hljs-params">(is_same_v&lt;T,U&gt; &amp;&amp; ...)</span>, T&gt;, <span class="hljs-params">(<span class="hljs-number">1</span> + <span class="hljs-keyword">sizeof</span>...(U))</span>&gt;</span>;
+}
+
+std::array a{<span class="hljs-number">42</span>, <span class="hljs-number">45</span>, <span class="hljs-number">77</span>}; <span class="hljs-comment">// OK, deduces std::array&lt;int,3&gt;</span>
+std::array a{<span class="hljs-number">42</span>, <span class="hljs-number">45</span>, <span class="hljs-number">77.7</span>}; <span class="hljs-comment">// ERROR: types differ</span>
+<span class="hljs-keyword">constexpr</span> std::array arr{<span class="hljs-number">0</span>, <span class="hljs-number">8</span>, <span class="hljs-number">15</span>}; <span class="hljs-comment">// OK, works even in compile-time contexts, deduces std::array&lt;int,3&gt;</span>
+</div></code></pre>
+<p><strong>Deduction from Iterators</strong></p>
+<p>To be able to deduce the type of the elements from iterators that define a range for initialization, containers
+have a deduction guide such as the following for <code>std::vector&lt;&gt;</code>:</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// let std::vector&lt;&gt; deduce element type from initializing iterators:</span>
+<span class="hljs-keyword">namespace</span> std {
+    <span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> Iterator&gt;
+    <span class="hljs-title">vector</span><span class="hljs-params">(Iterator, Iterator)</span> -&gt; vector&lt;<span class="hljs-keyword">typename</span> iterator_traits&lt;Iterator&gt;::value_type&gt;</span>;
+}
+
+<span class="hljs-comment">// This allows, for example:</span>
+std::set&lt;<span class="hljs-keyword">float</span>&gt; s;
+<span class="hljs-function">std::vector <span class="hljs-title">v1</span><span class="hljs-params">(s.begin(), s.end())</span></span>; <span class="hljs-comment">// OK, deduces std::vector&lt;float&gt;</span>
+
+std::vector v2{s.<span class="hljs-built_in">begin</span>(), s.<span class="hljs-built_in">end</span>()}; <span class="hljs-comment">// BEWARE: doesn’t deduce std::vector&lt;float&gt;</span>
+<span class="hljs-comment">// the two arguments are taken as elements of an initializer list (which has a higher priority according to the overload resolution rules). </span>
+<span class="hljs-comment">// Thus, it is equivalent to: std::vector&lt;std::set&lt;float&gt;::iterator&gt; v2{s.begin(), s.end()};</span>
+</div></code></pre>
+<p>Because of above confusing example, for a type with complicated constructors such as std::vector&lt;&gt; and other STL containers,
+<strong>it is highly recommended not to use class template argument deduction</strong> and instead, to specify the
+element type(s) explicitly.</p>
+<p><strong>No Deduction Guides for Smart Pointers</strong></p>
+<p>Because of the complication caused by aliasing constructor, the C++ standard committee has decided not to support it.</p>
+<br>
+<br>
+<h1 id="compile-time-if">Compile-Time if</h1>
+<p><a href="https://wg21.link/p0292r2">https://wg21.link/p0292r2</a>, <a href="https://wg21.link/p0128r0">https://wg21.link/p0128r0</a></p>
+<p>Note that a discarded statement is not ignored. The first translation phase (the definition time) is always performed, which checks:</p>
+<ul>
+<li>the correct syntax</li>
+<li>the validity of all names (such as function is declared) that do not depend on template parameters.</li>
+<li>All static_asserts that don't depend on template parameter must also be valid.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(T t)</span>
+</span>{
+    <span class="hljs-function"><span class="hljs-keyword">if</span> <span class="hljs-title">constexpr</span><span class="hljs-params">(std::is_integral_v&lt;T&gt;)</span> </span>{
+        ...
+    }
+    <span class="hljs-keyword">else</span> {
+        <span class="hljs-built_in">undeclared</span>(t); <span class="hljs-comment">// error if function &quot;undeclared(t)&quot; if not declared and not discarded (i.e., T is not integral)</span>
+        <span class="hljs-built_in">undeclared</span>();  <span class="hljs-comment">// error if function &quot;undeclared()&quot; not declared (*even the else part is discarded*)</span>
+        <span class="hljs-built_in"><span class="hljs-keyword">static_assert</span></span>(<span class="hljs-literal">false</span>, <span class="hljs-string">&quot;no integral&quot;</span>); <span class="hljs-comment">// always asserts (*even the else part is discarded*)</span>
+    }
+}
+</div></code></pre>
+<p>One application of compile-time if is the perfect forwarding of return values, <em>where they have to be processed before they can be returned</em>.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Normally, if we dont need process return value</span>
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> Callable, <span class="hljs-keyword">typename</span>... Args&gt;
+<span class="hljs-keyword">decltype</span>(<span class="hljs-keyword">auto</span>) <span class="hljs-title">call1</span><span class="hljs-params">(Callable op, Args&amp;&amp;... args)</span> <span class="hljs-comment">// decltype(auto) is to perfect forward a return type without knowing whether it is a reference or a value. </span>
+</span>{ 
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">op</span>(std::forward&lt;Args&gt;(args)...); 
+}
+
+<span class="hljs-comment">// If we now have to process the return value of callable</span>
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> Callable, <span class="hljs-keyword">typename</span>... Args&gt;
+<span class="hljs-keyword">decltype</span>(<span class="hljs-keyword">auto</span>) <span class="hljs-title">call2</span><span class="hljs-params">(Callable op, Args&amp;&amp;... args)</span>
+</span>{
+    <span class="hljs-function"><span class="hljs-keyword">if</span> <span class="hljs-title">constexpr</span><span class="hljs-params">(std::is_void_v&lt;std::<span class="hljs-keyword">invoke_result_t</span>&lt;Callable, Args...&gt;&gt;)</span> </span>{
+        <span class="hljs-comment">// return type is void:</span>
+        <span class="hljs-comment">// can&#x27;t use decltype(auto) here, because it cannot be deduced for void (as void is an incomplete type)</span>
+        <span class="hljs-built_in">op</span>(std::forward&lt;Args&gt;(args)...);
+        ... <span class="hljs-comment">// do something before we return</span>
+        <span class="hljs-keyword">return</span>;
+    }
+    <span class="hljs-keyword">else</span> {
+        <span class="hljs-comment">// return type is not void:</span>
+        <span class="hljs-keyword">decltype</span>(<span class="hljs-keyword">auto</span>) ret{<span class="hljs-built_in">op</span>(std::forward&lt;Args&gt;(args)...)};
+        ... <span class="hljs-comment">// do something (with ret) before we return</span>
+        <span class="hljs-keyword">return</span> ret;
+    }
+}
+</div></code></pre>
+<br>
+<br>
+<h1 id="fold-expressions">Fold Expressions</h1>
+<p><a href="https://wg21.link/n4295">https://wg21.link/n4295</a>.</p>
+<p>Fold Expressions is a feature to compute the result of using a binary operator over <em>all</em> arguments of a parameter pack.</p>
+<p>The intention is to avoid the need to recursively instantiate templates to perform an operation on all parameters of a parameter pack.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Before C++17</span>
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-keyword">auto</span> <span class="hljs-title">foldSumRec</span> <span class="hljs-params">(T arg)</span> </span>{
+    <span class="hljs-keyword">return</span> arg;
+}
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span>... Ts&gt;
+<span class="hljs-keyword">auto</span> <span class="hljs-title">foldSumRec</span> <span class="hljs-params">(T1 arg1, Ts... otherArgs)</span> </span>{
+    <span class="hljs-keyword">return</span> arg1 + <span class="hljs-built_in">foldSumRec</span>(otherArgs...);
+}
+
+<span class="hljs-comment">// Since C++17</span>
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... T&gt;
+<span class="hljs-keyword">auto</span> <span class="hljs-title">foldSum</span> <span class="hljs-params">(T... args)</span> </span>{
+    <span class="hljs-keyword">return</span> (... + args); <span class="hljs-comment">// arg1 + arg2 + arg3 ...</span>
+}
+</div></code></pre>
+<p><strong>unary left fold</strong>: <code>( ... op args )</code>
+<br>which expands to: <code>((arg1 op arg2) op arg3) op . . .</code>
+<br> <strong>left fold is more common</strong>, because most evaluation is from left to right.</p>
+<p><strong>unary right fold</strong>:  <code>( args op ... )</code>
+<br>which expands to: <code>arg1 op (arg2 op . . . (argN-1 op argN))</code></p>
+<p><strong>binary left fold</strong>: <code>( value op ... op args )</code>
+<br>which expands to: <code>(((value op arg1) op arg2) op arg3) op ...</code></p>
+<p><strong>binary right fold</strong>: <code>( args op ... op value )</code>
+<br>which expands to: <code>arg1 op (arg2 op . . . (argN op value)))</code></p>
+<p><strong>Empty Parameter Packs</strong></p>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Value when parameter pack is empty</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&amp;&amp;</td>
+<td>true</td>
+</tr>
+<tr>
+<td>||</td>
+<td>false</td>
+</tr>
+<tr>
+<td>,</td>
+<td>void()</td>
+</tr>
+<tr>
+<td>all other</td>
+<td>use binary fold with an initial value</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Folded Function Calls</strong> (using <strong>comma operator</strong>)</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Types&gt;
+<span class="hljs-keyword">void</span> <span class="hljs-title">callFoo</span><span class="hljs-params">(<span class="hljs-keyword">const</span> Types&amp;... args)</span>
+</span>{
+    (... , <span class="hljs-built_in">foo</span>(args)); <span class="hljs-comment">// calls foo(arg1), foo(arg2), foo(arg3), ...</span>
+
+    <span class="hljs-comment">// NOTE, this comma right fold has same effect as above comma left fold</span>
+    <span class="hljs-comment">// because of the evaluation order of the comma operator is always left to right.</span>
+    <span class="hljs-comment">// even though it expands to &quot;foo(arg1) , (foo(arg2) , foo(arg3));&quot; with parentheses grouping the calls, it is still called left to right.</span>
+    (<span class="hljs-built_in">foo</span>(args) , ...); <span class="hljs-comment">// right fold, SAME as left fold here.</span>
+}
+
+
+
+<span class="hljs-comment">// if move semantics should be supported</span>
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Types&gt;
+<span class="hljs-keyword">void</span> <span class="hljs-title">callFoo</span><span class="hljs-params">(Types&amp;&amp;... args)</span>
+</span>{
+    (... , <span class="hljs-built_in">foo</span>(std::forward&lt;Types&gt;(args))); <span class="hljs-comment">// calls foo(arg1), foo(arg2), ...</span>
+}
+
+<span class="hljs-comment">// cast return type to void, in case the called function returns a value of a type with an overloaded comma operator</span>
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Types&gt;
+<span class="hljs-keyword">void</span> <span class="hljs-title">callFoo</span><span class="hljs-params">(<span class="hljs-keyword">const</span> Types&amp;... args)</span>
+</span>{
+    (... , (<span class="hljs-keyword">void</span>)<span class="hljs-built_in">foo</span>(std::forward&lt;Types&gt;(args))); <span class="hljs-comment">// calls foo(arg1), foo(arg2), ...</span>
+}
+
+<span class="hljs-comment">//Example: calls of member functions of a variadic number of base classes:</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Bases&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MultiBase</span> :</span> <span class="hljs-keyword">private</span> Bases...
+{
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">()</span> </span>{
+        (... , Bases::<span class="hljs-built_in">print</span>()); <span class="hljs-comment">// call print() of all base classes:</span>
+    }
+};
+</div></code></pre>
+<p><strong>Fold Expressions for Types</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;type_traits&gt;</span></span>
+
+<span class="hljs-comment">// check whether tempalte parameter types are homogeneous:</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span>... TN&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">IsHomogeneous</span> {</span>
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">bool</span> value = (std::is_same_v&lt;T1,TN&gt; &amp;&amp; ...);
+};
+
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">T</span>, <span class="hljs-title">class</span>... <span class="hljs-title">Rest</span>&gt;</span>
+<span class="hljs-keyword">inline</span> <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">bool</span> are_all_same = (std::is_same_v&lt;T, Rest&gt; &amp;&amp; ...);
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">T</span>, <span class="hljs-title">class</span>... <span class="hljs-title">Rest</span>&gt;</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">is_any</span> :</span> std::bool_constant&lt;(std::is_same_v&lt;T, Rest&gt; || ...)&gt; 
+{};
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">T</span>, <span class="hljs-title">class</span>... <span class="hljs-title">Rest</span>&gt;</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">are_same</span> :</span> std::bool_constant&lt;(std::is_same_v&lt;T, Rest&gt; &amp;&amp; ...)&gt; 
+{};
+
+<span class="hljs-comment">// check whether passed arguments have the same type:</span>
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span>... TN&gt;
+<span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">isHomogeneous</span><span class="hljs-params">(T1, TN...)</span>
+</span>{
+    <span class="hljs-keyword">return</span> (std::is_same_v&lt;T1,TN&gt; &amp;&amp; ...);
+}
+
+<span class="hljs-comment">// expands to: </span>
+<span class="hljs-comment">//  std::is_same_v&lt;int,int&gt; &amp;&amp; std::is_same_v&lt;int,const char*&gt; &amp;&amp; std::is_same_v&lt;int,std::nullptr_t&gt;</span>
+<span class="hljs-comment">// As usual, operator &amp;&amp; short-circuits (aborts the evaluation after the first false).</span>
+<span class="hljs-built_in">isHomogeneous</span>(<span class="hljs-number">43</span>, <span class="hljs-number">-1</span>, <span class="hljs-string">&quot;hello&quot;</span>, <span class="hljs-literal">nullptr</span>) 
+</div></code></pre>
+<br>
+<br>
+<h1 id="other-template-programming-improvements">Other Template Programming Improvements</h1>
+<h2 id="auto-as-non-type-template-parameter"><code>auto</code> as non-type template parameter</h2>
+<p><a href="http://open-std.org/JTC1/SC22/WG21/docs/papers/2016/p0127r1.html">http://open-std.org/JTC1/SC22/WG21/docs/papers/2016/p0127r1.html</a></p>
+<p>As a refresher, a non-type template parameter is a template parameter that does not name a type, but rather, a constant value (e.g. <code>template&lt;int value&gt;</code>).</p>
+<p>Since C++17, you can use placeholder types (<code>auto</code> and <code>decltype(auto)</code>) as <em>non-type</em> template parameter types.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">auto</span> V&gt; <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">S</span> {</span>  <span class="hljs-comment">// type of V is deduced</span>
+    ...
+};
+
+S&lt;<span class="hljs-number">42</span>&gt; s1;  <span class="hljs-comment">// OK: type of N in S is int</span>
+S&lt;<span class="hljs-string">&#x27;a&#x27;</span>&gt; s2; <span class="hljs-comment">// OK: type of N in S is char</span>
+S&lt;<span class="hljs-number">2.5</span>&gt; s3; <span class="hljs-comment">// ERROR: template parameter type still cannot be double, C++20 fixes this.</span>
+</div></code></pre>
+<p>With variadic tempaltes</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">auto</span>... VS&gt; <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HeterogeneousValueList</span>
+{</span>};
+
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">auto</span> V1, <span class="hljs-keyword">decltype</span>(V1)... VS&gt; <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HomogeneousValueList</span> 
+{</span>};
+
+HeterogeneousValueList&lt;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&gt; vals1;      <span class="hljs-comment">// OK</span>
+HeterogeneousValueList&lt;<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-literal">true</span>&gt; vals2; <span class="hljs-comment">// OK</span>
+HomogeneousValueList&lt;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&gt; vals3;        <span class="hljs-comment">// OK</span>
+HomogeneousValueList&lt;<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-literal">true</span>&gt; vals4;   <span class="hljs-comment">// ERROR</span>
+</div></code></pre>
+<p>This makes <strong>defining metaprogramming constants</strong> easier</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Before C++17</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, T v&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">constant</span>
+{</span>
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">constexpr</span> T value = v;
+};
+<span class="hljs-keyword">using</span> i = constant&lt;<span class="hljs-keyword">int</span>, <span class="hljs-number">42</span>&gt;;
+<span class="hljs-keyword">using</span> c = constant&lt;<span class="hljs-keyword">char</span>, <span class="hljs-string">&#x27;x&#x27;</span>&gt;;
+<span class="hljs-keyword">using</span> b = constant&lt;<span class="hljs-keyword">bool</span>, <span class="hljs-literal">true</span>&gt;;
+
+<span class="hljs-comment">// Since C++17</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">auto</span> v&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">constant</span>
+{</span>
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">auto</span> value = v;
+};
+<span class="hljs-keyword">using</span> i = constant&lt;<span class="hljs-number">42</span>&gt;;
+<span class="hljs-keyword">using</span> c = constant&lt;<span class="hljs-string">&#x27;x&#x27;</span>&gt;;
+<span class="hljs-keyword">using</span> b = constant&lt;<span class="hljs-literal">true</span>&gt;;
+
+<span class="hljs-comment">// you can also declare a constant variable of an arbitrary type deduced from its initial value:</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">auto</span> N&gt; <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">auto</span> val = N; <span class="hljs-comment">// OK since C++17</span>
+
+<span class="hljs-keyword">auto</span> v1 = val&lt;<span class="hljs-number">5</span>&gt;;       <span class="hljs-comment">// v1 is deduced as int, and it is set as 5</span>
+<span class="hljs-keyword">auto</span> v2 = val&lt;<span class="hljs-literal">true</span>&gt;;    <span class="hljs-comment">// v2 is deduced as bool, it is set as true</span>
+<span class="hljs-keyword">auto</span> v3 = val&lt;<span class="hljs-string">&#x27;a&#x27;</span>&gt;;     <span class="hljs-comment">// v3 is deduced as char, it is set as &#x27;a&#x27;</span>
+
+<span class="hljs-comment">// Before C++17</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, T... Elements&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sequence</span> {</span>
+};
+<span class="hljs-keyword">using</span> indexes = sequence&lt;<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>&gt;;
+
+<span class="hljs-comment">// Since C++17</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">auto</span>... Elements&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sequence</span> {</span>
+};
+<span class="hljs-keyword">using</span> indexes = sequence&lt;<span class="hljs-number">0</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>&gt;;
+</div></code></pre>
+<br>
+<br>
+<h2 id="pack-expansions-in-using-clause">Pack expansions in <code>using</code> clause</h2>
+<p>Comma-separated using declarations allow you to generically derive all operations of the same kind from a variadic list of base classes.</p>
+<p>Example: &quot;inherit&quot; all function call operators of passed base types (One application of this technique are <code>std::variant</code> visitors):</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Ts&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">overload</span> :</span> Ts...
+{
+    <span class="hljs-function"><span class="hljs-keyword">using</span> <span class="hljs-title">Ts::operator</span><span class="hljs-params">()</span>...</span>;
+};
+
+<span class="hljs-comment">// Deduction Guides: base types are deduced from passed arguments:</span>
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Ts&gt;
+<span class="hljs-title">overload</span><span class="hljs-params">(Ts...)</span> -&gt; overload&lt;Ts...&gt;</span>;
+
+<span class="hljs-comment">// Here,  we use a deduction guide to deduce the types of the lambdas as base classes of the template type overload </span>
+<span class="hljs-comment">// and use aggregate initialization to initialize the subobjects for the bases classes with the copy constructor of the closure type of each lambda.</span>
+<span class="hljs-keyword">auto</span> twice = overload {
+    [](std::string&amp; s) { s += s; },
+    [](<span class="hljs-keyword">auto</span>&amp; v) { v *= <span class="hljs-number">2</span>; }
+};
+
+<span class="hljs-comment">// The using declaration then makes both function call operators available for type overload.</span>
+<span class="hljs-comment">// As a result, you can pass a string, which calls the first overload, or pass another type, which uses the second overload</span>
+<span class="hljs-keyword">int</span> i = <span class="hljs-number">42</span>;
+<span class="hljs-built_in">twice</span>(i); <span class="hljs-comment">// i 84 now</span>
+std::string s = <span class="hljs-string">&quot;hi&quot;</span>;
+<span class="hljs-built_in">twice</span>(s); <span class="hljs-comment">// s is &quot;hihi&quot; now</span>
+
+<span class="hljs-comment">// Or use this in a variant</span>
+<span class="hljs-function">std::variant&lt;<span class="hljs-keyword">int</span>, std::string&gt; <span class="hljs-title">var</span><span class="hljs-params">(<span class="hljs-number">42</span>)</span></span>;
+std::<span class="hljs-built_in">visit</span>(twice, var); <span class="hljs-comment">// value 42 becomes 84</span>
+var = <span class="hljs-string">&quot;hi&quot;</span>;
+std::<span class="hljs-built_in">visit</span>(twice, var); <span class="hljs-comment">// value &quot;hi&quot; becomes &quot;hihi&quot;</span>
+</div></code></pre>
+<p>Example: Variadic Using Declarations for Inheriting Constructors:</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Base</span> {</span>
+    T value{};
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-built_in">Base</span>() {}
+    <span class="hljs-built_in">Base</span>(T v) : value{v} {}
+};
+
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Types&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Multi</span> :</span> <span class="hljs-keyword">private</span> Base&lt;Types&gt;...
+{
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-comment">// derive all constructors:</span>
+    <span class="hljs-keyword">using</span> Base&lt;Types&gt;::Base...;
+};
+
+<span class="hljs-comment">// When declaring Multi&lt;&gt; type for values of three different types, you can declare objects using each one of the corresponding constructors</span>
+<span class="hljs-comment">// Each initialization calls the corresponding constructor for the matching base class and the default constructor for all other base classes.</span>
+<span class="hljs-keyword">using</span> MultiISB = Multi&lt;<span class="hljs-keyword">int</span>,std::string,<span class="hljs-keyword">bool</span>&gt;;
+MultiISB m1 = <span class="hljs-number">42</span>;
+MultiISB m2 = std::<span class="hljs-built_in">string</span>(<span class="hljs-string">&quot;hello&quot;</span>);
+MultiISB m3 = <span class="hljs-literal">true</span>;
+</div></code></pre>
+<br>
+<br>
+<h2 id="stdinvoke"><code>std::invoke&lt;&gt;()</code></h2>
+<p><a href="https://wg21.link/p0604r0">https://wg21.link/p0604r0</a>.</p>
+<h2 id="stdbool_constant"><code>std::bool_constant&lt;&gt;</code></h2>
+<p><a href="https://wg21.link/n4389">https://wg21.link/n4389</a>.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">namespace</span> std {
+    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">bool</span> B&gt;
+        <span class="hljs-keyword">using</span> bool_constant = integral_constant&lt;<span class="hljs-keyword">bool</span>, B&gt;; <span class="hljs-comment">// since C++17</span>
+    <span class="hljs-keyword">using</span> true_type = bool_constant&lt;<span class="hljs-literal">true</span>&gt;;
+    <span class="hljs-keyword">using</span> false_type = bool_constant&lt;<span class="hljs-literal">false</span>&gt;;
+    <span class="hljs-comment">// Before C++17</span>
+    <span class="hljs-comment">//using true_type = integral_constant&lt;bool, true&gt;;</span>
+    <span class="hljs-comment">//using false_type = integral_constant&lt;bool, false&gt;;</span>
+}
+</div></code></pre>
+<h2 id="stdvoid_t"><code>std::void_t&lt;&gt;</code></h2>
+<p><a href="https://wg21.link/n3911">https://wg21.link/n3911</a></p>
+<p><code>std::void_t&lt;&gt;</code> is defined as below, that is, it yields void for any variadic list of template parameters.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">namespace</span> std {
+    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>...&gt; <span class="hljs-keyword">using</span> <span class="hljs-keyword">void_t</span> = <span class="hljs-keyword">void</span>;
+}
+</div></code></pre>
+<p>The major application is the ability to check for conditions when defining new type traits. The following
+example demonstrates the application of this helper:</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span> <span class="hljs-comment">// for declval&lt;&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;type_traits&gt;</span> <span class="hljs-comment">// for true_type, false_type, and void_t</span></span>
+
+<span class="hljs-comment">// primary template:</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>, <span class="hljs-keyword">typename</span> = std::<span class="hljs-keyword">void_t</span>&lt;&gt;&gt;
+    struct HasVarious : std::false_type {
+};
+
+<span class="hljs-comment">// partial specialization (may be SFINAE’d away):</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">HasVarious</span>&lt;</span>T, std::<span class="hljs-keyword">void_t</span>&lt;<span class="hljs-keyword">decltype</span>(std::declval&lt;T&gt;().<span class="hljs-built_in">begin</span>()),
+                                <span class="hljs-keyword">typename</span> T::difference_type,
+                                <span class="hljs-keyword">typename</span> T::iterator&gt;&gt;
+    : std::true_type {
+};
+<span class="hljs-comment">// Note, the usage of declval here is in case T doesn&#x27;t have a constructor: declval converts any type T to a reference type, making it possible to use member functions in decltype expressions without the need to go through constructors. It is commonly used in templates where acceptable template parameters may have no constructor in common, but have the same member function whose return type is needed. </span>
+</div></code></pre>
+<p>The partial specialization is used only when all the corresponding expressions are valid for a type T. In that case, it is more specific than the primary template. In that case, <code>if constexpr (HasVarious&lt;T&gt;::value)</code> yields true.</p>
+<p>Another example: a type trait that finds out whether an operator delete is defined:</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;type_traits&gt;</span> <span class="hljs-comment">// for true_type, false_type, and void_t</span></span>
+<span class="hljs-comment">// primary template:</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>, <span class="hljs-keyword">typename</span> = std::<span class="hljs-keyword">void_t</span>&lt;&gt;&gt;
+struct HasDelete
+    : std::false_type {
+};
+<span class="hljs-comment">// partial specialization (may be SFINAE’d away):</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">HasDelete</span>&lt;</span>T, std::<span class="hljs-keyword">void_t</span>&lt;<span class="hljs-keyword">decltype</span>(T::<span class="hljs-keyword">operator</span> <span class="hljs-built_in"><span class="hljs-keyword">delete</span></span>(<span class="hljs-literal">nullptr</span>))&gt;&gt;
+    : std::true_type {
+};
+
+<span class="hljs-function"><span class="hljs-keyword">if</span> <span class="hljs-title">constexpr</span><span class="hljs-params">(HasDelete&lt;TP&gt;::value)</span> </span>{ <span class="hljs-comment">// yields true for type with delete() defined</span>
+ ...
+}
+</div></code></pre>
+<br>
+<br>
+<h1 id="stdoptional"><code>std::optional&lt;&gt;</code></h1>
+<p><code>std::optional&lt;&gt;</code> object has internal memory for the contained object plus a Boolean flag. Thus, the
+size is usually one byte larger than the contained object (plus a possible alignment overhead). No heap
+memory is allocated. The object uses the same alignment as the contained type.</p>
+<p>If there is no value, no constructor is called for the contained type (that way, objects
+that do not have a default constructor can get a default state).</p>
+<p>Copying is implemented as a deep copy that creates an independent object with the flag and the contained value (if there
+is one).</p>
+<pre><code class="language-C++"><div>std::optional&lt;std::string&gt; os;
+
+std::cout &lt;&lt; os; <span class="hljs-comment">// ERROR, no I/O operator directly defined.</span>
+
+<span class="hljs-comment">// does not check whether the optional contains a value!</span>
+<span class="hljs-comment">// The behavior is undefined if *this does not contain a value.</span>
+<span class="hljs-comment">// - Use has_value() or operator bool() to check. </span>
+<span class="hljs-comment">// - if checked access is needed, value() or value_or() may be used.</span>
+std::cout &lt;&lt; *os; <span class="hljs-comment">// NOT SAFE!</span>
+
+<span class="hljs-comment">// If *this contains a value, returns a reference to the contained value.</span>
+<span class="hljs-comment">// Otherwise, throws a std::bad_optional_access exception.</span>
+std::cout &lt;&lt; os.<span class="hljs-built_in">value</span>();
+
+<span class="hljs-comment">// return by value </span>
+<span class="hljs-comment">// this could potentially allocate thus more expensive operation, while value() never allocate.</span>
+std::cout &lt;&lt; os.<span class="hljs-built_in">value_or</span>(<span class="hljs-string">&quot;no value&quot;</span>); 
+<span class="hljs-comment">// so an efficient implementation of above is</span>
+std::cout &lt;&lt; os ? os-&gt;<span class="hljs-built_in">c_str</span>() : <span class="hljs-string">&quot;no value&quot;</span>;
+
+<span class="hljs-keyword">if</span>(os) { <span class="hljs-comment">// same as os.has_value()</span>
+    std::cout &lt;&lt; *os;
+}
+</div></code></pre>
+<p><strong>comparsion</strong></p>
+<ul>
+<li>If only one operand is with a value, the operand without a value is considered to be less than the other operand.</li>
+<li>If both operands are without a value, they are considered to be equal.</li>
+</ul>
+<p>Note that optional Boolean or raw pointer comparsion can result in some surprises. See examples below</p>
+<pre><code class="language-C++"><div>std::optional&lt;<span class="hljs-keyword">unsigned</span>&gt; uo;
+uo &lt; <span class="hljs-number">0</span> <span class="hljs-comment">// yields true</span>
+uo &lt; <span class="hljs-number">-42</span> <span class="hljs-comment">// yields true</span>
+<span class="hljs-keyword">if</span> (uo == <span class="hljs-number">0</span>) {
+    <span class="hljs-comment">// this evaluation to false, does not get into this block</span>
+}
+
+std::optional&lt;<span class="hljs-keyword">bool</span>&gt; bo;
+<span class="hljs-keyword">if</span> (bo &lt; <span class="hljs-literal">false</span>) <span class="hljs-comment">// yields true, beucase bo is empty.</span>
+
+std::optional&lt;<span class="hljs-keyword">bool</span>&gt; opt1{<span class="hljs-literal">false</span>};
+<span class="hljs-keyword">if</span> (opt1) ... <span class="hljs-comment">// yeilds true because the variable is non-empty (even though it is false)</span>
+              <span class="hljs-comment">// RECOMMEND: use opt1.has_value() check instead to avoid confusion</span>
+<span class="hljs-keyword">if</span> (opt1 == <span class="hljs-literal">false</span>) ... <span class="hljs-comment">// yields true, comparsion checks the contained value</span>
+
+std::optional&lt;<span class="hljs-keyword">void</span>*&gt; opt2 {<span class="hljs-literal">nullptr</span>};
+<span class="hljs-keyword">if</span> (opt2) ... <span class="hljs-comment">// yields true because the variable is non-empty (even though it is nullptr)</span>
+              <span class="hljs-comment">// RECOMMEND: use opt2.has_value() check instead to avoid confusion</span>
+<span class="hljs-keyword">if</span> (op == <span class="hljs-literal">nullptr</span>) ... <span class="hljs-comment">// yields true, comparsion checks the contained value</span>
+</div></code></pre>
+<p><strong>reset</strong></p>
+<pre><code class="language-C++"><div>std::optional ox{<span class="hljs-number">77</span>}; <span class="hljs-comment">// optional&lt;int&gt; with value 77</span>
+<span class="hljs-comment">// below three statements do the same thing</span>
+ox = std::nullopt;
+ox.<span class="hljs-built_in">reset</span>();
+ox={};
+</div></code></pre>
+<p><strong>move</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Due to these overloads, temporary optionals are moved</span>
+<span class="hljs-keyword">namespace</span> std {
+    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">optional</span> {</span>
+        ...
+        <span class="hljs-keyword">constexpr</span> T&amp;&amp; <span class="hljs-keyword">operator</span>*() &amp;&amp;;
+        <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">const</span> T&amp;&amp; <span class="hljs-keyword">operator</span>*() <span class="hljs-keyword">const</span>&amp;&amp;;
+        <span class="hljs-function"><span class="hljs-keyword">constexpr</span> T&amp;&amp; <span class="hljs-title">value</span><span class="hljs-params">()</span> &amp;&amp;</span>;
+        <span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">const</span> T&amp;&amp; <span class="hljs-title">value</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>&amp;&amp;</span>;
+    };
+}
+
+<span class="hljs-function">std::optional&lt;std::string&gt; <span class="hljs-title">func</span><span class="hljs-params">()</span></span>; <span class="hljs-comment">// a function that returns an optional string</span>
+std::string s4 = <span class="hljs-built_in">func</span>().<span class="hljs-built_in">value</span>(); <span class="hljs-comment">// OK, moves</span>
+std::string s5 = *<span class="hljs-built_in">func</span>(); <span class="hljs-comment">// OK, moves</span>
+
+std::optional&lt;std::string&gt; os;
+std::string s6 = std::<span class="hljs-built_in">move</span>(os).<span class="hljs-built_in">value</span>(); <span class="hljs-comment">// OK, moves</span>
+</div></code></pre>
+<br>
+<br>
+<h1 id="stdvariant"><code>std::variant&lt;&gt;</code></h1>
+<p><a href="https://wg21.link/p0088r3">https://wg21.link/p0088r3</a></p>
+<p>With std::variant&lt;&gt;, the C++ standard library provides a closed discriminated union (which means that there is a specified list of possible types). Compared to union, it have following advantages:</p>
+<ul>
+<li>Where the type of the current value is always known</li>
+<li>variant can hold values of any specified type</li>
+<li>you can derive from a variant</li>
+<li>variant can have two alternatives with same type</li>
+</ul>
+<p>Variants simply have internal memory for the maximum size of the underlying types plus a fixed overhead to manage which alternative is used.</p>
+<p>No heap memory is allocated.(unlike <code>Boost.Variant</code>, where memory had to be allocated to be able to recover from exceptions during value changes)</p>
+<p>Same as with <code>std::optional&lt;&gt;</code> and <code>std::any</code>, the resulting objects have value semantics. That is, copying is implemented as a <code>deep copy</code>. However, copying a std::variant&lt;&gt; is slightly more expensive because it has to find out which value to copy.</p>
+<p><strong><code>std::monostate</code></strong></p>
+<p>By default, the default constructor of a variant calls the default constructor of the first alternative.</p>
+<p>To support variants where the first type has no default constructor, the C++ standard library provides a special helper type: <code>std::monostate</code> so that the variant can be default constructible. Its purpose is to represent an alternative type so that the variant has no value of any other type.</p>
+<pre><code class="language-C++"><div>std::variant&lt;std::monostate, NoDefConstr, <span class="hljs-keyword">int</span>&gt; v2; <span class="hljs-comment">// OK to be default constructed now</span>
+std::cout &lt;&lt; <span class="hljs-string">&quot;index: &quot;</span> &lt;&lt; v2.<span class="hljs-built_in">index</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>; <span class="hljs-comment">// prints 0</span>
+</div></code></pre>
+<p><strong>Constructor</strong></p>
+<ul>
+<li>If a value is passed for initialization, the best matching type is used.</li>
+<li>If two types match equally well, the call is ambiguous</li>
+<li>use <code>std::in_place_index</code> to resolve ambiguities</li>
+</ul>
+<pre><code class="language-C++"><div>std::variant&lt;<span class="hljs-keyword">long</span>, <span class="hljs-keyword">int</span>&gt; v2{<span class="hljs-number">42</span>}; <span class="hljs-comment">// OK, v2.index() == 1</span>
+std::variant&lt;<span class="hljs-keyword">long</span>, <span class="hljs-keyword">long</span>&gt; v3{<span class="hljs-number">42</span>}; <span class="hljs-comment">// ERROR: ambiguous</span>
+std::variant&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">float</span>&gt; v4{<span class="hljs-number">42.3</span>}; <span class="hljs-comment">// ERROR: ambiguous</span>
+std::variant&lt;std::string, std::string_view&gt; v7{<span class="hljs-string">&quot;hello&quot;</span>}; <span class="hljs-comment">// ERROR: ambiguous</span>
+std::variant&lt;std::string, std::string_view, <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span>*&gt; v8{<span class="hljs-string">&quot;hello&quot;</span>}; <span class="hljs-comment">// OK, v2.index() == 2</span>
+std::variant&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">int</span>&gt; v13{std::in_place_index&lt;<span class="hljs-number">1</span>&gt;, <span class="hljs-number">77</span>}; <span class="hljs-comment">// init 2nd int, v2.index() == 1</span>
+std::variant&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">long</span>&gt; v14{std::in_place_index&lt;<span class="hljs-number">1</span>&gt;, <span class="hljs-number">77</span>}; <span class="hljs-comment">// init long, not int, v2.index() == 1</span>
+</div></code></pre>
+<p><strong>Access</strong></p>
+<ul>
+<li><code>get&lt;&gt;()</code>, you can pass its index, or a type (if it is not used twice).
+<ul>
+<li>Using invalid index/type results in compiler-time error.</li>
+<li>if it requests an alternative not currently set, it throws a <code>std::bad_variant_exception</code>.</li>
+</ul>
+</li>
+<li><code>get_if&lt;&gt;()</code> acess the value with the check whether it exists.  You pass a pointer to a variant, it returns either a pointer to the current value or <code>nullptr</code>.
+<ul>
+<li>example: using <a href="#if-and-switch-with-initialization">if with initialization</a><pre><code class="language-C++"><div><span class="hljs-keyword">if</span> (<span class="hljs-keyword">auto</span> ip = std::get_if&lt;<span class="hljs-number">1</span>&gt;(&amp;var)) {
+    std::cout &lt;&lt; *ip &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+}
+<span class="hljs-keyword">else</span> {
+    std::cout &lt;&lt; <span class="hljs-string">&quot;alternative with index 1 not set\n&quot;</span>;
+}
+</div></code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Modify</strong></p>
+<ul>
+<li><code>operator=</code> or <code>emplace&lt;&gt;()</code> (in-place construct). If it is a change to the stored type, then a destructor of the underlying type is called.</li>
+<li>You can use <code>get&lt;&gt;()</code> or <code>get_if&lt;&gt;()</code> to assign a new value to the current alternative, since they return a reference/pointer</li>
+<li>visitor</li>
+</ul>
+<pre><code class="language-C++"><div>std::variant&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">float</span>, std::string&gt; intFloatString { <span class="hljs-string">&quot;Hello&quot;</span> };
+intFloatString = <span class="hljs-number">10</span>; <span class="hljs-comment">// we&#x27;re now an int</span>
+intFloatString.emplace&lt;<span class="hljs-number">2</span>&gt;(std::<span class="hljs-built_in">string</span>(<span class="hljs-string">&quot;Hello&quot;</span>)); <span class="hljs-comment">// we&#x27;re now string again</span>
+
+<span class="hljs-comment">// std::get returns a reference, so you can change the value:</span>
+std::get&lt;std::string&gt;(intFloatString) += std::<span class="hljs-built_in">string</span>(<span class="hljs-string">&quot; World&quot;</span>);
+
+intFloatString = <span class="hljs-number">10.1f</span>;
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">auto</span> pFloat = std::get_if&lt;<span class="hljs-keyword">float</span>&gt;(&amp;intFloatString); pFloat)
+    *pFloat *= <span class="hljs-number">2.0f</span>;
+</div></code></pre>
+<p><strong>Valueless by Exception</strong></p>
+<p>When you modify a variant and this modification throws an exception, the variant can get into a very special state: the variant has already lost its old but has not received its new value. ie, the variant holds no value at all.</p>
+<ul>
+<li><code>var.valueless_by_exception()</code> returns <code>true</code></li>
+<li><code>var.index()</code> returns <code>std::variant_npos</code></li>
+</ul>
+<h2 id="visitor">visitor</h2>
+<p>Visitors are objects that have to unambiguously provide a function call operator for each possible type. When these objects “visit” a variant, they call the best matching function call operator for the actual value of the variant.</p>
+<ul>
+<li>The call of visit() is a compile-time error if not all possible types are supported by an operator() or if the call is ambiguous.</li>
+<li>You cannot have different behavior for alternatives that have the same type.</li>
+</ul>
+<p>The easist way to use visitor is to use a generic lambda.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">auto</span> printvariant = [](<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; val) {
+    std::cout &lt;&lt; val &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+};
+<span class="hljs-comment">// which conceptually creates this lambda closure type</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CompilerSpecificClosureTypeName</span> {</span>
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+    <span class="hljs-keyword">auto</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span> <span class="hljs-params">(<span class="hljs-keyword">const</span> T&amp; val)</span> <span class="hljs-keyword">const</span> </span>{
+        std::cout &lt;&lt; val &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+    }
+};
+<span class="hljs-comment">// use visit here</span>
+std::<span class="hljs-built_in">visit</span>(printvariant, var);
+
+<span class="hljs-comment">// double the value of the current alternative:</span>
+std::<span class="hljs-built_in">visit</span>([](<span class="hljs-keyword">auto</span>&amp; val) {
+                val = val + val;
+            },
+            var);
+
+<span class="hljs-comment">// restore to the default value of the current alternative:</span>
+std::<span class="hljs-built_in">visit</span>([](<span class="hljs-keyword">auto</span>&amp; val) {
+                val = std::<span class="hljs-keyword">remove_reference_t</span>&lt;<span class="hljs-keyword">decltype</span>(val)&gt;{};
+            },
+            var);
+
+<span class="hljs-comment">// Return Values in Visitors</span>
+<span class="hljs-keyword">using</span> IntOrDouble = std::variant&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">double</span>&gt;;
+std::vector&lt;IntOrDouble&gt; coll { <span class="hljs-number">42</span>, <span class="hljs-number">7.7</span>, <span class="hljs-number">0</span>, <span class="hljs-number">-0.7</span>};
+<span class="hljs-keyword">double</span> sum{<span class="hljs-number">0</span>};
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; elem : coll) {
+    sum += std::<span class="hljs-built_in">visit</span>([] (<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; val) -&gt; <span class="hljs-keyword">double</span> { <span class="hljs-comment">// explicit specification of the return type double is required here</span>
+                          <span class="hljs-keyword">return</span> val;
+                      },
+                      elem);
+}
+</div></code></pre>
+<p>By using an overloader for function objects and lambdas, you can also define a set of lambdas where the
+best match is used as a visitor. <a href="#pack-expansions-in-using-clause">Also refer to here</a></p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;class... Ts&gt; <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">overload</span> :</span> Ts... { <span class="hljs-function"><span class="hljs-keyword">using</span> <span class="hljs-title">Ts::operator</span><span class="hljs-params">()</span>...</span>; };
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;class... Ts&gt; <span class="hljs-title">overload</span><span class="hljs-params">(Ts...)</span> -&gt; overload&lt;Ts...&gt;</span>;
+std::variant&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">float</span>, std::string&gt; intFloatString { <span class="hljs-string">&quot;Hello&quot;</span> };
+std::<span class="hljs-built_in">visit</span>(overload{
+                [](<span class="hljs-keyword">int</span>&amp; i) { i*= <span class="hljs-number">2</span>; },
+                [](<span class="hljs-keyword">float</span>&amp; f) { f*= <span class="hljs-number">2.0f</span>; },
+                [](std::string&amp; s) { s = s + s; }
+            }, intFloatString);
+std::<span class="hljs-built_in">visit</span>(PrintVisitor, intFloatString);
+</div></code></pre>
+<p><strong>Polymorphism with <code>std::variant</code></strong></p>
+<p>A variant&lt;&gt; can hold values of multiple alternative types. By creating collections of variants, the collections become heterogeneous, holding objects of different types. With visitor interface, we can program that at runtime different functions/methods are called for different types (similar to virtual function's behavior).</p>
+<p>Example (incomplete code)</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// different types of all geometric object types:</span>
+<span class="hljs-keyword">using</span> GeoObj = std::variant&lt;Line, Circle, Rectangle&gt;;
+
+<span class="hljs-comment">// create and initialize a collection of geometric objects:</span>
+std::vector&lt;GeoObj&gt; f {
+            Line{Coord{<span class="hljs-number">1</span>,<span class="hljs-number">2</span>},Coord{<span class="hljs-number">3</span>,<span class="hljs-number">4</span>}},
+            Circle{Coord{<span class="hljs-number">5</span>,<span class="hljs-number">5</span>},<span class="hljs-number">2</span>},
+            Rectangle{Coord{<span class="hljs-number">3</span>,<span class="hljs-number">3</span>},Coord{<span class="hljs-number">6</span>,<span class="hljs-number">4</span>}} };
+
+<span class="hljs-comment">// By using visitors, we can then iterate over the elements and “do the right thing” depending on the element type:</span>
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; geoobj : f) {
+    std::<span class="hljs-built_in">visit</span>([] (<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; obj) {
+                    obj.<span class="hljs-built_in">draw</span>(); <span class="hljs-comment">// polymorphic call of draw()</span>
+                },
+                geoobj);
+}
+</div></code></pre>
+<p>Another example:</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">using</span> Var = std::variant&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">double</span>, std::string&gt;;
+std::vector&lt;Var&gt; values {<span class="hljs-number">42</span>, <span class="hljs-number">0.19</span>, <span class="hljs-string">&quot;hello world&quot;</span>, <span class="hljs-number">0.815</span>};
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> Var&amp; val : values) {
+    std::<span class="hljs-built_in">visit</span>([] (<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; v) {
+                <span class="hljs-keyword">if</span> <span class="hljs-built_in"><span class="hljs-keyword">constexpr</span></span>(std::is_same_v&lt;<span class="hljs-keyword">decltype</span>(v), <span class="hljs-keyword">const</span> std::string&amp;&gt;) {
+                    std::cout &lt;&lt; <span class="hljs-string">&#x27;&quot;&#x27;</span> &lt;&lt; v &lt;&lt; <span class="hljs-string">&quot;\&quot; &quot;</span>;
+                }
+                <span class="hljs-keyword">else</span> {
+                    std::cout &lt;&lt; v &lt;&lt; <span class="hljs-string">&#x27; &#x27;</span>;
+                }
+            },
+            val);
+}
+</div></code></pre>
+<br>
+<br>
+<h1 id="stdany"><code>std::any</code></h1>
+<p><a href="https://wg21.link/n3804">https://wg21.link/n3804</a></p>
+<p><code>std::any</code> is a value type that can change its type while still having type safety. That is, objects can hold values of any arbitrary type but they know which type the value has that they currently hold.</p>
+<p>The trick is that objects contain both the contained value and the type of the contained value.</p>
+<p>Because the value can have any size, the memory might be allocated on the heap. However, implementations should avoid the use of heap memory for small contained values.</p>
+<p>In the header file <code>&lt;any&gt;</code>, the C++ standard library defines class <code>std::any</code> as follows. That is, <strong><code>std::any</code> is not a class template</strong> at all.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">namespace</span> std {
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">any</span>;</span>
+}
+</div></code></pre>
+<p>By default, a <code>std::any</code> is initialized by being empty. If a value is passed for initialization, its <em><strong>decayed</strong></em> type (arrays convert to pointers, and top-level references and const are ignored) is used as the type of the contained value:</p>
+<pre><code class="language-C++"><div>std::any a1; <span class="hljs-comment">// a1 is empty </span>
+std::any a2 = <span class="hljs-number">42</span>;       <span class="hljs-comment">// a2 contains value of type int</span>
+std::any a3 = <span class="hljs-string">&quot;hello&quot;</span>;  <span class="hljs-comment">// a3 contains value of type const char*</span>
+<span class="hljs-keyword">if</span> (a3.<span class="hljs-built_in">type</span>() == <span class="hljs-built_in"><span class="hljs-keyword">typeid</span></span>(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span>*)) <span class="hljs-comment">// yields true</span>
+
+<span class="hljs-comment">// reset</span>
+a.<span class="hljs-built_in">reset</span>(); <span class="hljs-comment">// makes it empty</span>
+a = std::any{};
+a = {};
+</div></code></pre>
+<p>To change the value, use assignment operator or <code>emplace()</code>.</p>
+<p>To access the contained value, you have to cast it to its type with a <code>std::any_cast&lt;&gt;</code>.</p>
+<ul>
+<li>If the cast fails, a <code>std::bad_any_cast</code> exception is thrown.</li>
+<li>To avoid exception handling, you can pass the address of an <code>std::any</code> object. It returns <code>nullptr</code> if the cast fails</li>
+</ul>
+<pre><code class="language-C++"><div>std::any_cast&lt;std::string&gt;(a) <span class="hljs-comment">// yield copy of the value</span>
+std::any_cast&lt;std::string&amp;&gt;(a); <span class="hljs-comment">// write access by reference</span>
+std::any_cast&lt;<span class="hljs-keyword">const</span> std::string&amp;&gt;(a); <span class="hljs-comment">// read access by reference</span>
+
+<span class="hljs-comment">// using C++17 if with initialization:</span>
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">auto</span> sp{std::any_cast&lt;std::string&gt;(&amp;a)}; sp != <span class="hljs-literal">nullptr</span>) {
+    <span class="hljs-comment">// use *sp for write access to the value of a</span>
+}
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">auto</span> sp{std::any_cast&lt;<span class="hljs-keyword">const</span> std::string&gt;(&amp;a)}; sp != <span class="hljs-literal">nullptr</span>) {
+    <span class="hljs-comment">// use *sp for read access to the value of a</span>
+}
+std::any_cast&lt;std::string&amp;&gt;(&amp;a); <span class="hljs-comment">// casting any pointer to a reference results in a RUNTIME ERROR</span>
+</div></code></pre>
+<h2 id="stdany-implementation"><code>std::any</code> implementation</h2>
+<p>A good (maybe oldest) example of how type erasure is implemented is <code>boost::any</code>, it is source code is short and clean: <a href="https://www.boost.org/doc/libs/1_44_0/boost/any.hpp">https://www.boost.org/doc/libs/1_44_0/boost/any.hpp</a></p>
+<p>A simplified implementation of <code>boost::any</code>, a good illustration of type erasure.
+<a href="http://coliru.stacked-crooked.com/a/e637a3571d74087a">http://coliru.stacked-crooked.com/a/e637a3571d74087a</a></p>
+<p><img src="images/2022-04-12-21-48-52.png" alt=""></p>
+<p><code>std::any</code> has a bit more optimization than <code>boost::any</code></p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Boost.Any (1.67.0)</th>
+<th>std::any</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Extra memory allocation</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Small buffer optimization</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>emplace</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>in_place_type_t in constructor</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>Some implementation explain for <code>std::any</code>
+<a href="https://stackoverflow.com/questions/51361606/stdany-without-rtti-how-does-it-work">https://stackoverflow.com/questions/51361606/stdany-without-rtti-how-does-it-work</a></p>
+<br>
+<br>
+<h1 id="stdbyte"><code>std::byte</code></h1>
+<p><a href="https://wg21.link/p0298r3">https://wg21.link/p0298r3</a>.</p>
+<p>C++17 introduces a type which represents the “natural” type of the elements of memory: <code>std::byte</code>. <code>std::byte</code> essentially represents all the values a byte can hold but places no numeric or character interpretation on them, other than their bit-wise representation.</p>
+<p>In the header file <code>&lt;cstddef&gt;</code>, the C++ standard library defines type <code>std::byte</code> as follows. That is, std::byte is nothing but a scoped enumeration type with some supplementary bit-wise operators.</p>
+<pre><code><code><div>namespace std {
+    enum class byte : unsigned char {
+    };
+}
+</div></code></code></pre>
+<p>Using <code>std::to_integer&lt;&gt;()</code>, you can convert a std::byte into any fundamental integral type (bool, a character
+type, or an integer type). There are no input and output operators defined for <code>std::byte</code>, so you have to convert them into an integral value using <code>std::to_integer&lt;&gt;()</code>. Note</p>
+<p>using a <code>std::bitset&lt;&gt;</code>, you can also output the value as a binary value (a sequence of bits):</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cstddef&gt;</span> <span class="hljs-comment">// for std::byte</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;bitset&gt;</span>  <span class="hljs-comment">// for std::bitset</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;limits&gt;</span>  <span class="hljs-comment">// for std::numeric_limits</span></span>
+
+std::byte b1{<span class="hljs-number">42</span>};
+<span class="hljs-keyword">using</span> ByteBitset = std::bitset&lt;std::numeric_limits&lt;<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span>&gt;::digits&gt;; <span class="hljs-comment">// you can also use std::underlying_type_t&lt;std::byte&gt; instead of unsigned char here</span>
+std::cout &lt;&lt; ByteBitset{std::to_integer&lt;<span class="hljs-keyword">unsigned</span>&gt;(b1)}; <span class="hljs-comment">// output 00101010</span>
+</div></code></pre>
+<br>
+<br>
+<h1 id="stdstring_view"><code>std::string_view</code></h1>
+<p><code>std::string_view</code> allows us to deal with character sequences like strings without allocating memory for them. That is, objects
+of type <code>std::string_view</code> refer to external character sequences without owning them. Therefore, a string
+view object can be considered as a kind of <em>reference</em> to a character sequence.</p>
+<ul>
+<li>The underlying character sequence is read-only. There is no modification operation.</li>
+<li>There is no allocator support.</li>
+<li>The character sequence is not guaranteed to be null terminated. Therefore, a string view is not a <em>null terminated byte stream</em> (NTBS).</li>
+<li>The value returned by <code>data()</code> can be <code>nullptr</code>. eg, after it is default constructed.</li>
+<li>Due to the possible nullptr value and possible missing null terminator, you should always use <code>size()</code> before accessing characters via <code>operator[]</code> or <code>data()</code> (unless you know better).</li>
+</ul>
+<p><img src="images/2022-03-28-21-41-25.png" alt=""></p>
+<p>Using <code>string_view</code> is cheap and fast (passing a <code>string_view</code> by value is always cheap). However, it is also potentially dangerous because it is up to the programmer to ensure that the referred character sequence is still valid when using a <code>string_view</code>.</p>
+<p><strong>String View Considered Harmful</strong></p>
+<p>To summarize, use <code>std::string_view</code> with care, meaning that you should adjust your programming style as follows:</p>
+<ul>
+<li>Do not use string views in APIs that pass the argument to a string.
+<ul>
+<li>Do not initialize string members from string view parameters.</li>
+<li>No string at the end of a string view chain.</li>
+</ul>
+</li>
+<li>Do not return a string view.
+<ul>
+<li>Unless it is just a forwarded input argument or you signal the danger by, for example, naming the function accordingly.</li>
+</ul>
+</li>
+<li>For this reason, function templates should never return the type T of a passed generic argument.
+<ul>
+<li>Return auto instead.</li>
+</ul>
+</li>
+<li>Never use a returned value to initialize a string view.</li>
+<li>For this reason, do not assign the return value of a function template that return a generic type to auto.
+<ul>
+<li>This means the AAA (<em>Almost Always Auto</em>) pattern is broken with string view.
+If these rules are too complicated or hard to follow, do not use <code>std::string_view</code> at all (unless you know
+what you are doing).</li>
+</ul>
+</li>
+</ul>
+<p>using a <code>std::string_view</code> only makes sense if the function using the parameter has the following constraints:</p>
+<ul>
+<li>It does not expect a null terminator at the end. This is not the case when passing the parameter to a C function as a single <code>const char*</code> without its size.</li>
+<li>It respects the lifetime of the passed argument. Usually, this means that the receiving function uses the passed value only until it ends.</li>
+<li>The calling function should not deal with the owner of the underlying characters (such as deleting it, changing its value, or freeing its memory).</li>
+<li>It can deal with the nullptr as value.</li>
+</ul>
+<p>Null Termination</p>
+<pre><code class="language-C++"><div>std::string s = <span class="hljs-string">&quot;hello&quot;</span>;
+std::string_view sv{s};
+std::cout &lt;&lt; sv.<span class="hljs-built_in">size</span>(); <span class="hljs-comment">// 5</span>
+std::cout &lt;&lt; sv.<span class="hljs-built_in">at</span>(<span class="hljs-number">5</span>);  <span class="hljs-comment">// throws std::out_of_range exception, same in std::String</span>
+std::cout &lt;&lt; sv[<span class="hljs-number">5</span>];     <span class="hljs-comment">// undefined behavior, OK in std::string</span>
+std::cout &lt;&lt; sv.<span class="hljs-built_in">data</span>(); <span class="hljs-comment">// OOPS: only works because \0&#x27; is behind sv</span>
+</div></code></pre>
+<p>Cases where <code>string_view</code> is an improvement:</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// this is much faster than &quot;a.substr(2) &lt; b.substr(2)&quot; because a substring a new string that could allocate its own memory.</span>
+<span class="hljs-built_in">sort</span>(coll.<span class="hljs-built_in">begin</span>(), coll.<span class="hljs-built_in">end</span>(),
+    [] (<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; a, <span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; b) {
+        <span class="hljs-keyword">return</span> std::string_view{a}.<span class="hljs-built_in">substr</span>(<span class="hljs-number">2</span>) &lt; std::string_view{b}.<span class="hljs-built_in">substr</span>(<span class="hljs-number">2</span>);
+    });
+</div></code></pre>
+<br>
+<br>
+<h1 id="filesystem">filesystem</h1>
+<p><a href="https://wg21.link/p0218r0">https://wg21.link/p0218r0</a></p>
+<p>C++17 complete guide chapter 20</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">namespace</span> fs = std::filesystem;
+</div></code></pre>
+<br>
+<br>
+<h1 id="parallel-stl-alogrithm">Parallel STL Alogrithm</h1>
+<p><a href="https://wg21.link/p0024r2">https://wg21.link/p0024r2</a></p>
+<p>C++17 standard library introduces the ability to allow STL standard algorithms to run using multiple threads to deal with different elements in parallel.</p>
+<p>Many algorithms were extended by a new first argument to specify whether and how to run the algorithm
+in parallel threads. In addition, some supplementary algorithms were introduced that specifically support parallel processing.</p>
+<p>Recent enough versions of GCC and Clang include parallel STL headers. The runtime threading system used by both compilers is Intel Threading Building Blocks (TBB), which comes as a library with its own set of headers. To run the programs linked with TBB, you will likely need to add the TBB libraries to your library path.</p>
+<p><strong>You need to measure the performance gain, if any.</strong> some tests show a simple algorithm with a fast predicate, running in parallel probably never pays off. To justify using a parallel algorithm, something should happen with each element that takes
+significant time and is independent of the processing of the other elements.</p>
+<p>The parallel versions of STL algorithms show good performance when</p>
+<ul>
+<li>operate on large enough data volumes, at least 1024 elements.</li>
+<li>The work is complicated enough. For simple tasks, even 32K elements show no benefit.</li>
+<li>It does show improvement on some hard-to-parallelize STL algorithms (such as <code>std::sort</code>, and search and partition algos) on large amount of data.</li>
+</ul>
+<p>You cannot predict anything because it is up to the implementer of the C++ standard library
+when and how to use parallel threads. In fact, you cannot control how many threads are used and the
+implementation might decide to use multiple threads only with a certain number of elements.</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;algorithm&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;execution&gt;</span> <span class="hljs-comment">// for the execution policy</span></span>
+...
+for_each(std::execution::par,
+         coll.<span class="hljs-built_in">begin</span>(), coll.<span class="hljs-built_in">end</span>(), <span class="hljs-comment">// all parallel algorithms require the iterators to be at least forward iterators</span>
+         [](<span class="hljs-keyword">auto</span>&amp; val) {
+            val.sqrt = std::<span class="hljs-built_in">sqrt</span>(val.value);
+         });
+</div></code></pre>
+<p>All parallel algorithms call <code>std::terminate()</code> if execution of a function invoked as part of the algorithm throws an exception. If the algorithm fails to allocate memory, <code>std::bad_alloc</code> is thrown.</p>
+<p><strong>Execution Policies</strong></p>
+<p>You can pass different execution policies to parallel STL algorithms as the first argument. All execution policies are <code>constexpr</code> objects of a corresponding new unique class in namespace <code>std</code> (<code>sequenced_policy</code>, <code>parallel_policy</code>, and <code>parallel_unsequenced_policy</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>std::execution::seq</td>
+<td>Sequential execution. Almost same as un-paralleled version, but additional constraints might apply, such as <code>for_each()</code> not returning any value or all iterators having to be at least forward iterators</td>
+</tr>
+<tr>
+<td>std::execution::par</td>
+<td>Parallel sequenced execution. It executes element by element. <br>  It allows the algorithm to execute on multiple threads. The number of threads and the way the computations are partitioned within threads are unspecified and depend on the implementation.</td>
+</tr>
+<tr>
+<td>std::execution::par_unseq</td>
+<td>Parallel unsequenced (vectorized) execution. In particular, this enables vectorized execution (AVX)</td>
+</tr>
+<tr>
+<td>std::execution::unseq (introduced in C++20)</td>
+<td>Parallel execution of multiple data with one thread. With this policy you enable vectorization or SIMD computing; however, you do not mandate (or garantee) it.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Algorithms</strong></p>
+<p>Not all STL algorithms have their parallel equivalents:</p>
+<ul>
+<li>To run <code>accumulate()</code> in parallel, use <code>reduce()</code> or <code>transform_reduce()</code>.</li>
+<li>To run <code>partial_sum()</code> in parallel, use the <code>...scan()</code> algorithms.</li>
+<li>To run <code>inner_product()</code> in parallel, use <code>transform_reduce()</code>.</li>
+</ul>
+<p><strong><code>reduce()</code></strong></p>
+<p><code>reduce()</code> was introduced as a parallel form of <code>accumulate()</code>. Both defined in the header file <numeric>, instead of <algorithm>, because they count as numeric algorithms.</p>
+<pre><code class="language-C++"><div>std::vector&lt;<span class="hljs-keyword">long</span>&gt; coll;
+<span class="hljs-keyword">auto</span> sum = std::<span class="hljs-built_in">reduce</span>(std::execution::par,
+                      coll.<span class="hljs-built_in">begin</span>(), coll.<span class="hljs-built_in">end</span>(),
+                      <span class="hljs-number">0L</span>); 
+
+<span class="hljs-comment">// Note for floating-point values the order makes a difference, the result here is different than using accumulate()</span>
+std::vector&lt;<span class="hljs-keyword">double</span>&gt; cold;
+<span class="hljs-keyword">auto</span> sum2 = std::<span class="hljs-built_in">reduce</span>(std::execution::par,
+                       cold.<span class="hljs-built_in">begin</span>(), cold.<span class="hljs-built_in">end</span>(),
+                       <span class="hljs-number">0.0</span>);
+</div></code></pre>
+<p><code>reduce()</code> doesn't handle Non-Associative Operations, such as below example of calcuating sum of square</p>
+<p><strong><code>transform_reduce()</code></strong></p>
+<p><code>transform_reduce()</code> separates the modification we want to perform with each element (which is one thing we can parallelize) and the accumulation of the results provided it is commutative (which is the other thing we can parallelize).</p>
+<p><code>transform_reduce()</code> will probably be by far the most important parallel algorithm because we often
+modify values before we combine them (also called the map reduce principle).</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;numeric&gt;</span></span>
+<span class="hljs-keyword">auto</span> sum = std::<span class="hljs-built_in">transform_reduce</span>(std::execution::par,
+                                coll.<span class="hljs-built_in">begin</span>(), coll.<span class="hljs-built_in">end</span>(),
+                                <span class="hljs-number">0L</span>,
+                                std::plus{},
+                                [] (<span class="hljs-keyword">auto</span> val) { <span class="hljs-keyword">return</span> val * val; }
+                                );
+</div></code></pre>
+<p>When calling transform_reduce(), we pass</p>
+<ul>
+<li>The execution policy to (allow us to) run this in parallel</li>
+<li>The range of the values to deal with</li>
+<li><code>0L</code> as the initial value of the outer accumulation</li>
+<li>The operation + as operation of the outer accumulation</li>
+<li>A lambda to process each value before the accumulation</li>
+</ul>
+<p>There are two variants of <code>std::transform_reduce()</code>:
+V1:</p>
+<pre><code class="language-C++"><div><span class="hljs-function">T <span class="hljs-title">transform_reduce</span> <span class="hljs-params">(ExecutionPolicy&amp;&amp; pol, <span class="hljs-comment">// optional</span>
+                    InputIterator beg, InputIterator end)</span>
+                    T initVal,
+                    BinaryOp op2, UnaryOp op1)
+</span></div></code></pre>
+<p>For the values: <code>a1 a2 a3 a4 ...</code>
+<br>it computes and returns: <code>initVal op2 op1(a1) op2 op1(a2) op2 op1(a3) op2 ...</code></p>
+<p>V2:</p>
+<pre><code class="language-C++"><div><span class="hljs-function">T <span class="hljs-title">transform_reduce</span> <span class="hljs-params">(ExecutionPolicy&amp;&amp; pol, <span class="hljs-comment">// optional</span>
+                    InputIterator1 beg1, InputIterator1 end1)</span>
+                    InputIterator2 beg2,
+                    T initVal)
+T <span class="hljs-title">transform_reduce</span> <span class="hljs-params">(ExecutionPolicy&amp;&amp; pol, <span class="hljs-comment">// optional</span>
+                    InputIterator1 beg1, InputIterator1 end1)</span>
+                    InputIterator2 beg2,
+                    T initVal,
+                    BinaryOp1 op1, BinaryOp2 op2)
+</span></div></code></pre>
+<p>Thus, for the values
+<br>    <code>a1 a2 a3 ...</code>
+<br>    <code>b1 b2 b3 ...</code>
+<br>the forms compute and return either<br>
+<code>initVal + (a1 * b1) + (a2 * b2) + (a3 * b3) + ...</code>  (this is <code>std::inner_product()</code>)
+<br> or <br>
+<code>initVal op1 (a1 op2 b1) op1 (a2 op2 b2) op1 (a3 op2 b3) op ...</code></p>
+<p><strong><code>std::for_each_n()</code></strong></p>
+<p>Similarly for copy_n(), fill_n(), and generate_n(), an integral parameter is required to specify for how many elements</p>
+<pre><code class="language-C++"><div><span class="hljs-function">InputIterator <span class="hljs-title">for_each_n</span> <span class="hljs-params">(ExecutionPolicy&amp;&amp; pol, <span class="hljs-comment">// optional</span>
+                         InputIterator beg,
+                         Size count,
+                         UnaryProc op)</span>
+</span></div></code></pre>
+<ul>
+<li>Calls <code>op(elem)</code> for the first count elements in the range starting with beg.</li>
+<li>Returns the position after the last element for which <code>op()</code> was called.</li>
+<li>The caller must ensure that the range starting with beg contains enough elements.</li>
+<li>If no execution policy is passed, it guarantees that the passed callable is called for each element in order.</li>
+<li>If the first optional execution policy is passed:
+– There is no guaranteed order for using the operator op for all elements.
+– It is up to the caller to ensure that parallel calls of the operations do not result in a data race.</li>
+</ul>
+<p><strong><code>std::inclusive_scan()</code> and <code>std::exclusive_scan()</code></strong></p>
+<p>The algorithms are provided as the parallel version of <code>std::partial_sum()</code> called for associative operations.
+If the first optional execution policy is passed:
+– There is no guaranteed order for using the operator op1, which means that op1 must be commutative and associative.
+– It is up to the caller to ensure that parallel calls of the operations do not result in a data race.
+– The iterators must be forward iterators.</p>
+<pre><code class="language-C++"><div><span class="hljs-function">OutputIterator <span class="hljs-title">inclusive_scan</span> <span class="hljs-params">(ExecutionPolicy&amp;&amp; pol, <span class="hljs-comment">// optional</span>
+                               InputIterator inBeg, InputIterator inEnd)</span>
+                               OutputIterator outBeg,
+                               BinaryOp op, <span class="hljs-comment">// optional</span>
+                               T initVal) <span class="hljs-comment">// optional</span>
+
+OutputIterator <span class="hljs-title">exclusive_scan</span> <span class="hljs-params">(ExecutionPolicy&amp;&amp; pol, <span class="hljs-comment">// optional</span>
+                               InputIterator inBeg, InputIterator inEnd)</span>
+                               OutputIterator outBeg,
+                               T initVal, <span class="hljs-comment">// mandatory</span>
+                               BinaryOp op) <span class="hljs-comment">// optional</span>
+</span></div></code></pre>
+<p>For the values <br>
+<code>a1 a2 a3 ... aN</code></p>
+<table>
+<thead>
+<tr>
+<th>OutputIterator</th>
+<th>b1</th>
+<th>b2</th>
+<th>b3</th>
+<th>last</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inclusive_scan()</code></td>
+<td><code>initVal op a1</code></td>
+<td><code>initVal op a1 op a2</code></td>
+<td><code>initVal op a1 op a2 op a3</code></td>
+<td><code>initVal op a1 op a2 op a3 ... op aN</code></td>
+</tr>
+<tr>
+<td><code>exclusive_scan()</code></td>
+<td><code>initVal</code></td>
+<td><code>initVal op a1</code></td>
+<td><code>initVal op a1 op a2</code></td>
+<td><code>initVal op a1 op a2 ... op aN-1</code></td>
+</tr>
+</tbody>
+</table>
+<p>The difference between the two:</p>
+<ul>
+<li><code>exclusive_scan()</code> starts with the initial value (mandatory for it) and excludes the last input element from the result.
+<ul>
+<li>This means that for <code>inclusive_scan()</code>, initVal serves as an offset for each output value, while for <code>exclusive_scan()</code>, it serves as the first output value</li>
+</ul>
+</li>
+<li>the order of the trailing function parameters differs</li>
+</ul>
+<p><strong><code>std::transform_inclusive_scan()</code> and <code>std::transform_exclusive_scan()</code></strong></p>
+<p>similar to <code>std::inclusive_scan()</code> and <code>std::exclusive_scan()</code>, with extra &quot;transform&quot; functionality on each element before doing accumulation.</p>
+<br>
+<br>
+<h1 id="c17-stl-changes">C++17 STL changes</h1>
+<h2 id="searchers">Searchers</h2>
+<p><a href="https://wg21.link/n3411">https://wg21.link/n3411</a></p>
+<p>C++17 therefore introduced the Boyer-Moore and Boyer-Moore-Horspool search algorithms. In particular, they are provided for searching for substrings in large texts.</p>
+<p>The Boyer-Moore and the Boyer-Moore-Horspool searchers are well-known algorithms that pre-compute
+tables (of hash values) before the search starts to improve the speed of the search if the search covers a text
+and/or substring of significant size. To use these searchers, the algorithms require random-access iterators (instead of forward iterators, which suffice for a naive search()).</p>
+<p>We now have the following options for searching for a substring sub in a string text:</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">//1. String member find():</span>
+std::size_type idx = text.<span class="hljs-built_in">find</span>(sub);
+<span class="hljs-comment">// 2. Algorithm search():</span>
+<span class="hljs-keyword">auto</span> pos = std::<span class="hljs-built_in">search</span>(text.<span class="hljs-built_in">begin</span>(), text.<span class="hljs-built_in">end</span>(), sub.<span class="hljs-built_in">begin</span>(), sub.<span class="hljs-built_in">end</span>());
+<span class="hljs-comment">// 3. Parallel algorithm search():</span>
+<span class="hljs-keyword">auto</span> pos = std::<span class="hljs-built_in">search</span>(std::execution::par, text.<span class="hljs-built_in">begin</span>(), text.<span class="hljs-built_in">end</span>(), sub.<span class="hljs-built_in">begin</span>(), sub.<span class="hljs-built_in">end</span>());
+<span class="hljs-comment">//4. Using a default_searcher:</span>
+<span class="hljs-keyword">auto</span> pos = std::<span class="hljs-built_in">search</span>(text.<span class="hljs-built_in">begin</span>(), text.<span class="hljs-built_in">end</span>(), std::default_searcher{sub.<span class="hljs-built_in">begin</span>(), sub.<span class="hljs-built_in">end</span>()});
+<span class="hljs-comment">//5. Using a boyer_moore_searcher:</span>
+<span class="hljs-keyword">auto</span> pos = std::<span class="hljs-built_in">search</span>(text.<span class="hljs-built_in">begin</span>(), text.<span class="hljs-built_in">end</span>(), 
+                       std::boyer_moore_searcher{sub.<span class="hljs-built_in">begin</span>(), sub.<span class="hljs-built_in">end</span>()});
+<span class="hljs-comment">//6. Using a boyer_moore_horspool_searcher:</span>
+<span class="hljs-keyword">auto</span> pos = std::<span class="hljs-built_in">search</span>(text.<span class="hljs-built_in">begin</span>(), text.<span class="hljs-built_in">end</span>(), 
+                       std::boyer_moore_horspool_searcher{sub.<span class="hljs-built_in">begin</span>(), sub.<span class="hljs-built_in">end</span>()});
+</div></code></pre>
+<ul>
+<li>Using just (non-parallel) <code>search()</code> is usually the slowest approach.</li>
+<li>Using the default_searcher should produce an equivalent result, but I noted a running time of up to a factor of 3 slower.</li>
+<li>using the parallel <code>search()</code> gave me a factor of 3 compared to the ordinary <code>search()</code></li>
+<li>Using <code>find()</code> might be faster, I noted an improvement between 20% and a factor of 100 compared to <code>search()</code>.</li>
+<li>For texts and substrings of significant size, the boyer_moore_searcher should be the fastest approach. Compared to <code>search()</code>, I noted an improvement with a factor of 50 or even 100.</li>
+<li>The boyer_moore_horspool_searcher trades space for time. It is slower than boyer_moore, but not use as much memory.</li>
+<li>In summary, it seems to use <code>find()</code> for small strings, and boyer_moore_searcher for significant size.</li>
+</ul>
+<p><strong>Using Searchers Directly</strong></p>
+<p>you can use the function-call operator of the searcher, which returns a pair of both the begin and the end of any subsequence found.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// To find the first occurrence of a substring</span>
+std::boyer_moore_searcher bmsearch{sub.<span class="hljs-built_in">begin</span>(), sub.<span class="hljs-built_in">end</span>()};
+...
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">auto</span> [beg, end] = <span class="hljs-built_in">bmsearch</span>(text.<span class="hljs-built_in">begin</span>(), text.<span class="hljs-built_in">end</span>()); beg != text.<span class="hljs-built_in">end</span>()) {
+    std::cout &lt;&lt; <span class="hljs-string">&quot;found &#x27;&quot;</span> &lt;&lt; sub &lt;&lt; <span class="hljs-string">&quot;&#x27; first at index &quot;</span>
+              &lt;&lt; beg - text.<span class="hljs-built_in">begin</span>() &lt;&lt; <span class="hljs-string">&#x27;-&#x27;</span>
+              &lt;&lt; end - text.<span class="hljs-built_in">begin</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+}
+
+<span class="hljs-comment">// To find all occurances </span>
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> [beg, end] = <span class="hljs-built_in">bmsearch</span>(text.<span class="hljs-built_in">begin</span>(), text.<span class="hljs-built_in">end</span>());
+        beg != text.<span class="hljs-built_in">end</span>();
+        std::<span class="hljs-built_in">tie</span>(beg,end) = <span class="hljs-built_in">bmsearch</span>(end, text.<span class="hljs-built_in">end</span>())) {
+    std::cout &lt;&lt; <span class="hljs-string">&quot;found &#x27;&quot;</span> &lt;&lt; sub &lt;&lt; <span class="hljs-string">&quot;&#x27; at index &quot;</span>
+              &lt;&lt; beg - text.<span class="hljs-built_in">begin</span>() &lt;&lt; <span class="hljs-string">&#x27;-&#x27;</span>
+              &lt;&lt; end - text.<span class="hljs-built_in">begin</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+}
+</div></code></pre>
+<p><strong>Using Searcher Predicates</strong></p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// searching for a substring case-insensitively:</span>
+std::boyer_moore_searcher bmic{substr.<span class="hljs-built_in">begin</span>(), substr.<span class="hljs-built_in">end</span>(),
+                              [](<span class="hljs-keyword">char</span> c){
+                                <span class="hljs-keyword">return</span> std::hash&lt;<span class="hljs-keyword">char</span>&gt;{}(std::<span class="hljs-built_in">toupper</span>(c));
+                              },
+                              [](<span class="hljs-keyword">char</span> c1, <span class="hljs-keyword">char</span> c2){
+                                <span class="hljs-keyword">return</span> std::<span class="hljs-built_in">toupper</span>(c1)==std::<span class="hljs-built_in">toupper</span>(c2);
+                              }
+                            };
+</div></code></pre>
+<h2 id="size-as_const-clamp-sample"><code>size()</code>, <code>as_const()</code>, <code>clamp()</code>, <code>sample()</code></h2>
+<p><strong><code>std::size()</code></strong>: get size of any range as long as it has an iterator interface or is a raw array.</p>
+<p>One of the motivations is to get the size of built-in arrays instead of doing <code>sizeof(a)/sizeof(*(a))</code> or <code>std::distance(std::begin(c), std::end(c))</code>, so that we have an unified way to get size for both build-in array and containers with <code>size()</code> member function.</p>
+<p><a href="https://wg21.link/n4017">https://wg21.link/n4017</a> - the propsoal includes below two functions as well.</p>
+<p><strong><code>std::empty()</code></strong>: check whether a container, a raw C array, or a std::initializer_list&lt;&gt; is empty.</p>
+<p><strong><code>std::data()</code></strong>: give access to the raw data of collections (containers that have a data() member, raw C arrays, or std::initializer_list&lt;&gt;s).</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt; <span class="hljs-comment">// can be used for container, raw array, string literal, initializer_list</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printData</span><span class="hljs-params">(<span class="hljs-keyword">const</span> T&amp; coll)</span>
+</span>{
+<span class="hljs-comment">// print every second element:</span>
+<span class="hljs-keyword">for</span> (std::<span class="hljs-keyword">size_t</span> idx{<span class="hljs-number">0</span>}; idx &lt; std::<span class="hljs-built_in">size</span>(coll); ++idx) {
+    <span class="hljs-keyword">if</span> (idx % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>) {
+        std::cout &lt;&lt; std::<span class="hljs-built_in">data</span>(coll)[idx] &lt;&lt; <span class="hljs-string">&#x27; &#x27;</span>;
+    }
+}
+</div></code></pre>
+<p><strong><code>std::as_const()</code></strong>: converts values into the corresponding const values without using <code>const_cast&lt;&gt;</code> or the <code>add_const_t&lt;&gt;</code> type trait. It allows us to force calling the const overload of a function (especailly for a function tempalte) for a non-const object.</p>
+<p>The motivation is to replace below:</p>
+<ul>
+<li><code>const_cast&lt;const T&amp;&gt;(object)</code> where you need to know the type</li>
+<li><code>const_cast&lt;std::add_const&lt;decltype(object)&gt;::type &amp;&gt;(object)</code> where you dont need know the type, it is too long!</li>
+</ul>
+<p><a href="https://wg21.link/p0007r1">https://wg21.link/p0007r1</a></p>
+<p><strong><code>std::clamp()</code></strong>: enables you to “clamp” a value between a passed minimum and maximum value. It is a combined call of <code>min()</code> and <code>max()</code>.</p>
+<p>like for <code>min()</code> and <code>max()</code>, you can pass a predicate as a comparison operation.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i : {<span class="hljs-number">-7</span>, <span class="hljs-number">0</span>, <span class="hljs-number">8</span>, <span class="hljs-number">15</span>}) { <span class="hljs-comment">// output -7, 5, 8, 13</span>
+    std::cout &lt;&lt; std::<span class="hljs-built_in">clamp</span>(i, <span class="hljs-number">5</span>, <span class="hljs-number">13</span>,
+                            [] (<span class="hljs-keyword">auto</span> a, <span class="hljs-keyword">auto</span> b) {
+                                <span class="hljs-keyword">return</span> std::<span class="hljs-built_in">abs</span>(a) &lt; std::<span class="hljs-built_in">abs</span>(b);
+                            });
+}
+</div></code></pre>
+<p><strong><code>std::sample()</code></strong>: it extracts a <strong>random</strong> subset (<em>sample</em>) from a given range of values (the <em>population</em>). This is sometimes called <em>reservoir sampling</em> or <em>selection sampling</em>.</p>
+<pre><code class="language-C++"><div>std::vector&lt;std::string&gt; coll;
+... initialize the vector ...
+std::<span class="hljs-built_in">sample</span>(coll.<span class="hljs-built_in">begin</span>(), coll.<span class="hljs-built_in">end</span>(),
+            std::ostream_iterator&lt;std::string&gt;{std::cout, <span class="hljs-string">&quot;\n&quot;</span>},
+            <span class="hljs-number">10</span>,
+            std::default_random_engine{});
+
+<span class="hljs-comment">// another example:</span>
+std::vector&lt;std::string&gt; coll; <span class="hljs-comment">// initialize the vector part omitted</span>
+std::random_device rd; <span class="hljs-comment">// random seed (if supported)</span>
+std::mt19937 eng{<span class="hljs-built_in">rd</span>()}; <span class="hljs-comment">// initialize a Mersenne twister engine with a random seed</span>
+std::vector&lt;std::string&gt; subset; <span class="hljs-comment">// initialize destination range (must be big enough for 10 elements):</span>
+subset.<span class="hljs-built_in">resize</span>(<span class="hljs-number">10</span>);
+<span class="hljs-comment">// copy 10 randomly selected values from the source range to the destination range, the order of the elements is stable if the iterators for the passed range are at least forward iterators.</span>
+<span class="hljs-comment">// The return value end is the position behind the last randomly extracted element.</span>
+<span class="hljs-keyword">auto</span> end = std::<span class="hljs-built_in">sample</span>(coll.<span class="hljs-built_in">begin</span>(), coll.<span class="hljs-built_in">end</span>(),
+                        subset.<span class="hljs-built_in">begin</span>(),
+                        <span class="hljs-number">10</span>,
+                        eng);
+</div></code></pre>
+<p><a href="https://wg21.link/n3925">https://wg21.link/n3925</a></p>
+<h2 id="unordered_map-extract-and-merge">(unordered_)map <code>extract()</code> and <code>merge()</code></h2>
+<p><a href="https://wg21.link/p0083r3">https://wg21.link/p0083r3</a>.</p>
+<p><code>extract()</code> introduces the ability to splice a node out of an associative or unordered container.</p>
+<p>A <em>node handle</em> that owns the extracted element is returned, or empty node handle in case no element found. If a node is not inserted again, when the node handle goes out of scope, the desctrutor of the element will be called.</p>
+<p>Pointers and references to the extract'ed elements remain valid but unusable untill they are inserted into a container again.</p>
+<pre><code class="language-C++"><div>std::map&lt;<span class="hljs-keyword">int</span>, std::string&gt; m; <span class="hljs-comment">// with some elements inserted</span>
+<span class="hljs-keyword">auto</span> nh = m.<span class="hljs-built_in">extract</span>(<span class="hljs-number">2</span>);       <span class="hljs-comment">// nh has type decltype(m)::node_type</span>
+nh.<span class="hljs-built_in">key</span>() = <span class="hljs-number">4</span>;               
+m.<span class="hljs-built_in">insert</span>(std::<span class="hljs-built_in">move</span>(nh));      <span class="hljs-comment">// node is inserted into map with a changed key without dellocating and creating a new node.</span>
+
+std::multimap&lt;<span class="hljs-keyword">double</span>, std::string&gt; src;
+std::map&lt;<span class="hljs-keyword">double</span>, std::string&gt; dst;
+dst.<span class="hljs-built_in">insert</span>(src.<span class="hljs-built_in">extract</span>(src.<span class="hljs-built_in">find</span>(<span class="hljs-number">1.1</span>))); <span class="hljs-comment">// splice using an iterator</span>
+dst.<span class="hljs-built_in">insert</span>(src.<span class="hljs-built_in">extract</span>(<span class="hljs-number">2.2</span>));           <span class="hljs-comment">// splice using the key</span>
+
+<span class="hljs-comment">// merge all elements from src into dst:</span>
+dst.<span class="hljs-built_in">merge</span>(src);
+</div></code></pre>
+<h2 id="sequential-containers-emplace_back">sequential containers emplace_back()</h2>
+<p><a href="https://wg21.link/p0084r0">https://wg21.link/p0084r0</a>.</p>
+<p>returns a reference to the inserted objects (as was already the case for associative containers)</p>
+<h2 id="unordered_map-try_emplace-and-insert_or_assign">(unordered_)map <code>try_emplace</code> and <code>insert_or_assign()</code></h2>
+<p><a href="https://wg21.link/n4279">https://wg21.link/n4279</a>.</p>
+<p>Unlike <code>insert</code> or <code>emplace</code>, <code>try_emplace()</code> does not move from rvalue arguments if the insertion does not happen, which makes it easy to manipulate maps whose values are move-only types, such as <code>std::map&lt;std::string, std::unique_ptr&lt;foo&gt;&gt;</code>.
+In addition, <code>try_emplace</code> treats the key and the arguments to the mapped_type separately, unlike <code>emplace</code>, which requires the arguments to construct a value_type (that is, a std::pair).</p>
+<pre><code class="language-C++"><div>std::map&lt;<span class="hljs-keyword">int</span>, std::thread&gt; m;
+m.<span class="hljs-built_in">emplace</span>(<span class="hljs-number">42</span>, std::<span class="hljs-built_in">move</span>(t1)); <span class="hljs-comment">// might move even without inserting the new value</span>
+m.<span class="hljs-built_in">try_emplace</span>(<span class="hljs-number">42</span>, std::<span class="hljs-built_in">move</span>(t1)); <span class="hljs-comment">// no move if not inserted</span>
+<span class="hljs-comment">// It is a short form of below code, with the benefit of the position in the map is looked up only once.</span>
+<span class="hljs-keyword">auto</span> pos = m.<span class="hljs-built_in">find</span>(<span class="hljs-number">42</span>);
+<span class="hljs-keyword">if</span> (pos == m.<span class="hljs-built_in">end</span>()) {
+    m.<span class="hljs-built_in">emplace</span>(<span class="hljs-number">42</span>, std::<span class="hljs-built_in">move</span>(t1)); <span class="hljs-comment">// insert</span>
+}
+</div></code></pre>
+<p>In addition, the new member function insert_or_assign() guarantees to move the value either to a new
+or an existing argument:</p>
+<pre><code class="language-C++"><div>m.<span class="hljs-built_in">insert_or_assign</span>(<span class="hljs-number">42</span>, std::<span class="hljs-built_in">move</span>(t1)); <span class="hljs-comment">// will always move</span>
+
+<span class="hljs-comment">// The behavior is the short form of:</span>
+<span class="hljs-keyword">auto</span> pos = m.<span class="hljs-built_in">find</span>(<span class="hljs-number">42</span>);
+<span class="hljs-keyword">if</span> (pos == m.<span class="hljs-built_in">end</span>()) {
+    m.<span class="hljs-built_in">insert</span>({<span class="hljs-number">42</span>, std::<span class="hljs-built_in">move</span>(t1)}); <span class="hljs-comment">// insert</span>
+}
+<span class="hljs-keyword">else</span> {
+    pos-&gt;second = std::<span class="hljs-built_in">move</span>(t1); <span class="hljs-comment">// update</span>
+}
+<span class="hljs-comment">// And similar to this, but a new element is not first initialized with its default value and then overwritten.</span>
+m[<span class="hljs-number">42</span>] = std::<span class="hljs-built_in">move</span>(t1); <span class="hljs-comment">// same with value initialization first</span>
+</div></code></pre>
+<h2 id="stdscoped_lock"><code>std::scoped_lock&lt;&gt;</code></h2>
+<p><a href="https://wg21.link/p0156r2">https://wg21.link/p0156r2</a></p>
+<p>Similar to <code>std::lock_guard</code>,  <code>std::scoped_lock&lt;&gt;</code> provides a variadic template to allow multiple mutexes to be locked with
+a single declaration. which guarantees that the call does not result in a deadlock.</p>
+<p>If only one mutex is passed to the constructor of a <code>scoped_lock</code>, it simply locks the mutex. Thus,
+in a <code>scoped_lock</code> with a single constructor, argument acts like a <code>lock_guard</code>.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// pre C++17</span>
+{
+    std::<span class="hljs-built_in">lock</span>(allIssuesMx, openIssuesMx); <span class="hljs-comment">// lock with deadlock avoidance</span>
+    <span class="hljs-function">std::lock_guard&lt;std::mutex&gt; <span class="hljs-title">lg1</span><span class="hljs-params">(allIssuesMx, std::adopt_lock)</span></span>;
+    <span class="hljs-function">std::lock_guard&lt;std::mutex&gt; <span class="hljs-title">lg2</span><span class="hljs-params">(openIssuesMx, std::adopt_lock)</span></span>;
+    ... <span class="hljs-comment">// manipulate both allIssues and openIssues</span>
+}
+
+<span class="hljs-comment">// since C++17</span>
+{
+    std::<span class="hljs-built_in">lock</span>(allIssuesMx, openIssuesMx); <span class="hljs-comment">// Note: deadlock avoidance algorithm used</span>
+    std::scoped_lock lg{std::adopt_lock, allIssuesMx, openIssuesMx};
+    ... <span class="hljs-comment">// manipulate both allIssues and openIssues</span>
+}
+</div></code></pre>
+<h2 id="cache-line-sizes">Cache Line Sizes</h2>
+<p><a href="https://wg21.link/p0154r1">https://wg21.link/p0154r1</a>.</p>
+<p>C++ standard library introduces two inline variables in header <code>&lt;new&gt;</code>:</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">namespace</span> std {
+    <span class="hljs-keyword">inline</span> <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">size_t</span> hardware_destructive_interference_size;
+    <span class="hljs-keyword">inline</span> <span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">size_t</span> hardware_constructive_interference_size;
+}
+</div></code></pre>
+<p>These objects have the following implementation-defined values:</p>
+<ul>
+<li><code>hardware_destructive_interference_size</code> is the recommended minimum offset between two objects
+that might be accessed by different threads concurrently to avoid worse performance because the
+same L1 cache line is affected.</li>
+<li><code>hardware_constructive_interference_size</code> is the recommended maximum size of contiguous
+memory within which two objects are placed in the same L1 cache line.
+Both values are only hints because the ideal value might depend on the exact</li>
+</ul>
+<p>If you want to access two different (atomic) objects with different threads:</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Data</span> {</span>
+    <span class="hljs-built_in"><span class="hljs-keyword">alignas</span></span>(std::hardware_destructive_interference_size) <span class="hljs-keyword">int</span> valueForThreadA;
+    <span class="hljs-built_in"><span class="hljs-keyword">alignas</span></span>(std::hardware_destructive_interference_size) <span class="hljs-keyword">int</span> valueForThreadB;
+};
+</div></code></pre>
+<p>If you want to access two different (atomic) objects with the same thread:</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Data</span> {</span>
+    <span class="hljs-keyword">int</span> valueForThreadA;
+    <span class="hljs-keyword">int</span> otherValueForTheThreadA;
+};
+<span class="hljs-comment">// double-check we have best performance due to shared cache line:</span>
+<span class="hljs-built_in"><span class="hljs-keyword">static_assert</span></span>(<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(Data) &lt;= std::hardware_constructive_interference_size);
+<span class="hljs-comment">// ensure objects are properly aligned:</span>
+<span class="hljs-built_in"><span class="hljs-keyword">alignas</span></span>(<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(Data)) Data myDataForAThread;
+</div></code></pre>
+<br>
+<br>
+<h1 id="new-and-delete-for-over-aligned-types">new and delete for <em>over-aligned</em> types</h1>
+<p><a href="https://wg21.link/p0035r4">https://wg21.link/p0035r4</a>.</p>
+<p>dynamic/heap allocation of over-aligned data is not handled correctly in C++11 and C++14. Using operator <code>new</code> for over-aligned types by default ignores the requested alignment. This gap was closed with C++17 by providing overloads with an alignment argument
+to allow you to provide your own implementations of operator <code>new</code> for over-aligned data.</p>
+<p><strong>Pre C++17</strong> alternatives:</p>
+<ul>
+<li>
+<p>you can do <code>aligned_alloc()</code> to allcoate aligned memory. In this case, you can use <code>free()</code> for deallocation.</p>
+</li>
+<li>
+<p>Passing the alignment in <code>new</code>, however this affects <code>delete</code>.</p>
+<ul>
+<li>you have to call the corresponding <code>operator delete()</code> directly, which means:</li>
+<li>You have to know which of the multiple overloads are implemented so that you call the right one.</li>
+<li>Before calling operator <code>delete()</code>, you have to call the destructor explicitly.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-C++"><div>std::string* p = <span class="hljs-built_in"><span class="hljs-keyword">new</span></span>(std::<span class="hljs-keyword">align_val_t</span>{<span class="hljs-number">64</span>}) std::string; <span class="hljs-comment">// 64-byte aligned</span>
+<span class="hljs-built_in"><span class="hljs-keyword">delete</span></span>(std::<span class="hljs-keyword">align_val_t</span>{<span class="hljs-number">64</span>}) p; <span class="hljs-comment">// ERROR: no placement delete supported</span>
+p-&gt;~<span class="hljs-built_in">basic_string</span>(); <span class="hljs-comment">// destruct value</span>
+::<span class="hljs-function"><span class="hljs-keyword">operator</span> <span class="hljs-title">delete</span><span class="hljs-params">(p, std::<span class="hljs-keyword">align_val_t</span>{<span class="hljs-number">64</span>})</span></span>; <span class="hljs-comment">// directly call global ::operator delete to free memory</span>
+
+<span class="hljs-comment">// If a type-specific delete is defined, you have to call it after calling the destructor:</span>
+MyType32* p = <span class="hljs-built_in"><span class="hljs-keyword">new</span></span>(std::<span class="hljs-keyword">align_val_t</span>{<span class="hljs-number">64</span>}) MyType32{}; <span class="hljs-comment">// 64-byte aligned</span>
+p-&gt;~<span class="hljs-built_in">MyType32</span>(); <span class="hljs-comment">// destruct value</span>
+<span class="hljs-function">MyType32::<span class="hljs-keyword">operator</span> <span class="hljs-title">delete</span><span class="hljs-params">(p, std::<span class="hljs-keyword">align_val_t</span>{<span class="hljs-number">64</span>})</span></span>; <span class="hljs-comment">// free memory</span>
+
+<span class="hljs-comment">// In your class, you need define something like this</span>
+<span class="hljs-function">struct <span class="hljs-title">alignas</span><span class="hljs-params">(<span class="hljs-number">32</span>)</span> MyType32 </span>{
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span>* <span class="hljs-keyword">operator</span> <span class="hljs-title">new</span> <span class="hljs-params">(std::<span class="hljs-keyword">size_t</span> size)</span> </span>{
+        <span class="hljs-comment">// use API of C11:</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">aligned_alloc</span>(<span class="hljs-built_in"><span class="hljs-keyword">alignof</span></span>(MyType32), size);
+        ... omit non-c11 cases ...
+    }
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-keyword">operator</span> <span class="hljs-title">delete</span> <span class="hljs-params">(<span class="hljs-keyword">void</span>* p)</span> </span>{
+        <span class="hljs-comment">// C11/Linux can use the general free():</span>
+        <span class="hljs-built_in">free</span>(p);
+    }
+    <span class="hljs-comment">// since C++14:</span>
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-keyword">operator</span> <span class="hljs-title">delete</span> <span class="hljs-params">(<span class="hljs-keyword">void</span>* p, std::<span class="hljs-keyword">size_t</span> size)</span> </span>{
+        <span class="hljs-function">MyType32::<span class="hljs-keyword">operator</span> <span class="hljs-title">delete</span><span class="hljs-params">(p)</span></span>; <span class="hljs-comment">// use the non-sized delete</span>
+    }
+};
+</div></code></pre>
+<p><strong>Since C++17</strong>, you can skip the overhead of implementing operations to allocate/deallocate aligned
+data. The example works well even without defining operator new() and operator delete() for your
+type</p>
+<pre><code class="language-C++"><div><span class="hljs-function">struct <span class="hljs-title">alignas</span><span class="hljs-params">(<span class="hljs-number">32</span>)</span> MyType32 </span>{
+    <span class="hljs-keyword">int</span> i;
+    ...
+};
+
+<span class="hljs-keyword">auto</span> p = <span class="hljs-keyword">new</span> MyType32; <span class="hljs-comment">// allocates 32-byte aligned memory since C++17</span>
+<span class="hljs-keyword">delete</span> p
+</div></code></pre>
+<p>A compiler switches from default-alignment to over-alignment according to a general alignment value,
+which you can find in the new preprocessor constant <code>__STDCPP_DEFAULT_NEW_ALIGNMENT__</code></p>
+<ul>
+<li>with alignment larger than this constant, it calls <code>operator new(std::size_t, std::align_val_t)</code>,</li>
+<li>otherwise, it calls <code>operator new(std::size_t)</code>.</li>
+<li>This also means, with C++17, a behavior change maybe possible because compiler may pick a different <code>operator new</code> overload for over-aligned data.</li>
+</ul>
+<p>If you pass a requested alignment in the <code>new</code> expression, the passed alignment argument is always passed and
+has to be supported by the <code>operator new()</code>. In fact, alignment arguments are handled just like any other
+additional argument you can pass to new expressions: they are passed as they are as additional parameters
+to <code>operator new()</code>.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Thus, a call such as:</span>
+std::string* p = <span class="hljs-built_in"><span class="hljs-keyword">new</span></span>(std::<span class="hljs-keyword">align_val_t</span>{<span class="hljs-number">64</span>}) std::string; <span class="hljs-comment">// 64-byte aligned</span>
+<span class="hljs-comment">// will always try to call:</span>
+<span class="hljs-function"><span class="hljs-keyword">operator</span> <span class="hljs-title">new</span><span class="hljs-params">(std::<span class="hljs-keyword">size_t</span>, std::<span class="hljs-keyword">align_val_t</span>)</span>
+</span></div></code></pre>
+<br>
+<br>
+<h1 id="stdto_chars-and-stdfrom_chars"><code>std::to_chars()</code> and <code>std::from_chars()</code></h1>
+<p><a href="https://wg21.link/p0067r5">https://wg21.link/p0067r5</a>, <a href="https://wg21.link/p0682r1">https://wg21.link/p0682r1</a>.</p>
+<p>C++17 provides new low-level functions for converting numeric values into character sequences and vice versa.</p>
+<br>
+<br>
+        
+        
+    </body>
+    </html>

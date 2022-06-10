@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>System Performance</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{text-rendering:auto;font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.13.24"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+#button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <!-- title: System Performance -->
+<h1>System Performance</h1>
+<p><a href="#" class="to-top">➤</i></a></p>
+<ul>
+<li><a href="#methodology-and-concept">Methodology and Concept</a>
+<ul>
+<li><a href="#use-method">USE method</a></li>
+</ul>
+</li>
+<li><a href="#observability-sources">Observability Sources</a>
+<ul>
+<li><a href="#proc"><code>/proc</code></a></li>
+<li><a href="#sys"><code>/sys</code></a></li>
+<li><a href="#tracepoints">Tracepoints</a></li>
+<li><a href="#kprobe">kprobe</a></li>
+<li><a href="#hardware-counters-pmcs">Hardware Counters (PMCs)</a></li>
+</ul>
+</li>
+<li><a href="#cpu">CPU</a>
+<ul>
+<li><a href="#interconnect">Interconnect</a></li>
+</ul>
+</li>
+<li><a href="#memory">Memory</a>
+<ul>
+<li><a href="#swap">Swap</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="methodology-and-concept">Methodology and Concept</h1>
+<p><img src="images/2022-04-28-09-15-25.png" alt=""></p>
+<ul>
+<li>Applications and the kernel typically provide data on their state and activity: operation counts,
+byte counts, latency measurements, resource utilization, and error rates. They are typically
+implemented as integer variables called <em>counters</em>.</li>
+<li>These cumulative counters can be read at different times by performance tools for calculating <em>statistics</em>.
+<ul>
+<li>For example, the <code>vmstat(8)</code> utility prints a system-wide summary of virtual memory statistics and more, based on kernel counters in the <code>/proc</code> file system.</li>
+</ul>
+</li>
+<li>A <em>metric</em> is a statistic that has been selected to evaluate or monitor a target. Most companies use
+monitoring agents to record selected statistics (metrics) at regular intervals, and chart them in a
+graphical interface to see changes over time.</li>
+<li>Monitoring software can also support creating custom <em>alerts</em> from these metrics. Also, alerts may be generated by any layer.</li>
+</ul>
+<h2 id="use-method">USE method</h2>
+<p>The utilization, saturation, and errors (USE) method. It is a methodology that focuses on
+system resources and can be summarized as:</p>
+<pre><code class="language-bash"><div>For every resource, check utilization, saturation, and errors.
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>component</th>
+<th>type</th>
+<th>metric</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU</td>
+<td>utilization</td>
+<td>system-wide: <br> <code>vmstat 1</code>, &quot;us&quot; + &quot;sy&quot; + &quot;st&quot;; <br> <code>sar -u</code>, sum fields except &quot;%idle&quot; and &quot;%iowait&quot;; <br> <code>dstat -c</code>, sum fields except &quot;idl&quot; and &quot;wai&quot;; <br><br> per-cpu: <br> <code>mpstat -P ALL 1</code>, sum fields except &quot;%idle&quot; and &quot;%iowait&quot;; <br><code>sar -P ALL</code>, same as mpstat; <br><br>per-process: <br> <code>top, &quot;%CPU&quot;</code>;<br> <code>htop, &quot;CPU%&quot;</code>; <br> <code>ps -o pcpu</code>; <br> <code>pidstat 1, &quot;%CPU&quot;</code>; <br><br>per-kernel-thread:<br> <code>top/htop</code> (&quot;K&quot; to toggle), where VIRT == 0 (heuristic).</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>saturation</td>
+<td>system-wide: <br> <code>vmstat 1, &quot;r&quot;</code> &gt; CPU count ; <br> <code>sar -q, &quot;runq-sz&quot;</code> &gt; CPU count; <br> <code>dstat -p, &quot;run&quot;</code> &gt; CPU count; <br><br> per-process: <br> <code>/proc/PID/schedstat</code> 2nd field (sched_info.run_delay); <br> perf sched latency (shows &quot;Average&quot; and &quot;Maximum&quot; delay per-schedule); <br>dynamic tracing, eg, SystemTap schedtimes.stp &quot;queued(us)&quot; [3]</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>errors</td>
+<td>perf (LPE, Linux Performance Events, aka perf_events, from perf tool) if processor specific error events (CPC) are available;</td>
+</tr>
+<tr>
+<td>Memory capacity</td>
+<td>utilization</td>
+<td>system-wide:<br> <code>free -m</code>, &quot;Mem:&quot; (main memory), &quot;Swap:&quot; (virtual memory); <br><code>vmstat 1</code>, &quot;free&quot; (main memory), &quot;swap&quot; (virtual memory); <br><code>sar -r, &quot;%memused&quot;</code>; <br><code>dstat -m</code>, &quot;free&quot;; <br> <code>slabtop -s c</code> for kmem slab usage; <br><br>per-process:<br> <code>top/htop</code>, &quot;RES&quot; (resident main memory), &quot;VIRT&quot; (virtual memory), &quot;Mem&quot; for system-wide summary</td>
+</tr>
+<tr>
+<td>Memory capacity</td>
+<td>saturation</td>
+<td>system-wide: <br><code>vmstat 1</code>, &quot;si&quot;/&quot;so&quot; (swapping); <br><code>sar -B</code>, &quot;pgscank&quot; + &quot;pgscand&quot; (scanning); <br><code>sar -W</code>; <br><br>per-process: <br> <code>/proc/PID/stat</code>, 10th field (min_flt) for minor-fault rate <br> dynamic tracing [5];<br><br> OOM killer: <br>`dmesg</td>
+</tr>
+<tr>
+<td>Memory capacity</td>
+<td>errors</td>
+<td>dmesg for physical failures; dynamic tracing, eg, SystemTap uprobes for failed malloc()s</td>
+</tr>
+<tr>
+<td>Network Interfaces</td>
+<td>utilization</td>
+<td><code>sar -n DEV 1</code>, &quot;rxKB/s&quot;/max &quot;txKB/s&quot;/max; <br><code>ip -s link</code>, RX/TX tput / max bandwidth; <br><code>/proc/net/dev</code>, &quot;bytes&quot; RX/TX tput/max; <br><code>nicstat &quot;%Util&quot;</code> [6]</td>
+</tr>
+<tr>
+<td>Network Interfaces</td>
+<td>saturation</td>
+<td><code>ifconfig</code>, &quot;overruns&quot;, &quot;dropped&quot;; <br><code>netstat -s</code>, &quot;segments retransmited&quot;;<br> <code>sar -n EDEV</code>, *drop and *fifo metrics; <br><code>/proc/net/dev</code>, RX/TX &quot;drop&quot;; <br><code>nicstat &quot;Sat&quot;</code> [6];<br> dynamic tracing for other TCP/IP stack queueing [7]</td>
+</tr>
+<tr>
+<td>Network Interfaces</td>
+<td>rrors</td>
+<td><code>ifconfig</code>, &quot;errors&quot;, &quot;dropped&quot;; <br><code>netstat -i</code>, &quot;RX-ERR&quot;/&quot;TX-ERR&quot;; <br><code>ip -s link</code>, &quot;errors&quot;; <br><code>sar -n EDEV</code>, &quot;rxerr/s&quot; &quot;txerr/s&quot;; <br><code>/proc/net/dev</code>, &quot;errs&quot;, &quot;drop&quot;;<br> extra counters may be under <code>/sys/class/net/...</code>; <br>dynamic tracing of driver function returns</td>
+</tr>
+<tr>
+<td>Storage device I/O</td>
+<td>utilization</td>
+<td>system-wide: <br><code>iostat -xz 1</code>, &quot;%util&quot;; <br><code>sar -d</code>, &quot;%util&quot;; <br><br>per-process: <br><code>iotop</code>;<br> <code>pidstat -d</code>; <br><code>/proc/PID/sched &quot;se.statistics.iowait_sum&quot;</code></td>
+</tr>
+<tr>
+<td>Storage device I/O</td>
+<td>saturation</td>
+<td><code>iostat -xnz 1</code>, &quot;avgqu-sz&quot; &gt; 1, or high &quot;await&quot;; <br><code>sar -d</code> same; <br>LPE block probes for queue length/latency; <br>dynamic/static tracing of I/O subsystem (incl. LPE block probes)</td>
+</tr>
+<tr>
+<td>Storage device I/O</td>
+<td>errors</td>
+<td><code>/sys/devices/.../ioerr_cnt</code>; <br>smartctl; <br>dynamic/static tracing of I/O subsystem response codes [8]</td>
+</tr>
+<tr>
+<td>Storage capacity</td>
+<td>utilization</td>
+<td>swap:<br> <code>swapon -s</code>; <br><code>free</code>; <code>/proc/meminfo</code> &quot;SwapFree&quot;/&quot;SwapTotal&quot;; <br><br>file systems:<br> <code>&quot;df -h&quot;</code></td>
+</tr>
+<tr>
+<td>Storage capacity</td>
+<td>saturation</td>
+<td>not sure this one makes sense - once it's full, ENOSPC</td>
+</tr>
+<tr>
+<td>Storage capacity</td>
+<td>errors</td>
+<td><code>strace</code> for ENOSPC; <br>dynamic tracing for ENOSPC; <br><code>/var/log/messages</code> errs, depending on FS</td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>
+<h1 id="observability-sources">Observability Sources</h1>
+<h2 id="proc"><a href="kernel.html#proc-virtual-file-system"><code>/proc</code></a></h2>
+<h2 id="sys"><a href="kernel.html#sys-virtual-file-system"><code>/sys</code></a></h2>
+<h2 id="tracepoints">Tracepoints</h2>
+<p>Tracepoints are a Linux kernel event source based on <em>static instrumentation</em>. Tracepoints are hard-coded instrumentation points placed at logical locations in kernel code.</p>
+<p>Available tracepoints can be listed using the <code>perf list</code> command.</p>
+<pre><code class="language-bash"><div><span class="hljs-comment"># the following command traces the block:block_rq_issue tracepoint and prints events live:</span>
+$ perf trace -e block:block_rq_issue
+
+<span class="hljs-comment"># trace block I/O issue events only when the size (bytes argument) is larger than 65536</span>
+<span class="hljs-comment"># The --filter argument for perf trace was added in Linux 5.5.</span>
+$ perf trace -e block:block_rq_issue --filter <span class="hljs-string">&#x27;bytes &gt; 65536&#x27;</span>
+</div></code></pre>
+<p>Each tracepoint has a format string that contains event arguments: extra context about the event. The structure of this format string can be seen in a “format” file under <code>/sys/kernel/debug/tracing/events</code>. For example:</p>
+<pre><code class="language-bash"><div>$ cat /sys/kernel/debug/tracing/events/block/block_rq_issue/format
+</div></code></pre>
+<p><strong>Overhead</strong></p>
+<p>When tracepoints are activated, they add a small amount of CPU overhead to each event. The
+tracing tool may also add CPU overhead to post-process events, plus file system overheads
+to record them.</p>
+<p>event rates of less than 10,000 per second cost negligible overhead, and only over 100,000 does the overhead begin to become measurable.</p>
+<p>the minimum tracepoint overhead to be <strong>96 nanoseconds</strong> of CPU time.</p>
+<p>A disabled tracepoint becomes a small number of instructions: for
+x86_64 it is a 5-byte no-operation (nop) instruction. There is also a tracepoint handler added
+to the end of the function, which increases its text size a little.</p>
+<h2 id="kprobe">kprobe</h2>
+<p>kprobes (short for kernel probes) is a Linux kernel event source for tracers based on <em>dynamic
+instrumentation</em>. kprobes can trace any kernel function or instruction. They are considered an unstable API because they expose raw kernel functions and arguments that may change between kernel versions.</p>
+<p>kprobes are important because they are a last-resort source of virtually unlimited information about kernel behavior in production.</p>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>kprobes</th>
+<th>Tracepoints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td>Dynamic</td>
+<td>Static</td>
+</tr>
+<tr>
+<td>Rough Number of Events</td>
+<td>50,000+</td>
+<td>1,000+</td>
+</tr>
+<tr>
+<td>Kernel Maintenance</td>
+<td>None</td>
+<td>Required</td>
+</tr>
+<tr>
+<td>Disabled Overhead</td>
+<td>None</td>
+<td>Tiny (NOPs + metadata)</td>
+</tr>
+<tr>
+<td>Stable API</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Overhead</strong></p>
+<p>For a particular system I measured the minimum kprobe CPU cost to be 76 nanoseconds, and the minimum kretprobe CPU cost to be 212 nanoseconds [Gregg 19].</p>
+<h2 id="hardware-counters-pmcs">Hardware Counters (PMCs)</h2>
+<p><em>performance monitoring counters</em> (PMCs), also known as, <em>CPU performance counters</em> (CPCs),
+<em>performance instrumentation counters</em> (PICs), or <em>performance monitoring unit events</em> (PMU events),
+they all refer to the same thing: programmable hardware registers on the processor that provide
+low-level performance information at the CPU cycle level.</p>
+<p>They typically include counters for the following:</p>
+<ul>
+<li>CPU cycles: Including stall cycles and types of stall cycles</li>
+<li>CPU instructions: Retired (executed)</li>
+<li>Level 1, 2, 3 cache accesses: Hits, misses</li>
+<li>Floating-point unit: Operations</li>
+<li>Memory I/O: Reads, writes, stall cycles</li>
+<li>Resource I/O: Reads, writes, stall cycles</li>
+</ul>
+<p>On Linux PMCs are accessed via the perf_event_open(2) syscall and are consumed by tools including perf(1).</p>
+<p>PMCs can be used in different modes:</p>
+<ul>
+<li><em>counting</em>, where they count events with practically zero overhead;
+<ul>
+<li>perf(1) can perform counting using the <code>stat</code> subcommand</li>
+</ul>
+</li>
+<li><em>overflow sampling</em>, where an interrupt is raised for one in every configurable number of events, so that state can be captured.
+<ul>
+<li>perf(1) can perform sampling using the <code>record</code> subcommand.</li>
+<li>Overflow sampling may not record the correct instruction pointer that triggered the event, due
+to interrupt latency (often called “skid”) or out-of-order instruction execution.
+<ul>
+<li>The solution is processor support for what are known as <em>precise events</em>. On Intel, precise events use a technology called precise event-based sampling (PEBS), which uses hardware buffers to record a more accurate (“precise”) instruction pointer at the time of the PMC event. On AMD, precise events use instruction-based sampling (IBS). The Linux perf(1) command supports precise events.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="cpu">CPU</h1>
+<p><strong>CPU Priority inversion</strong></p>
+<p>Priority inversion occurs when a lower-priority thread holds a resource and blocks a higher priority
+thread from running.</p>
+<p>This can be solved using a priority inheritance scheme. Linux since 2.6.18 has provided a user-level mutex that supports priority inheritance</p>
+<p>Here is an example of how this can work:</p>
+<ol>
+<li>Thread A performs monitoring and has a low priority. It acquires an address space lock for
+a production database, to check memory usage.</li>
+<li>Thread B, a routine task to perform compression of system logs, begins running.</li>
+<li>There is insufficient CPU to run both. Thread B preempts A and runs.</li>
+<li>Thread C is from the production database, has a high priority, and has been sleeping waiting
+for I/O. This I/O now completes, putting thread C back into the runnable state.</li>
+<li>Thread C preempts B, runs, but then blocks on the address space lock held by thread A.
+Thread C leaves CPU.</li>
+<li>The scheduler picks the next-highest-priority thread to run: B.</li>
+<li>With thread B running, a high-priority thread, C, is effectively blocked on a lower-priority
+thread, B. This is priority inversion.</li>
+<li>Priority inheritance gives thread A thread C’s high priority, preempting B, until it releases
+the lock. Thread C can now run.</li>
+</ol>
+<h2 id="interconnect">Interconnect</h2>
+<p>For multiprocessor architectures, processors are connected using either a shared system bus or a
+dedicated interconnect. Modern servers are typically multiprocessor, NUMA, and use a CPU interconnect instead.</p>
+<p>Example interconnects include Intel’s Quick Path Interconnect (<strong>QPI, being replaced by UPI</strong>), Intel’s Ultra Path Interconnect (UPI), AMD’s HyperTransport (HT), ARM’s CoreLink Interconnects (there are three different types), and IBM’s Coherent Accelerator Processor Interface (CAPI).</p>
+<ul>
+<li>QPI's cache coherency mode could be tuned in the BIOS, with options including Home Snoop to optimize for memory bandwidth, Early Snoop to optimize for memory latency, and Directory Snoop to improve scalability (it involves tracking what is shared).</li>
+<li>UPI only supports Directory Snoop.</li>
+</ul>
+<h1 id="memory">Memory</h1>
+<p><code>vmstat</code></p>
+<pre><code class="language-bash"><div>vmstat 1
+
+vmstat -Sm 1 <span class="hljs-comment"># output units as megabytes using the -S option</span>
+vmstat -a 1  <span class="hljs-comment"># -a option to print a breakdown of inactive and active memory</span>
+</div></code></pre>
+<p><code>sar</code></p>
+<pre><code class="language-bash"><div>sar -B 1 <span class="hljs-comment"># Paging statistics</span>
+<span class="hljs-comment"># pgscank column: page scanned by kswapd daemon per second.</span>
+<span class="hljs-comment"># pgscand column: effectively shows the rate at which an application is blocking on memory allocations and entering direct reclaim (higher is bad).</span>
+<span class="hljs-comment"># %vmeff column: a measure of page reclaim efficiency. High means pages are successfully stolen from the inactive list (healthy); low means the system is struggling.</span>
+
+sar -H 1 <span class="hljs-comment"># Huge pages statistics</span>
+sar -r [ALL] 1 <span class="hljs-comment"># Memory utilization, ALL flag to print more stats.</span>
+sar -S 1 <span class="hljs-comment"># Swap space statistics</span>
+sar -W 1 <span class="hljs-comment"># Swapping statistics</span>
+</div></code></pre>
+<p><code>numastat</code> - show memory usage on NUMA system, per CPU socket. It can show system-wide and <strong>per-process</strong>.</p>
+<pre><code class="language-bash"><div>numastat <span class="hljs-comment"># show memory allocation on node</span>
+<span class="hljs-comment"># numa_hit: Memory allocations on the intended NUMA node.</span>
+<span class="hljs-comment"># numa_miss + numa_foreign: Memory allocations not on the preferred NUMA node. (numa_miss shows local allocations that should have been elsewhere, and numa_foreign shows remote allocations that should have been local.)</span>
+<span class="hljs-comment"># other_node: Memory allocations on this node while the process was running elsewhere.</span>
+
+numastat -m      <span class="hljs-comment"># -m print output in the style of /proc/meminfo</span>
+numastat -mp PID <span class="hljs-comment"># -p print per-process info</span>
+</div></code></pre>
+<h2 id="swap">Swap</h2>
+<p><code>swapon(1)</code> can show whether swap devices have been configured and how much of their volume is in use.</p>
+<pre><code class="language-bash"><div>$ swapon
+NAME        TYPE        SIZE    USED    PRIO
+/dev/dm-2   partition   980M    611.6M  -2
+/swap1      file        30G     10.9M   -3
+</div></code></pre>
+<p><code>/proc/meminfo</code></p>
+<pre><code class="language-bash"><div>$ cat /proc/meminfo | grep -i swap
+SwapCached:     0KB
+SwapTotal:      9764860KB
+SwapFree:       9764860KB
+</div></code></pre>
+<p>Check active swap usage using <code>vmstat 1</code></p>
+<ul>
+<li><strong><code>swpd</code></strong> column: Amount of swapped-out memory</li>
+<li><strong><code>si</code></strong> column: Memory swapped in (paging)</li>
+<li><strong><code>so</code></strong> column: Memory swapped out (paging)</li>
+</ul>
+<br>
+<br>
+        <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+        
+    </body>
+    </html>

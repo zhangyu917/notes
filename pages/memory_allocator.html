@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Different types of allocator</title>
+        <style>
+/* From extension vscode.github */
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+    display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Caligraphic;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Caligraphic;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Fraktur;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Fraktur;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype");font-weight:700;font-style:italic}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype");font-weight:400;font-style:italic}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Math;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype");font-weight:700;font-style:italic}@font-face{font-family:KaTeX_Math;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype");font-weight:400;font-style:italic}@font-face{font-family:"KaTeX_SansSerif";src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:"KaTeX_SansSerif";src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype");font-weight:400;font-style:italic}@font-face{font-family:"KaTeX_SansSerif";src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Script;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size1;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size2;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size3;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size4;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Typewriter;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype");font-weight:400;font-style:normal}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto;border-color:currentColor}.katex *{-ms-high-contrast-adjust:none!important}.katex .katex-version:after{content:"0.13.0"}.katex .katex-mathml{position:absolute;clip:rect(1px,1px,1px,1px);padding:0;border:0;height:1px;width:1px;overflow:hidden}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-weight:700;font-style:italic}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{display:inline-table;table-layout:fixed;border-collapse:collapse}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;vertical-align:bottom;position:relative}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;vertical-align:bottom;font-size:1px;width:2px;min-width:2px}.katex .vbox{display:inline-flex;flex-direction:column;align-items:baseline}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{width:0;max-width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{display:inline-block;width:100%;border-bottom-style:solid}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{width:0;position:relative}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{display:inline-block;border:0 solid;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{display:inline-block;width:100%;border-bottom-style:solid}.katex .hdashline{display:inline-block;width:100%;border-bottom-style:dashed}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{display:block;position:absolute;width:100%;height:inherit;fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex svg path{stroke:none}.katex img{border-style:none;min-width:0;min-height:0;max-width:none;max-height:none}.katex .stretchy{width:100%;display:block;position:relative;overflow:hidden}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{width:100%;position:relative;overflow:hidden}.katex .halfarrow-left{position:absolute;left:0;width:50.2%;overflow:hidden}.katex .halfarrow-right{position:absolute;right:0;width:50.2%;overflow:hidden}.katex .brace-left{position:absolute;left:0;width:25.1%;overflow:hidden}.katex .brace-center{position:absolute;left:25%;width:50%;overflow:hidden}.katex .brace-right{position:absolute;right:0;width:25.1%;overflow:hidden}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{box-sizing:border-box;border:.04em solid}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{box-sizing:border-content;border-top:.049em solid;border-right:.049em solid;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{counter-increment:katexEqnNo;content:"(" counter(katexEqnNo) ")"}.katex .mml-eqn-num:before{counter-increment:mmlEqnNo;content:"(" counter(mmlEqnNo) ")"}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;position:absolute;left:calc(50% + .3em);text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{text-align:left;padding-left:2em}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        
+        
+        
+    </head>
+    <body class="vscode-body vscode-light">
+        <ul>
+<li><a href="#different-types-of-allocator">Different types of allocator</a>
+<ul>
+<li><a href="#thread-local-allocator">Thread local allocator</a></li>
+<li><a href="#block-allocator">Block allocator</a></li>
+</ul>
+</li>
+<li><a href="#slab-allocator">Slab allocator</a>
+<ul>
+<li><a href="#slab-coloring">Slab Coloring</a></li>
+<li><a href="#per-cpu-cache">per-cpu cache</a></li>
+<li><a href="#sized-cache">Sized Cache</a></li>
+<li><a href="#slab-allocator-interfaces">Slab Allocator Interfaces</a></li>
+<li><a href="#an-usage-example">An usage example</a></li>
+<li><a href="#%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8B-slab-%E4%BF%A1%E6%81%AF">如何查看 slab 信息</a></li>
+<li><a href="#slub-internals">Slub Internals</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="different-types-of-allocator">Different types of allocator</h1>
+<h2 id="thread-local-allocator">Thread local allocator</h2>
+<p>use a memory allocator with thread-local caches, such as the popular malloc() replacement library TCMalloc.</p>
+<ul>
+<li>It reserves some amount of memory for each thread.</li>
+<li>When a thread needs to allocate memory, it is taken from the thread-local memory arena first. This does not need a lock.</li>
+<li>Only if the arena is empty does the allocator have to take the lock and allocate from the memory shared between all threads.</li>
+<li>Similarly, when a thread deallocates the memory, it is added to the thread-specific arena, again without any locking.</li>
+</ul>
+<p>Problems with such allocators:</p>
+<ul>
+<li>tend to use more memory overall</li>
+<li>It can lead to unbalance memory allocation between threads: if one thread frees a lot of memory and another thread allocates a lot of memory, the recently freed memory does not become available to the other thread.
+<ul>
+<li>Thus, the allocators typically do not allow the per-thread arena to grow above some predefined limit. Once the limit is reached, the thread-local memory is returned to the main arena shared between all threads (which requires lock)</li>
+</ul>
+</li>
+<li>Cross-thread deallocation is difficult because the memory must be transferred from the thread-local arena of one thread to that of the other (or to the shared arena).
+memory transfers between threads should be avoided whenever possible when using thread local memory allcoators.</li>
+<li>Be cautious with non-uniform memory architecture (<strong>NUMA</strong>) when using memory that was allocated by another thread.</li>
+</ul>
+<h2 id="block-allocator">Block allocator</h2>
+<p>Use block allocator to <strong>avoid memory fragmentation</strong>.</p>
+<ul>
+<li>The idea is that all memory is allocated in blocks of fixed size, such as 64 KB.</li>
+<li>from the OS, allocate larger chunks of fixed size (such as 8MB), and sub-divide them into block size (64KB)</li>
+<li>The memory allocator that handles these requests (OS malloc call and sub-divide into blocks) is called the primary allocator.</li>
+<li>There can be a secondary allocator that further subdivides the 64 KB blocks into smaller allocations</li>
+</ul>
+<p>Advantage:</p>
+<ul>
+<li>No fragmentation. Since they are fixed-size, any time a memory block is returned to the allocator, it can be reused to satisfy the next request for memory.</li>
+<li>The blocks are kept in a free-list. The last 64 KB memory block is likely to be from the most recently used memory and is still hot in the cache. This improves memory reference locality</li>
+<li>These free lists can be maintained per thread, but periodic rebalance will be needed.</li>
+</ul>
+<br>
+<h1 id="slab-allocator">Slab allocator</h1>
+<p>Linux kernel provides the slab layer (also called the slab allocator).The slab
+layer acts as a generic per-process data structure-caching layer.</p>
+<p>A bit of history</p>
+<ul>
+<li>K&amp;R allocator (1991-1996), simply manages list of free objects. allocation requires traversing the list. Rapid fragmentation.</li>
+<li>SLAB allocator (1996-1999), as compact as possible.</li>
+<li>SLOB: Solaris type allocator (1999-2008), as cache friendly as possible. benchmark friendly.</li>
+<li>SLUB: unqueued allocator (2008-today), currently default in most distros. Simple and instruction cost counts. Superior debugging. Defragmentation. Exucution time friendly.</li>
+</ul>
+<blockquote>
+<p>slab 算法共有三种：SLAB、SLUB、SLOB。SLAB 最早出现，而 SLOB 和 SLUB 是后面出现的，但是继承了 SLAB 的接口定义，所以现在都倾向于对该类型内存算法称为 slab。SLAB 是最早出现的分配算法，内存块管理采用的是红黑树；而 SLOB 是针对嵌入式场景而优化的；SLUB 则是现在主流算法，是针对 SLAB 的改良。三种算法的接口统一，也就意味着不能共存，内核编译时可以通过配置选项来控制选择何种算法。</p>
+</blockquote>
+<p>The slab allocator has three principle aims:</p>
+<ul>
+<li>The allocation of small blocks of memory to help eliminate internal fragmentation that would be otherwise caused by the buddy system;</li>
+<li>The caching of commonly used objects so that the system does not waste time allocating, initialising and destroying objects.</li>
+<li>The better utilisation of hardware cache by aligning objects to the L1 or L2 caches.</li>
+</ul>
+<p>The slab layer divides different objects into groups called <em>caches</em>, each of which stores a
+different type of object, ie. <strong>one cache per object type</strong>.</p>
+<ul>
+<li>For example, one cache is for process descriptors (a free list of <code>task_struct</code> structures), whereas another cache is for <code>inode</code> objects.</li>
+<li>After you create a cache, the slab layer works just like a specialized allocator for the
+specific type of object.</li>
+</ul>
+<p>The caches are then divided into <em>slabs</em>. Each slab is composed of one or more <strong>physically contiguous</strong> pages (typically, one page).</p>
+<p>Each slab contains some number of objects, which are the data structures being cached. Each slab is in one of three states: full (all objects allcoated), partial, or empty (all objects free). A new request is first served in partial slab, if available, otherwise, from an empty slab. If no empty slab, one is created.</p>
+<p><img src="images/2022-02-12-15-19-28.png" alt=""></p>
+<p>Each cache is represented by a <code>kmem_cache</code> structure.This structure contains three
+lists: <code>slabs_full</code>, <code>slabs_partial</code>, and <code>slabs_empty</code>, they are stored inside a <code>kmem_list3</code>
+structure, which is defined in <code>&lt;mm/slab.c&gt;</code>.</p>
+<p>A slab descriptor, <code>struct slab</code>, represents each slab:</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">slab</span> {</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">list</span>;</span>    <span class="hljs-comment">/* full, partial, or empty list */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> colouroff;  <span class="hljs-comment">/* offset for the slab coloring */</span>
+  <span class="hljs-keyword">void</span> *s_mem;              <span class="hljs-comment">/* first object in the slab */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> inuse;       <span class="hljs-comment">/* allocated objects in the slab */</span>
+  <span class="hljs-keyword">kmem_bufctl_t</span> <span class="hljs-built_in">free</span>;       <span class="hljs-comment">/* first free object, if any */</span>
+};
+</div></code></pre>
+<h2 id="slab-coloring">Slab Coloring</h2>
+<p>Objects that have the same offset within different slabs will, with a relatively high probability, end up mapped in the same cache line.</p>
+<p>Slab coloring is a scheme which attempts to have objects in different slabs use different lines in the cache. It uses the <em>free</em> unused bytes to color the slab. If a slab is colored with color col, the offset of the first object (with respect to the slab initial address) is equal to col × aln + dsize bytes. Coloring essentially leads to moving some of the free area of the slab from the end to the beginning.</p>
+<p><img src="images/2022-02-16-11-12-02.png" alt=""></p>
+<h2 id="per-cpu-cache">per-cpu cache</h2>
+<p>To improved hardware cache utilization, Linux tries to keep objects in the same CPU cache with a <code>cpucache</code> object cache.</p>
+<p>When allocating or freeing objects, they are placed in the cpucache. When there are no objects free, a batch of objects is placed into the pool. When the pool gets too large, half of them are removed and placed in the global cache. The second major benefit of this method is that spinlocks do not have to be held when accessing the CPU pool.</p>
+<p>Inside each kmem_cache, there is a per-cpu cache if it is SMP.</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">kmem_cache_s</span> {</span>
+  ...
+  <span class="hljs-meta">#<span class="hljs-meta-keyword">ifdef</span> CONFIG_SMP</span>
+      <span class="hljs-keyword">cpucache_t</span>              *cpudata[NR_CPUS];
+  <span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span>
+  ...
+}
+</div></code></pre>
+<p>A helper macro <code>cc_data()</code> is provided to give the cpucache for a given cache and processor. It is defined as</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> cc_data(cachep) \
+        ((cachep)-&gt;cpudata[smp_processor_id()])</span>
+</div></code></pre>
+<p>Pointers to objects on the cpucache are placed immediately after the cpucache_t struct.</p>
+<p><img src="images/2022-02-19-11-22-31.png" alt=""></p>
+<h2 id="sized-cache">Sized Cache</h2>
+<p>There are two types of slab allocators:</p>
+<ul>
+<li>One is for specific types, the cache can be created using <code>kmem_cache_create(name, ...)</code>.</li>
+<li>One is for generic types, Linux maintains a limited number of these types, sized from 2^5 (32) to 2^17 (131072).
+<ul>
+<li>From <code>/proc/slabinfo</code>, they show us as <code>size-N cache</code></li>
+</ul>
+</li>
+</ul>
+<p><code>kmalloc</code> 是基于slab 分配器的 ，同样可以用<code>cat /proc/slabinfo</code> 命令，查看 <code>kmalloc</code> 相关 slab 对象信息，下面的 <code>kmalloc-8</code>、<code>kmalloc-16</code> 等等就是基于slab分配的 <code>kmalloc</code> 高速缓存。</p>
+<p><img src="images/2022-02-19-12-51-50.png" alt=""></p>
+<h2 id="slab-allocator-interfaces">Slab Allocator Interfaces</h2>
+<p>A new cache is created via</p>
+<pre><code class="language-C++"><div><span class="hljs-function">struct kmem_cache * <span class="hljs-title">kmem_cache_create</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *name,
+                                      <span class="hljs-keyword">size_t</span> size, <span class="hljs-comment">/*size of the each object in the cache*/</span>
+                                      <span class="hljs-keyword">size_t</span> align,
+                                      <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> flags,
+                                      <span class="hljs-keyword">void</span> (*ctor)(<span class="hljs-keyword">void</span> *))</span></span>;
+</div></code></pre>
+<p>flags parameter:</p>
+<ul>
+<li><strong>SLAB_HWCACHE_ALIGN</strong>: This flag instructs the slab layer to align each object within
+a slab to a cache line.This prevents “false sharing”, but at a cost of increased memory.</li>
+<li><strong>SLAB_POISON</strong>: This flag causes the slab layer to fill the slab with a known value
+(a5a5a5a5).This is called poisoning and is useful for catching access to uninitialized
+memory.</li>
+<li><strong>SLAB_RED_ZONE</strong>: This flag causes the slab layer to insert “red zones” around the
+allocated memory to help detect buffer overruns.</li>
+<li><strong>SLAB_PANIC</strong>: This flag causes the slab layer to panic if the allocation fails.This flag
+is useful when the allocation must not fail.</li>
+<li><strong>SLAB_CACHE_DMA</strong>: This flag instructs the slab layer to allocate each slab in DMAable
+memory.</li>
+</ul>
+<p>The final parameter, <code>ctor</code>, is a constructor for the cache.The constructor is called
+whenever new pages are added to the cache. In practice, caches in the Linux kernel do
+not often utilize a constructor. You can pass NULL for this parameter.</p>
+<p>After a cache is created, an object is obtained from the cache via</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// If no free objects are in any slabs in the cache, the slab layer will obtain new pages via</span>
+<span class="hljs-comment">// kmem_getpages(), the value of `flags` is passed to __get_free_pages().</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> * <span class="hljs-title">kmem_cache_alloc</span><span class="hljs-params">(struct kmem_cache *cachep, <span class="hljs-keyword">gfp_t</span> flags)</span></span>;
+
+<span class="hljs-comment">// To later free an object and return it to the slab</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">kmem_cache_free</span><span class="hljs-params">(struct kmem_cache *cachep, <span class="hljs-keyword">void</span> *objp)</span></span>;
+</div></code></pre>
+<h2 id="an-usage-example">An usage example</h2>
+<p>Slab layer for the <code>task_struct</code> structure, defined in <code>kernel/fork.c</code>.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// a global variable</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">kmem_cache</span> *<span class="hljs-title">task_struct_cachep</span>;</span>
+
+<span class="hljs-comment">// During kernel initialization, in fork_init(), the cache is created</span>
+task_struct_cachep = kmem_cache_create(“task_struct”,
+                                      <span class="hljs-keyword">sizeof</span>(struct task_struct),
+                                      ARCH_MIN_TASKALIGN,
+                                      SLAB_PANIC | SLAB_NOTRACK,
+                                      <span class="hljs-literal">NULL</span>);
+
+<span class="hljs-comment">// Each time a process calls fork(), a new process descriptor must be created,</span>
+<span class="hljs-comment">// This is done in dup_task_struct(), which is called from do_fork():</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">task_struct</span> *<span class="hljs-title">tsk</span>;</span>
+tsk = kmem_cache_alloc(task_struct_cachep, GFP_KERNEL);
+<span class="hljs-keyword">if</span> (!tsk)
+  eturn <span class="hljs-literal">NULL</span>;
+
+<span class="hljs-comment">// After a task dies, if it has no children waiting on it, its process descriptor is freed </span>
+<span class="hljs-comment">// and returned to the task_struct_cachep slab cache.This is done in free_task_struct()</span>
+<span class="hljs-comment">// `tsk` is the exiting task:</span>
+kmem_cache_free(task_struct_cachep, tsk);
+</div></code></pre>
+<h2 id="如何查看-slab-信息">如何查看 slab 信息</h2>
+<p><code>cat /proc/slabinfo</code></p>
+<p><code>slabtop</code> 实时显示内核slab 内存缓存信息。</p>
+<p><img src="images/2022-02-19-12-37-41.png" alt=""></p>
+<p><img src="images/2022-02-19-12-36-58.png" alt=""></p>
+<h2 id="slub-internals">Slub Internals</h2>
+<p><img src="images/2022-03-07-11-01-42.png" alt=""></p>
+<p><strong>per cpu freelist</strong></p>
+<p>针对每一个cpu都会分配一个<code>struct kmem_cache_cpu</code>的结构体。可以称作是本地缓存池。当内存申请的时候，优先从本地cpu缓存池申请。</p>
+<ul>
+<li><code>kmem_cache_cpu</code>中<code>page</code>成员指向正在使用的slab的<code>struct page</code>。</li>
+<li><code>freelist</code>成员指向第一个可用内存obj首地址。</li>
+</ul>
+<p>在分配初期，要从伙伴系统分配一定页数的内存。内核会为每一个page frame创建一个<code>struct page</code>的page frame descriptor。</p>
+<ul>
+<li><code>struct page</code>结构体中<code>inuse</code>代表已经使用的obj数量。被置成obj的总数，主要用于full slab，就像图的右下角，就像无人看管的孩子，没有任何链表来管理。</li>
+</ul>
+<p><strong>per cpu partial</strong></p>
+<p>当图中右下角full slab释放obj的时候，首先就会将slab挂入per cpu partial链表管理。通过<code>struct page</code>中next成员形成单链表。</p>
+<p>per cpu partial链表指向的第一个page中会存放一些特殊的数据。</p>
+<ul>
+<li><code>pobjects</code>存储着per cpu partial链表中所有slab可供分配obj的总数，如图所示。</li>
+<li>当然还有一个图中没有体现的pages成员存储per cpu partial链表中所有slab缓存池的个数。</li>
+</ul>
+<p><strong>per node partial</strong></p>
+<p>per node partia链表类似per cpu partial，区别是node中的slab是所有cpu共享的，而per cpu是每个cpu独占的。假如现在的slab布局如上图所示。假如现在如红色箭头指向的obj将会释放，那么就是一个empty slab，此时判断<code>kmem_cache_node-&gt;nr_partial</code>是否大于<code>kmem_cache-&gt;min_partial</code>，如果大于则会释放该slab的内存。</p>
+<p><strong>slub分配内存</strong></p>
+<p>首先从cpu本地缓存池分配，如果<code>kmem_cache_cpu-&gt;freelist</code>不存在，就会转向per cpu partial分配 （此时这个partial slab会升级成为active slab，<code>kmem_cache_cpu-&gt;page</code>和<code>kmem_cache_cpu-&gt;freelist</code>会更新而指向它），如果per cpu partial也没有可用对象，继续查看per node partial，如果很不幸也不没有可用对象的话，就只能从伙伴系统分配一个slab了，并挂入per cpu freelist。</p>
+<p><strong>slub释放内存</strong></p>
+<ul>
+<li>如果释放的obj就是属于正在使用cpu上的slab，那么直接释放即可；</li>
+<li>如果不是的话，首先判断所属slub是不是full状态，因为full slab释放之后就变成partial empty，需要插入到per cpu partial链表。
+<ul>
+<li>如果per cpu partial链表管理的所有slab的free object数量 （tracked by <code>pobjects</code> field in first struct page in per cpu partial list）超过<code>kmem_cache-&gt;cpu_partial</code>成员的话，就会将此时per cpu partial链表中所有的slab移送到<code>kmem_cache_node</code>的partial链表，然后再将刚刚释放obj的slab插入到per cpu partial链表。如果不大于，则更新<code>pobjects</code>和pages成员，并将slab插入到per cpu partial链表。</li>
+</ul>
+</li>
+<li>如果不是full slab的话，继续判断释放当前obj后的slab是否是empty slab，如果是empty slab，那么在满足<code>kmem_cache_node</code>的nr_partial大于<code>kmem_cache</code>的min_partial的情况下，则会释放该slab的内存。其他情况就直接释放即可。</li>
+</ul>
+
+    </body>
+    </html>

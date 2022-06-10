@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>C&plus;&plus; Concurrency</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{text-rendering:auto;font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.13.24"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+#button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <!-- title: C++ Concurrency -->
+<h1>C++ Concurrency</h1>
+<p><a href="#" class="to-top">➤</i></a></p>
+<ul>
+<li><a href="#c-concurrency-support">C++ Concurrency Support</a>
+<ul>
+<li><a href="#c1114">C++11/14</a></li>
+<li><a href="#c17">C++17</a></li>
+<li><a href="#c20">C++20</a></li>
+</ul>
+</li>
+<li><a href="#reordering">Reordering</a>
+<ul>
+<li><a href="#compiler-barrier">Compiler barrier</a></li>
+<li><a href="#memory-barrier">Memory barrier</a></li>
+<li><a href="#storeload">#StoreLoad</a></li>
+<li><a href="#store-buffer">Store Buffer</a></li>
+<li><a href="#x86-implementation">x86 implementation</a>
+<ul>
+<li><a href="#mfence-httpswwwfelixcloutiercomx86mfence"><code>mfence</code> (https://www.felixcloutier.com/x86/mfence)</a></li>
+<li><a href="#sfence-httpswwwfelixcloutiercomx86sfence"><code>sfence</code> (https://www.felixcloutier.com/x86/sfence)</a></li>
+<li><a href="#lfence-httpswwwfelixcloutiercomx86lfence"><code>lfence</code> (https://www.felixcloutier.com/x86/lfence)</a></li>
+<li><a href="#x86-has-a-strong-memory-model">x86 has a strong memory model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#memory-order">Memory order</a>
+<ul>
+<li><a href="#acquire-release-memory-order">acquire-release memory order</a></li>
+</ul>
+</li>
+<li><a href="#measure-threading-cost">Measure Threading Cost</a>
+<ul>
+<li><a href="#threaded-sequential-access-write-result---each-thread-with-independent-data-set">Threaded sequential access (write) result - each thread with independent data set</a></li>
+<li><a href="#concurrent-access-to-shared-data-is-expensive">Concurrent access to shared data is expensive</a></li>
+<li><a href="#concurrent-access-to-non-shared-data">Concurrent access to non-shared data</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="c-concurrency-support">C++ Concurrency Support</h1>
+<h2 id="c1114">C++11/14</h2>
+<ul>
+<li>It introduced memory model</li>
+<li>It introduced the notion of threads
+<ul>
+<li>Most implementations use system threads to support C++ threads.</li>
+</ul>
+</li>
+<li>It introduced several synchronization primitives
+<ul>
+<li><code>std::mutex</code>, on POSIX system, it is typically POSIX mutex.</li>
+<li>Timed and recursive mutex (following POSIX)</li>
+<li><code>std::lock_guard</code>, RAII template for locking/unlocking mutex</li>
+<li><code>std::lock()</code> for locking multiple mutexes safely</li>
+<li><code>std::condition_variable</code> (following POSIX)</li>
+</ul>
+</li>
+<li>It supports low-level atomic operation: <code>std::atomic</code>
+<ul>
+<li>CAS</li>
+<li>memory order specifiers.</li>
+</ul>
+</li>
+<li>It added support for asynchronous execution - <code>std::async</code> - where a function can be invoked asynchronously (possibly on another thread).
+<ul>
+<li>It provides limited practical use of parallelism or just execute each asynchronous function in its own thread which is high overhead</li>
+</ul>
+</li>
+</ul>
+<h2 id="c17">C++17</h2>
+<ul>
+<li><a href="c17.html#parallel-stl-alogrithm">Parallel algorithms</a>: The major new feature in C++17</li>
+<li><a href="c17.html#stdscoped_lock"><code>std::scoped_lock</code></a>: RAII wrapper for locking multiple mutexes safely without deadlock.</li>
+<li>std::shared_mutex
+<ul>
+<li>a read-writer mutex (following POSIX read-write mutex),</li>
+<li>most implementation offer not good performance</li>
+</ul>
+</li>
+<li><a href="c17.html#cache-line-sizes">cache line sizes</a>.</li>
+</ul>
+<h2 id="c20">C++20</h2>
+<ul>
+<li><a href="c20.html#corouties">Corouties</a></li>
+</ul>
+<br>
+<br>
+<h1 id="reordering">Reordering</h1>
+<p>Three levels of reordering</p>
+<ul>
+<li>compiler;</li>
+<li>processor;</li>
+<li>memory/cache (such as store buffer)</li>
+<li>to programmer, we dont care which level, as long as we guarantee the sequence consistent</li>
+</ul>
+<p>This document summarises some known mappings of C/C++11 atomic operations to x86: <a href="http://www.cl.cam.ac.uk/~pes20/cpp/cpp0xmappings.html">http://www.cl.cam.ac.uk/~pes20/cpp/cpp0xmappings.html</a></p>
+<table>
+<thead>
+<tr>
+<th>C/C++11</th>
+<th>Operation	x86 implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Load Relaxed:</td>
+<td>MOV (from memory)</td>
+</tr>
+<tr>
+<td>Load Consume:</td>
+<td>MOV (from memory)</td>
+</tr>
+<tr>
+<td>Load Acquire: <br> example: <br> <code>std::atomic&lt;int&gt; x(0);</code> <br> <code>int y = x.load(std::memory_order_acquire);</code></td>
+<td>MOV (from memory)</td>
+</tr>
+<tr>
+<td>Load Seq_Cst: <br> example: <br> <code>std::atomic&lt;int&gt; x(0);</code> <br> <code>int y = x.load()</code></td>
+<td>MOV (from memory)</td>
+</tr>
+<tr>
+<td>Store Relaxed</td>
+<td>MOV (into memory)</td>
+</tr>
+<tr>
+<td>Store Release <br> example: <br> <code>std::atomic&lt;int&gt; x(0);</code> <br> <code>x.store(2, std::memory_order_release);</code></td>
+<td>MOV (into memory)</td>
+</tr>
+<tr>
+<td>Store Seq Cst <br> example: <br> <code>std::atomic&lt;int&gt; x(0);</code> <br> <code>x.store(2); or just x = 2;</code></td>
+<td>(LOCK) XCHG // alternative: MOV (into memory),MFENCE  <br> The parenthesised (LOCK) reflects the fact that the XCHG instruction on x86 has an <strong>implicit</strong> LOCK prefix. <br>If a compiler emits code using non-temporal stores, it must also emit sufficient fencing to make the usage of non-temporal stores unobservable to callers and callees.</td>
+</tr>
+<tr>
+<td>Consume Fence:</td>
+<td>&lt;ignore&gt;</td>
+</tr>
+<tr>
+<td>Acquire Fence:</td>
+<td>&lt;ignore&gt;</td>
+</tr>
+<tr>
+<td>Release Fence:</td>
+<td>&lt;ignore&gt;</td>
+</tr>
+<tr>
+<td>Acq_Rel Fence:</td>
+<td>&lt;ignore&gt;</td>
+</tr>
+<tr>
+<td>Seq_Cst Fence:</td>
+<td>MFENCE</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Summary:</strong> Code Gen on X86:</p>
+<table>
+<thead>
+<tr>
+<th>operation</th>
+<th>ordinary</th>
+<th>atomic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>load:</td>
+<td>mov</td>
+<td>mov</td>
+</tr>
+<tr>
+<td>store:</td>
+<td>mov</td>
+<td>xchg</td>
+</tr>
+<tr>
+<td>CaS:</td>
+<td>cmpxchg</td>
+<td>cmpxchg</td>
+</tr>
+</tbody>
+</table>
+<p>From Intel Manual  (Intel 64 and IA-32 Architectures Software Developer’s Manual, Volume 3A):</p>
+<ul>
+<li>Reads are not reordered with any reads</li>
+<li>Writes are not reordered with any writes (some exceptions)</li>
+<li>writes are not reordered with older reads</li>
+<li>Reads maybe reordered with older writes (different locations)   #storeLoad barrier needed
+<ul>
+<li>eg, below can be reordered:  <br>
+Reads X<br>
+writres Y<br></li>
+</ul>
+</li>
+<li>Reads &amp; writes not reordered with locked instruction (such as xchg)
+<ul>
+<li>means every lock (such as atomic store operation) is a full fence</li>
+</ul>
+</li>
+</ul>
+<p>POWER (IBM) and ARM v7 architecture have very expensive atomic load operation</p>
+<ul>
+<li>that's the major reason we have relaxed atomics in c++11 standard</li>
+</ul>
+<h2 id="compiler-barrier">Compiler barrier</h2>
+<p><a href="https://preshing.com/20120625/memory-ordering-at-compile-time/">https://preshing.com/20120625/memory-ordering-at-compile-time/</a></p>
+<p><strong>Direct way:</strong>
+The minimalist approach to preventing compiler reordering is by using a special directive known as a compiler barrier</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span>
+</span>{
+    A = B + <span class="hljs-number">1</span>;
+    <span class="hljs-function"><span class="hljs-keyword">asm</span> <span class="hljs-title">volatile</span><span class="hljs-params">(<span class="hljs-string">&quot;&quot;</span> ::: <span class="hljs-string">&quot;memory&quot;</span>)</span></span>;
+    B = <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p><strong>Indirect way:</strong></p>
+<ul>
+<li>every non-relaxed atomic operation acts as a compiler barrier as well.</li>
+<li>every function containing a compiler barrier must act as a compiler barrier itself, even when the function is inlined.</li>
+<li>The majority of function calls act as compiler barriers, whether they contain their own compiler barrier or not.
+<ul>
+<li>This excludes inline functions, and cases where link-time code generation is used</li>
+<li>Other than those cases, a call to an external function is even stronger than a compiler barrier, since the compiler has no idea what the function’s side effects will be. Eg., it needs to reload the variable from the memory even the variable is used before the call</li>
+</ul>
+</li>
+</ul>
+<p><strong>Out-of-thin-air store:</strong></p>
+<p>In particular, compilers were free to introduce stores to shared memory in cases where there previously was none.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">int</span> A, B;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span>
+</span>{
+    <span class="hljs-keyword">if</span> (A)
+        B++;
+}
+<span class="hljs-comment">// Can be optimized to </span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span>
+</span>{
+    <span class="hljs-keyword">register</span> <span class="hljs-keyword">int</span> r = B;    <span class="hljs-comment">// Promote B to a register before checking A.</span>
+    <span class="hljs-keyword">if</span> (A)
+        r++;
+    B = r;          <span class="hljs-comment">// Surprise! A new memory store where there previously was none.</span>
+}
+</div></code></pre>
+<p>In any case, the new C++11 standard explicitly prohibits such behavior from the compiler in cases where it would introduce a data race. The wording can be found in and around §1.10.22 of the <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf">most recent C++11 working draft</a>:</p>
+<ul>
+<li>Compiler transformations that introduce assignments to a potentially shared memory location that would not be modified by the abstract machine are generally precluded by this standard.</li>
+</ul>
+<h2 id="memory-barrier">Memory barrier</h2>
+<p>You can enforce correct memory ordering on the processor by issuing any instruction which acts as a memory barrier. In some ways, this is the only technique you need to know, because when you use such instructions, compiler ordering is taken care of automatically. Examples of instructions which act as memory barriers include (but are not limited to) the following:</p>
+<ul>
+<li>Certain inline assembly directives in GCC, such as the PowerPC-specific <code>asm volatile(&quot;lwsync&quot; ::: &quot;memory&quot;)</code></li>
+<li>Any Win32 Interlocked operation, except on Xbox 360</li>
+<li>Many operations on C++11 atomic types, such as <code>load(std::memory_order_acquire)</code></li>
+<li>Operations on POSIX mutexes, such as <code>pthread_mutex_lock</code></li>
+</ul>
+<p>Each type of memory barrier is named after the type of memory reordering it’s designed to prevent: for example, #StoreLoad is designed to prevent the reordering of a store followed by a load.</p>
+<p><img src="images/2022-04-26-14-48-13.png" alt=""></p>
+<p><strong>#LoadLoad</strong> is useful when you want to prevent reordering between reads. This is especially useful when a thread is consuming some data depending on a flag e.g. <code>isPublished</code> written by another thread, so reading the data always happens after checking the flag.</p>
+<p>Similarly <strong>#StoreStore</strong> fence is used to prevent reordering writes (<code>sfense</code> on x86). This is useful when a thread is publishing some data using a flag, so writing the data always happens before setting the flag.</p>
+<p><strong>#LoadStore</strong> fence disallows reordering a subsequent store ahead of the load instruction, which typically happens on CPU when the later store is a cache hit and the earlier load is a cache miss.</p>
+<p><strong>#StoreLoad</strong> <strong>is unique</strong> and it acts as a full sync (full memory barrier, <code>mfence</code> on x86) – all writes before the fence will be made visible to all other caches and all reads after the fence will get values at-or-later than the execution time of the fence. If all operations have #StoreLoad fences, it would be sequential consistent.</p>
+<h2 id="storeload">#StoreLoad</h2>
+<p>A StoreLoad barrier ensures that all stores performed before the barrier are visible to other processors, and that all loads performed after the barrier receive the latest value that is visible at the time of the barrier. In other words, it effectively prevents reordering of all stores before the barrier against all loads after the barrier, respecting the way a sequentially consistent multiprocessor would perform those operations.</p>
+<p>#StoreLoad is unique. On most processors, instructions that act as a #StoreLoad barrier tend to be more expensive than instructions acting as the other barrier types.</p>
+<p>On x86/64 processors, there is no specific instruction which acts only as a StoreLoad barrier, but there are several instructions which do that and more. The <code>mfence</code> instruction is a full memory barrier, which prevents memory reordering of any kind. In GCC, it can be implemented as follows:</p>
+<pre><code class="language-C++"><div>   <span class="hljs-keyword">for</span> (;;)                                  <span class="hljs-comment">// Loop indefinitely</span>
+    {
+        <span class="hljs-built_in">sem_wait</span>(&amp;beginSema1);                <span class="hljs-comment">// Wait for signal from main thread</span>
+        <span class="hljs-keyword">while</span> (random.<span class="hljs-built_in">integer</span>() % <span class="hljs-number">8</span> != <span class="hljs-number">0</span>) {}  <span class="hljs-comment">// Add a short, random delay</span>
+
+        <span class="hljs-comment">// ----- THE TRANSACTION! -----</span>
+        X = <span class="hljs-number">1</span>;
+        <span class="hljs-function"><span class="hljs-keyword">asm</span> <span class="hljs-title">volatile</span><span class="hljs-params">(<span class="hljs-string">&quot;mfence&quot;</span> ::: <span class="hljs-string">&quot;memory&quot;</span>)</span></span>;  <span class="hljs-comment">// Prevent memory reordering</span>
+        r1 = Y;
+
+        <span class="hljs-built_in">sem_post</span>(&amp;endSema);                   <span class="hljs-comment">// Notify transaction complete</span>
+    }
+</div></code></pre>
+<p>Again, you can verify its presence by looking at the assembly code listing.</p>
+<pre><code class="language-asm"><code><div>   ...
+    mov    DWORD PTR _X, 1
+    mfence
+    mov    eax, DWORD PTR _Y
+    mov    DWORD PTR _r1, eax
+    ...
+</div></code></code></pre>
+<p>Good article: <a href="https://blog.the-pans.com/std-atomic-from-bottom-up/">https://blog.the-pans.com/std-atomic-from-bottom-up/</a></p>
+<h2 id="store-buffer">Store Buffer</h2>
+<p>When P is trying to write to its cache and its cache state is &quot;invalid&quot;, it needs to first fetch the cacheline from main memory (or transfer from other caches) before it can set exclusive ownership of the cacheline and set its state to &quot;modified&quot;. This can be very slow, hence the introduction of Store Buffer.</p>
+<p>In this case, writes get buffered in the cache-local store buffer after issuing read-invalidates to all caches. The cacheline will be eventually updated with the written value after it's fetched from main memory. During this window, read from the cache will have to search for its store buffer for buffered writes. It works for the local cache but not others.</p>
+<h2 id="x86-implementation">x86 implementation</h2>
+<h3 id="mfence-httpswwwfelixcloutiercomx86mfence"><code>mfence</code> (<a href="https://www.felixcloutier.com/x86/mfence">https://www.felixcloutier.com/x86/mfence</a>)</h3>
+<p>Performs a serializing operation on all load-from-memory and store-to-memory instructions that were issued prior the MFENCE instruction. This serializing operation guarantees that every load and store instruction that precedes the MFENCE instruction in program order becomes globally visible before any load or store instruction that follows the MFENCE instruction. The MFENCE instruction is ordered with respect to all load and store instructions, other MFENCE instructions, any LFENCE and SFENCE instructions...</p>
+<p>In practice, it drains the store buffer before any loads (globally) can proceed.</p>
+<h3 id="sfence-httpswwwfelixcloutiercomx86sfence"><code>sfence</code> (<a href="https://www.felixcloutier.com/x86/sfence">https://www.felixcloutier.com/x86/sfence</a>)</h3>
+<p>Orders processor execution relative to all memory stores prior to the SFENCE instruction. The processor ensures that every store prior to SFENCE is globally visible before any store after SFENCE becomes globally visible. The SFENCE instruction is ordered with respect to memory stores, other SFENCE instructions, MFENCE instructions, and any serializing instructions (such as the CPUID instruction). It is not ordered with respect to memory loads or the LFENCE instruction.</p>
+<p>It doesn't have to drain the store buffer. It's often used for Non-temporal instructions, when by default, operations bypass cache and &quot;breaks&quot; cache coherence explicitly. Inserting sfence after an NT store, makes sure the data becomes visible to other cores.</p>
+<h3 id="lfence-httpswwwfelixcloutiercomx86lfence"><code>lfence</code> (<a href="https://www.felixcloutier.com/x86/lfence">https://www.felixcloutier.com/x86/lfence</a>)</h3>
+<p>Performs a serializing operation on all load-from-memory instructions that were issued prior the LFENCE instruction. Specifically, LFENCE does not execute until all prior instructions have completed locally, and no later instruction begins execution until LFENCE completes. In particular, an instruction that loads from memory and that precedes an LFENCE receives data from memory prior to completion of the LFENCE.</p>
+<p>In practice, it drains the local invalidation queue and re-order buffer (load queue). I am not aware of when this is useful on x86.</p>
+<h3 id="x86-has-a-strong-memory-model">x86 has a strong memory model</h3>
+<ul>
+<li>A strong hardware memory model is one in which every machine instruction comes implicitly with acquire and release semantics. As a result, when one CPU core performs a sequence of writes, every other CPU core sees those values change in the same order that they were written.</li>
+<li>On x86, barring non-temporal instructions, all reads have acquire semantic and all writes have release semantic. This means you get <code>lfence</code> and <code>sfence</code> for free. But <code>lfense</code> + <code>sfence</code> != <code>mfence</code> or full memory barrier. Specifically, for #StoreLoad, you can reorder an acquire-load ahead of a release-store. In fact, it does happen on x86.</li>
+</ul>
+<br>
+<br>
+<h1 id="memory-order">Memory order</h1>
+<p>Curate list ofThreads and memory model for C++
+<a href="https://hboehm.info/c++mm/">https://hboehm.info/c++mm/</a></p>
+<h2 id="acquire-release-memory-order">acquire-release memory order</h2>
+<p>load acquire &lt;-&gt; store release</p>
+<p>Acquire-read disallows reordering reads or writes ahead of it, <em>in program order</em>. Release-write disallows reordering reads or writes after it, <em>in program order</em>. It says nothing about fences, which is just implementation detail. In practice it looks like (<a href="https://preshing.com/20120913/acquire-and-release-semantics/">https://preshing.com/20120913/acquire-and-release-semantics/</a>):</p>
+<p><img src="images/2022-04-26-15-00-47.png" alt=""></p>
+<p>On x86 this is the default behavior without extra memory barriers needed. With weak memory model, reorder can happen.</p>
+<p>When an atomic operation is executed with this order, we have a guarantee that</p>
+<ul>
+<li>any operation that accesses the memory and was executed before the atomic operation becomes visible to another thread before that thread executes an atomic operation on the same atomic variable.</li>
+<li>all operations that are executed after the atomic operation become visible only after an atomic operation on the same variable.</li>
+</ul>
+<p>Caveats:</p>
+<ul>
+<li>the order is defined relative to the operations both threads execute on the same atomic variable.</li>
+<li>both threads must use the acquire-release memory order</li>
+<li>all order guarantees are given in terms of before and after the operation on the atomic variable. There are no guarantees on the order of events before the operations, and no guarantees on the order of events after the operations.</li>
+</ul>
+<p>On the producer side, we need one-half of the guarantee given by the acquire-release memory barrier: release memory order:</p>
+<ul>
+<li>all operations executed before the atomic operation with the barrier must become visible to other threads before they execute the corresponding atomic operation.</li>
+<li>operations executed by this CPU after the atomic operation may become visible in any order, ie., may happen before the other CPU execute the atomic operation.</li>
+</ul>
+<p>On the consumer side: the acquire memory order:</p>
+<ul>
+<li>all operations executed after the barrier become visible to other threads after the barrier.</li>
+<li>The operations executed by this CPU before the atomic operation may become visible in other CPUs after the atomic operation.</li>
+</ul>
+<br>
+<br>
+<h1 id="measure-threading-cost">Measure Threading Cost</h1>
+<h2 id="threaded-sequential-access-write-result---each-thread-with-independent-data-set">Threaded sequential access (write) result - each thread with independent data set</h2>
+<p><img src="images/2022-01-24-18-11-12.png" alt=""></p>
+<p>The left side of the plot. Here, the speed is limited by the L1 cache (up to 32 KB) then by the L2 cache (256 KB). This processor has separate L1 and L2 caches for each core, so, as long as the data fits into the L2 cache, there should not be any interaction between the threads</p>
+<p>The right side of the plot - the L3 cache is shared between all the CPU cores. The main memory is shared too.</p>
+<ul>
+<li>For 1, 2, and even 4 threads, the throughput continues to scale with the number of threads: the main memory appears to have enough bandwidth for up to 4 processors writing into it at full speed.</li>
+<li>the throughput almost doesn't increase when we go from 6 to 16 threads. We have saturated the memory bus: it can't write the data any faster.</li>
+</ul>
+<h2 id="concurrent-access-to-shared-data-is-expensive">Concurrent access to shared data is expensive</h2>
+<p><img src="images/2022-01-24-18-12-12.png" alt=""></p>
+<p>Even on one thread</p>
+<ul>
+<li>23 nanoseconds for a mutex-guarded increment.</li>
+<li>7 nanoseconds for the atomic increment.
+The performance degrades much faster as the number of threads increases.</li>
+</ul>
+<h2 id="concurrent-access-to-non-shared-data">Concurrent access to non-shared data</h2>
+<p><img src="images/2022-01-24-18-13-06.png" alt=""></p>
+<p>False-share benchmark</p>
+<ul>
+<li>On all x86 CPUs, one cache line is 64 bytes. When a CPU needs to lock a memory location for an atomic transaction,it has to lock the entire cache line.</li>
+<li>the false sharing appears equivalent to the true data sharing for up to 8 threads but becomes faster for more threads: we are writing 8-byte words, so 8 of them fit into the same cache line. So, if we have, say, 16 threads at any time, there are two threads that can move forward, one for each half of the array.</li>
+</ul>
+<p>no-sharing benchmark allocates the atomic variables on the stack of each thread. these threads run completely independently of each other.</p>
+<p>This analysis shows that the real reason for the high cost of accessing the shared data is the work that must be done to maintain exclusive access to a cache line and to make sure all CPUs have consistent data in their caches.</p>
+<ul>
+<li>after one CPU has obtained exclusive access and updated even one bit in the cache line, the copy of that line in all other CPUs’ caches is out of date. Before these other CPUs can access any data in the same cache line, they must fetch the updated content from the main memory.</li>
+</ul>
+<br>
+<br>
+        
+        
+    </body>
+    </html>

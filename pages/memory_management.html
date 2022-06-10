@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Process Address Space</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{text-rendering:auto;font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.13.24"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+#button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <p><a href="#" class="to-top">➤</i></a></p>
+<ul>
+<li><a href="#process-address-space">Process Address Space</a>
+<ul>
+<li><a href="#heap">Heap</a></li>
+<li><a href="#stack-and-heap-growth-direction">Stack and heap growth direction</a>
+<ul>
+<li><a href="#program-to-determine-stack-grow-direction">Program to determine stack grow direction</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#memory-related-commands">Memory Related Commands</a>
+<ul>
+<li><a href="#free">free</a></li>
+<li><a href="#procmeminfo">/proc/meminfo</a></li>
+<li><a href="#ps--top-per-process">ps / top (per process)</a></li>
+</ul>
+</li>
+<li><a href="#mmap">mmap</a>
+<ul>
+<li><a href="#private-file-mapping">Private file mapping:</a></li>
+<li><a href="#private-anonymous-mapping">Private anonymous mapping:</a></li>
+<li><a href="#shared-file-mapping">Shared file mapping:</a></li>
+<li><a href="#shared-anonymous-mapping">Shared anonymous mapping:</a></li>
+<li><a href="#mmap-interface">mmap() interface</a>
+<ul>
+<li><a href="#memory-protection">Memory protection</a></li>
+</ul>
+</li>
+<li><a href="#file-mapping">File mapping</a>
+<ul>
+<li><a href="#memory-mapped-file-io-vs-readwrite">Memory-mapped file I/O vs read()/write()</a></li>
+<li><a href="#file-mapping-boundary-case">File mapping boundary case</a></li>
+<li><a href="#msync">msync()</a></li>
+</ul>
+</li>
+<li><a href="#anonymous-mapping">Anonymous mapping</a>
+<ul>
+<li><a href="#devzero">/dev/zero</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#malloc-kernel-implementation">malloc() kernel implementation</a></li>
+<li><a href="#virtual-memory-operations">Virtual Memory Operations</a>
+<ul>
+<li><a href="#mprotect">mprotect()</a></li>
+<li><a href="#mlock">mlock()</a>
+<ul>
+<li><a href="#mlockall">mlockall()</a></li>
+</ul>
+</li>
+<li><a href="#mincore">mincore()</a></li>
+<li><a href="#madvise--posix_madvise">madvise() / posix_madvise()</a></li>
+</ul>
+</li>
+<li><a href="#page-fault">Page fault</a>
+<ul>
+<li><a href="#remediation">Remediation</a></li>
+<li><a href="#page-fault-handler">Page fault handler</a></li>
+</ul>
+</li>
+<li><a href="#segfaut">Segfaut</a></li>
+<li><a href="#kernel-internals">Kernel Internals</a>
+<ul>
+<li><a href="#kernal-address-space">Kernal Address Space</a></li>
+<li><a href="#pyhsical-memory-overview">Pyhsical Memory Overview</a></li>
+<li><a href="#physical-pages">Physical Pages</a></li>
+<li><a href="#linux-physical-memory-model">Linux Physical Memory Model</a>
+<ul>
+<li><a href="#getting-whole-pages">Getting Whole Pages</a></li>
+</ul>
+</li>
+<li><a href="#buddy-system">Buddy system</a></li>
+<li><a href="#zone-watermarks-and-kswapd">Zone watermarks and kswapd</a></li>
+<li><a href="#page-frame-reclaim">Page frame Reclaim</a>
+<ul>
+<li><a href="#oom-killer">OOM Killer</a></li>
+<li><a href="#overcommit">overcommit</a></li>
+</ul>
+</li>
+<li><a href="#slab-allocator">slab allocator</a></li>
+<li><a href="#kmalloc">kmalloc()</a>
+<ul>
+<li><a href="#gfp_mask-flag">gfp_mask flag</a></li>
+</ul>
+</li>
+<li><a href="#vmalloc">vmalloc()</a></li>
+<li><a href="#memory-descriptor">Memory descriptor</a></li>
+<li><a href="#virtual-memory-area">virtual memory area</a>
+<ul>
+<li><a href="#procpidmaps">/proc/&lt;pid&gt;/maps</a></li>
+</ul>
+</li>
+<li><a href="#mmap-kernel-internals">mmap() Kernel Internals</a></li>
+<li><a href="#page-tables">Page Tables</a></li>
+<li><a href="#tlb">TLB</a></li>
+<li><a href="#page-fault-handler-kernel-implementation">Page Fault Handler Kernel Implementation</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="process-address-space">Process Address Space</h1>
+<p>This memory is called the process address space, which is the representation
+of memory given to each user-space process on the system.</p>
+<p><img src="images/2022-02-04-13-48-17.png" alt=""></p>
+<p><a href="#kernal-address-space">Kernel address space</a></p>
+<p><a href="#memory-descriptor">Memory descriptor <code>mm_struct</code> representation</a></p>
+<br>
+<h2 id="heap">Heap</h2>
+<p>Each Unix process owns a specific memory region called heap , which is used to satisfy the process’s dynamic memory requests. The <code>start_brk</code> and <code>brk</code> fields of the memory descriptor delimit the starting and ending addresses, respectively, of that region.</p>
+<p>The following C library functions can be used by the process to request and release dynamic memory:</p>
+<ul>
+<li><code>malloc(size)</code>: Requests size bytes of dynamic memory; if the allocation succeeds, it returns the linear address of the first memory location.</li>
+<li><code>calloc(n,size)</code>: Requests an array consisting of n elements of size size; if the allocation succeeds, it initializes the array components to 0 and returns the linear address of the first element.</li>
+<li><code>free(addr)</code>: Releases the memory region allocated by malloc( ) or calloc( ) that has an initial address of addr.</li>
+<li><code>brk(addr)</code>: Modifies the size of the heap directly; the addr parameter specifies the new value of current-&gt;mm-&gt;brk, and the return value is the new ending address of the memory region (the process must check whether it coincides with the requested addr value).</li>
+<li><code>sbrk(incr)</code>: Is similar to <code>brk()</code>, except that the incr parameter specifies the increment or decrement of the heap size in bytes.</li>
+</ul>
+<p>The <code>brk()</code> function differs from the other functions listed because it is the only one implemented as a system call. All the other functions are implemented in the C library by using <code>brk()</code> and <code>mmap()</code>.</p>
+<ul>
+<li>When a process in User Mode invokes the <code>brk()</code> system call, the kernel executes the <code>sys_brk(addr)</code></li>
+</ul>
+<h2 id="stack-and-heap-growth-direction">Stack and heap growth direction</h2>
+<ul>
+<li>Which way does the stack grow when a new frame is allocated -- if function f() calls function g(), will f's frame pointer be greater or less than g's frame pointer? This depends on the platform/compiler and its application binary interface (ABI) .
+<ul>
+<li>Downwards is more common; it's the case in x86, PowerPC, MIPS, SPARC, EE, and the Cell SPUs.</li>
+</ul>
+</li>
+<li>How are a function's local variables laid out inside its stack frame? This is unspecified and completely unpredictable; the compiler is free to arrange its local variables however it likes to get the most efficient result.</li>
+</ul>
+<h3 id="program-to-determine-stack-grow-direction">Program to determine stack grow direction</h3>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">fun</span><span class="hljs-params">(<span class="hljs-keyword">int</span> *main_local_addr)</span></span>{
+   <span class="hljs-keyword">int</span> fun_local;
+   <span class="hljs-keyword">if</span> (main_local_addr &lt; &amp;fun_local)
+      <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Stack grows upward\n&quot;</span>);
+   <span class="hljs-keyword">else</span>
+      <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Stack grows downward\n&quot;</span>);
+}
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+   <span class="hljs-keyword">int</span> main_local;
+   <span class="hljs-built_in">fun</span>(&amp;main_local);
+   <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br>
+<h1 id="memory-related-commands">Memory Related Commands</h1>
+<h2 id="free">free</h2>
+<p><img src="images/2022-02-27-10-27-31.png" alt=""></p>
+<p>第一行&quot;Mem&quot;中，&quot;total&quot;是总的物理内存，&quot;free&quot;是空闲内存，&quot;shared&quot;是基于tmpfs的共享内存，&quot;buff/cache&quot;主要就是page cache。而&quot;used&quot;是根据空闲内存和page cache计算出来的结果：</p>
+<pre><code class="language-bash"><div>used = total - free - buf/cache
+</div></code></pre>
+<p>&quot;available&quot;是内核3.14版本加入的，包括空闲内存和可回收的内存，但&quot;available&quot;的值实际是小于&quot;free+buffer/cache&quot;的, it is an estimate of the amount of memory that is available for starting new applications, without swapping.</p>
+<p>第二行&quot;Swap&quot;中，&quot;total&quot;是磁盘中划定的swap space大小。</p>
+<h2 id="procmeminfo">/proc/meminfo</h2>
+<p><a href="http://linuxperf.com/?p=142">http://linuxperf.com/?p=142</a></p>
+<p>/proc/meminfo是了解Linux系统内存使用状况的主要接口。我们常用的”free”、”vmstat”等命令就是通过它获取数据后进一步加工的。</p>
+<p>&quot;meminfo&quot;中数据的计算方法，则是在&quot;<code>/fs/proc/meminfo.c</code>&quot;文件中。</p>
+<p><img src="images/2022-02-27-10-41-33.png" alt=""></p>
+<p><strong>Cached and Buffered</strong></p>
+<p>当通过ext3/ext4等文件系统去访问file时，产生的page cache就是&quot;Cached&quot;，而直接访问&quot;/dev/sda1&quot;这种基于裸分区的file时，产生的缓存就是&quot;Buffers&quot;</p>
+<p><strong>LRU and shared mem</strong></p>
+<p>&quot;meminfo&quot;中记录了对用于内存回收的LRU链表的统计信息</p>
+<ul>
+<li>&quot;Active&quot;等于&quot;Active(anon)&quot;+&quot;Active(file)&quot;</li>
+<li>&quot;Inactive&quot;等于&quot;Inactive(anon)&quot;+&quot;Inctive(file)&quot;</li>
+</ul>
+<p>但是好像&quot;AnonPages&quot;并不等于&quot;Active(anon)&quot;+&quot;Inactive(anon)&quot;，&quot;Buffers&quot;+&quot;Cached&quot;也并不等于&quot;Active(file)&quot;+&quot;Inactive(file)&quot;？差值就在Shmem里.</p>
+<p>此处所讲的shared memory又包括一下几种, 在内核中都是基于tmpfs实现的</p>
+<ul>
+<li>SysV shared memory [shmget etc.]</li>
+<li>POSIX shared memory [shm_open etc.]</li>
+<li>shared anonymous mmap [ mmap(…MAP_ANONYMOUS|MAP_SHARED…)]</li>
+</ul>
+<p>既然基于tmpfs文件系统，就不算匿名页，所以不被计入/proc/meminfo中的AnonPages，而是被统计进了：</p>
+<ul>
+<li>Cached (i.e. page cache, &quot;buff/cache&quot;中的&quot;cache&quot;部分）。</li>
+<li>Mapped (当shmem被attached时候)</li>
+<li>Active(anon)/Inactive(anon) - 但是它又没有对应磁盘上的文件，在回收的时候，其页面内容需要像anonymous page一样swap out到磁盘保存起来，因此它只能放在Active(anon)/Inactive(anon)中。
+<ul>
+<li>虽然它们在LRU中被放进了anon list，但是不会被计入 AnonPages。这是shared memory &amp; tmpfs比较拧巴的一个地方，需要特别注意。</li>
+</ul>
+</li>
+</ul>
+<p><img src="images/2022-02-27-10-43-57.png" alt=""></p>
+<p><strong>AnonPages</strong></p>
+<ul>
+<li>所有page cache里的页面(Cached)都是file-backed pages，不是Anonymous Pages。”Cached”与”AnoPages”之间没有重叠。</li>
+<li>mmap private anonymous pages属于AnonPages(Anonymous Pages)，而mmap shared anonymous pages属于Cached(file-backed pages)，因为shared anonymous mmap也是基于tmpfs的，上一节解释过。</li>
+<li>Anonymous Pages是与用户进程共存的，一旦进程退出，则Anonymous pages也释放，不像page cache即使文件与进程不关联了还可以缓存。</li>
+<li>AnonPages统计值中包含了Transparent HugePages (THP)对应的 AnonHugePages 。参见：</li>
+</ul>
+<p><strong>Cached and mapped</strong></p>
+<p>Page Cache里包括所有file-backed pages，统计在/proc/meminfo的”Cached”中。</p>
+<p>因为page cache中的页面即便已经不再被任一进程使用，但考虑到以后的某个时刻可能还会用到，在内存相对充足的情况下，这些页面将继续驻留在内存而不会被释放，但此时它们属于没有进程映射的状态。</p>
+<p>为了统计Page Cache中被进程正在使用的内存，增加了一个&quot;Mapped&quot;信息，它属于page cache的一部分（可视作“子集”）</p>
+<p><img src="images/2022-02-27-10-46-12.png" alt=""></p>
+<p><strong>SwapCached</strong></p>
+<p>需要用到交换区的内存包括：”AnonPages”和”Shmem”。每一个交换区设备都对应自己的swap cache，可以把swap cache理解为交换区设备的”page cache”。</p>
+<ul>
+<li>匿名页即将被swap-out时会先被放进swap cache，但通常只存在很短暂的时间，因为紧接着在pageout完成之后它就会从swap cache中删除</li>
+<li>曾经被swap-out现在又被swap-in的匿名页会在swap cache中，直到页面中的内容发生变化</li>
+</ul>
+<p>/proc/meminfo中的SwapCached背后的含义是：系统中有多少匿名页曾经被swap-out、现在又被swap-in并且swap-in之后页面中的内容一直没发生变化。也就是说，如果这些匿名页需要被swap-out的话，是无需进行I/O write操作的。</p>
+<p>“SwapCached”不属于”Cached”，两者没有交叉</p>
+<p>“SwapCached”内存同时也在LRU中，还在”AnonPages”或”Shmem”中，它本身并不占用额外的内存。仅用来统计用。</p>
+<p><strong>mlocked</strong>
+“mlocked”统计的是被mlock()系统调用锁定的内存大小。被锁定的内存因为不能pageout/swapout，会从Active/Inactive LRU list移到Unevictable LRU list上。</p>
+<p>“mlocked”并不是独立的内存空间，它与以下统计项重叠：LRU Unevictable，AnonPages，Shmem，Mapped等。</p>
+<p><strong>slab</strong></p>
+<p>关于slab cache的统计信息</p>
+<ul>
+<li>SReclaimable: slab中可回收的部分。调用kmem_getpages()时加上SLAB_RECLAIM_ACCOUNT标记，表明是可回收的，计入SReclaimable，否则计入SUnreclaim。主要包括inode cache和dentry cache，它们除了在内存资源紧张时会被自动回收，还可手动强制回收</li>
+<li>SUnreclaim: slab中不可回收的部分。</li>
+<li>Slab: slab中所有的内存，等于以上两者之和。</li>
+</ul>
+<p><code>free</code>命令输出中的&quot;buff/cache&quot;通常包含&quot;Slab&quot;，但&quot;meminfo&quot;中的&quot;Cached&quot;并不包含它：</p>
+<p><img src="images/2022-02-27-10-47-29.png" alt=""></p>
+<p><strong>vmalloc</strong></p>
+<p>通过vmalloc分配的内存都统计在<code>/proc/meminfo</code>的 VmallocUsed 值中，但是要注意这个值不止包括了分配的物理内存，还统计了VM_IOREMAP、VM_MAP等操作的值，譬如VM_IOREMAP是把IO地址映射到内核空间、并未消耗物理内存。从物理内存分配的角度，我们只关心VM_ALLOC操作，这可以从<code>/proc/vmallocinfo</code>中的vmalloc记录看到：</p>
+<pre><code class="language-bash"><div>$ grep vmalloc /proc/vmallocinfo | awk <span class="hljs-string">&#x27;{total+=$2}; END {print total}&#x27;</span>
+23375872
+</div></code></pre>
+<p><strong>Page Table</strong></p>
+<p>Page Table用于将内存的虚拟地址翻译成物理地址，随着内存地址分配得越来越多，Page Table会增大，/proc/meminfo中的PageTables统计了Page Table所占用的内存大小。</p>
+<p>要把Page Table与Page Frame区分开，每个物理Page Frame对应一个描述符(·)，在内核的引导阶段就会分配好、保存在<code>mem_map[]</code>数组中（在NUMA系统上可能会有多个mem_map数组，在node_data中或mem_section中），<code>mem_map[]</code>所占用的内存被统计在dmesg显示的reserved中，/proc/meminfo的MemTotal是不包含它们的。</p>
+<p>而Page Table的用途是翻译虚拟地址和物理地址，它是会动态变化的，要从MemTotal中消耗内存。</p>
+<p><strong>Kernel Stack</strong></p>
+<p>每一个用户线程都会分配一个kernel stack（内核栈）。在x86系统上Linux的内核栈大小是固定的8K或16K</p>
+<p>Kernel stack（内核栈）是常驻内存的，既不包括在LRU lists里，也不包括在进程的RSS/PSS内存里，所以我们认为它是kernel消耗的内存。统计值是/proc/meminfo的KernelStack。</p>
+<p><strong>Kernel Stats</strong></p>
+<p>Slab+ VmallocUsed + PageTables + KernelStack + HardwareCorrupted + Bounce + X</p>
+<ul>
+<li>VmallocUsed其实不是我们感兴趣的，因为它还包括了VM_IOREMAP等并未消耗物理内存的IO地址映射空间，我们只关心VM_ALLOC操作，所以实际上应该统计/proc/vmallocinfo中的vmalloc记录</li>
+<li>kernel module的内存被包含在VmallocUsed中</li>
+<li>X表示直接通过alloc_pages/__get_free_page分配的内存，没有在/proc/meminfo中统计，不知道有多少，就像个黑洞。</li>
+</ul>
+<p><strong>User Stats</strong></p>
+<ol>
+<li>
+<p>围绕LRU进行统计: (Active + Inactive + Unevictable) + (HugePages_Total * Hugepagesize)</p>
+</li>
+<li>
+<p>围绕Page Cache进行统计:</p>
+<ul>
+<li>
+<p>当SwapCached为0的时候，用户进程的内存总计如下：(Cached + AnonPages + Buffers) + (HugePages_Total * Hugepagesize)</p>
+</li>
+<li>
+<p>当SwapCached不为0的时候，以上公式不成立，因为SwapCached可能会含有Shmem，而Shmem本来被含在Cached中，一旦swap-out就从Cached转移到了SwapCached，可是我们又不能把SwapCached加进上述公式中，因为SwapCached虽然不与Cached重叠却与AnonPages有重叠，它既可能含有Shared memory又可能含有Anonymous Pages。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>围绕RSS/PSS进行统计:</p>
+<p>把/proc/[1-9]*/smaps 中的 Pss 累加起来就是所有用户进程占用的内存，但是还没有包括Page Cache中unmapped部分、以及HugePages，所以公式如下：ΣPss + (Cached – mapped) + Buffers + (HugePages_Total * Hugepagesize)</p>
+</li>
+</ol>
+<h2 id="ps--top-per-process">ps / top (per process)</h2>
+<p><strong>VSS</strong> (Virtual Set Size) - 因为Linux中的进程是使用虚拟地址的，这些进程通过malloc()或者mmap()向内存申请内存之后，这部分内存大小称为VSS，内核并不会立刻为其分配实际的物理内存。等到进程真正使用到内存时(比如调用了memset()函数)，内核才会为这个进程分配物理内存，并建立虚拟地址和物理地址之间的映射。VIRT represents how much memory the program is able to access at the present moment. VIRT includes anything inside task's address space, no matter it is in RAM, swapped out or still not loaded from disk.</p>
+<ul>
+<li>shown as <code>VSZ</code> in <code>ps</code>; <code>VIRT</code> in top</li>
+</ul>
+<p><strong>USS</strong> (Unique Set Size) - 只计算进程自身占用的物理内存，完全不包含共享库所占用内存的USS</p>
+<p><strong>RSS</strong> (Resident Set Size) - 把共享库占用的内存直接加到每个进程头上</p>
+<ul>
+<li>shown as <code>PSS</code> in <code>ps</code>; <code>RES</code> in top</li>
+</ul>
+<p>PSS(Proportional Set Size) - 把一个共享库占用的内存，分摊到使用了这个共享库的各个进程头上，称为PSS(Proportional Set Size)，类似于小区里面的“公摊面积”。比如一个共享库占用了3MiB的物理内存，有3个进程使用了这个库，那么摊派到每个进程头上的都是1MiB。</p>
+<p><strong>SHR</strong> indicates how much of the VIRT size is actually sharable memory or libraries. In the case of libraries, it does not necessarily mean that the entire library is resident. For example, if a program only uses a few functions in a library, the whole library is mapped and will be counted in VIRT and SHR, but only the parts of the library file containing the functions being used will actually be loaded in and be counted under RES.</p>
+<p><img src="images/2022-02-27-10-57-29.png" alt=""></p>
+<br>
+<h1 id="mmap">mmap</h1>
+<p>(Linux programming interface chatper 49)</p>
+<p>mmap() FOUR usage</p>
+<p><img src="images/2022-02-12-23-03-07.png" alt=""></p>
+<h2 id="private-file-mapping">Private file mapping:</h2>
+<p>The contents of the mapping are initialized from a file region. Multiple processes mapping the same file initially share the same physical pages of memory, but the copy-on-write technique is employed, so that changes to the mapping by one process are invisible to other processes.</p>
+<p>The main use of this type of mapping is to initialize a region of memory from the contents of a file. Some common examples are initializing a process’s text and initialized data segments from the corresponding parts of a binary executable file or a shared library file.</p>
+<p><strong>Text segment:</strong> <br>
+To allow multiple processes executing the same program or using the same shared library to share the same (read-only) text segment.</p>
+<ul>
+<li>executable text segment is normally protected to allow only read and execute access (PROT_READ | PROT_EXEC), it is mapped using MAP_PRIVATE rather than MAP_SHARED, because a debugger or a self-modifying program can modify the program text (after first changing the protection on the memory), and such changes should not be carried through to the underlying file or affect other processes.</li>
+</ul>
+<p><strong>Initialized data segment:</strong><br>
+To map the initialized data segment of an executable or shared library. Such mappings are made private so that modifications to the contents of the mapped data segment are not carried through to the underlying file.</p>
+<h2 id="private-anonymous-mapping">Private anonymous mapping:</h2>
+<p>Each call to mmap() to create a private anonymous mapping yields a new mapping that is distinct from (i.e., does not share physical pages with) other anonymous mappings created by the same (or a different) process. Although a child process inherits its parent’s mappings, copy-on-write semantics ensure that, after the fork(), the parent and child don’t see changes made to the mapping by the other process.</p>
+<p>The primary purpose of private anonymous mappings is to allocate new (zero-filled) memory for a process</p>
+<ul>
+<li>e.g., <code>malloc()</code> employs <code>mmap()</code> for this purpose when allocating large blocks of memory.</li>
+</ul>
+<h2 id="shared-file-mapping">Shared file mapping:</h2>
+<p>All processes mapping the same region of a file share the same physical pages of memory, which are initialized from a file region. Modifications to the contents of the mapping are carried through to the file.</p>
+<p>This type of mapping serves two purposes.</p>
+<ul>
+<li>First, it permits memory-mapped I/O. ie., a file is loaded into a region of the process’s virtual memory, and modifications to that memory are automatically written to the file. Thus, it provides an alternative to using read() and write() for performing file I/O.</li>
+<li>A second purpose of this type of mapping is to allow unrelated processes to share a region of memory in order to perform (fast) IPC in a manner similar to System V shared memory segments.</li>
+</ul>
+<p><img src="images/2022-02-12-23-06-48.png" alt=""></p>
+<h2 id="shared-anonymous-mapping">Shared anonymous mapping:</h2>
+<p>As with a private anonymous mapping, each call to mmap() to create a shared anonymous mapping creates a new, distinct mapping that doesn’t share pages with any other mapping. The difference is that the pages of the mapping are not copied-on-write. This means that when a child inherits the mapping after a fork(), the parent and child share the same pages of RAM, and changes made to the contents of the mapping by one process are visible to the other process.</p>
+<ul>
+<li>Shared anonymous mappings allow IPC in a manner similar to System V shared memory segments, but only between related processes.</li>
+</ul>
+<p>Mappings are lost when a process performs an exec(), but are inherited by the child of a fork(). The mapping type (MAP_PRIVATE or MAP_SHARED) is also inherited.</p>
+<p>Information about all of a process’s mappings is visible in the Linux-specific /proc/PID/maps file.</p>
+<h2 id="mmap-interface">mmap() interface</h2>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> *<span class="hljs-title">mmap</span><span class="hljs-params">(<span class="hljs-keyword">void</span> *addr, <span class="hljs-keyword">size_t</span> length, <span class="hljs-keyword">int</span> prot, <span class="hljs-keyword">int</span> flags, <span class="hljs-keyword">int</span> fd, <span class="hljs-keyword">off_t</span> offset)</span></span>;
+</div></code></pre>
+<ul>
+<li>
+<p>The <code>addr</code> argument indicates the virtual address at which the mapping is to be located.</p>
+<ul>
+<li>If we specify addr as NULL, the kernel chooses a suitable address for the mapping.</li>
+<li>If we specify a non-NULL value in addr, the kernel will at the very least round the address to a nearby page boundary.</li>
+</ul>
+</li>
+<li>
+<p>The <code>length</code> argument will be rounded up to the next multiple of the page size.</p>
+</li>
+<li>
+<p>The <code>prot</code> argument is a bit mask specifying the protection to be placed on the mapping.</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PROT_NONE</td>
+<td>The region may not be accessed</td>
+</tr>
+<tr>
+<td>PROT_READ</td>
+<td>The contents of the region can be read</td>
+</tr>
+<tr>
+<td>PROT_WRITE</td>
+<td>The contents of the region can be modified</td>
+</tr>
+<tr>
+<td>PROT_EXEC</td>
+<td>The contents of the region can be executed</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>The <code>flags</code> argument is a bit mask of options controlling various aspects of the mapping operation.
+At least one of <code>MAP_PRIVATE</code> or <code>MAP_SHARED</code> needed to be included. <br>
+MAP_PRIVATE: <br></p>
+<ul>
+<li>Modifications to the contents of the region are not visible to other processes</li>
+<li>For file mapping, modifications are not carried through to the underlying file.
+MAP_SHARED:<br></li>
+<li>Modifications are visible to other processes mapping the same region with the MAP_SHARED attribute</li>
+<li>For file mapping, modifications are carried through to the underlying file. Updates to the file are not guaranteed to be immediate;</li>
+</ul>
+</li>
+<li>
+<p>The arguments, <code>fd</code> and <code>offset</code>, are used with file mappings (they are ignored for anonymous mappings).</p>
+<ul>
+<li>The <code>fd</code> argument is a file descriptor identifying the file to be mapped.</li>
+<li>The <code>offset</code> argument specifies the starting point of the mapping in the file, and must be a multiple of the system page size.</li>
+<li>To map the entire file, we would specify offset as 0 and length as the size of the file.</li>
+</ul>
+</li>
+<li>
+<p>return value</p>
+<ul>
+<li>On success, mmap() returns the starting address of the new mapping.</li>
+<li>On error, mmap() returns MAP_FAILED. On Linux, the MAP_FAILED constant equates to ((void *) –1).</li>
+</ul>
+</li>
+</ul>
+<p><a href="#mmap-kernel-internals">Refer to Kernel Implementaion</a></p>
+<h3 id="memory-protection">Memory protection</h3>
+<p>If a process attempts to access a memory region in a way that violates the protection on the region, then the kernel delivers the SIGSEGV signal to a process</p>
+<p>PROT_NONE can be used as guard pages at the start or end of a region of memory that a process has allocated. If the process accidentally steps into it, the kernel generates SIGSEGV</p>
+<p><strong>Memory protections reside in process-private virtual memory tables.</strong></p>
+<ul>
+<li>Thus, different processes may map the same memory region with different protections.</li>
+</ul>
+<h2 id="file-mapping">File mapping</h2>
+<p>To create a file mapping, we perform the following steps:</p>
+<ol>
+<li>Obtain a descriptor for the file, typically via a call to open().</li>
+<li>Pass that file descriptor as the fd argument in a call to mmap().</li>
+</ol>
+<p>Once mmap() has been called, we can close the file descriptor without affecting the mapping.</p>
+<p>On Linux, the pages of a file mapping are mapped in on the first access (not on mmap() call).
+This means that if changes are made to a file region after the mmap() call, but before the corresponding part (i.e., page) of the mapping is accessed, then the changes may be visible to the process. This behavior is implementation-dependent.</p>
+<h3 id="memory-mapped-file-io-vs-readwrite">Memory-mapped file I/O vs read()/write()</h3>
+<p>read()/write() involves two transfers:</p>
+<ul>
+<li>From file to the kernel buffer cache</li>
+<li>From kernel buffer cache to user space buffer</li>
+</ul>
+<p>Using mmap() eliminates the second transfer.</p>
+<ul>
+<li>For input, the data is available to the user process as soon as the kernel has mapped the file blocks into memory.</li>
+<li>For output, the user process only needs to modify the contents of mapped memory, and rely on the kernel memory manager to automatically update the underlying file.</li>
+</ul>
+<p>Using mmap() also lowers memory requirements by sharing a single buffer between the kernel space and user space. If multiple processes perform on the same file, they can all share the same kernel buffer.</p>
+<p><img src="images/2022-02-12-23-22-58.png" alt=""></p>
+<h3 id="file-mapping-boundary-case">File mapping boundary case</h3>
+<p>If the size of the mapping is not a multiple of the system page size, it is rounded up.
+While the bytes in the rounded-up region (i.e., bytes 2200 to 4095 in the diagram) are accessible, they are not mapped to the underlying file (since no corresponding bytes exist in the file). Instead, they are initialized to 0. Changes to these bytes are not written to the file.</p>
+<p><img src="images/2022-02-12-23-23-21.png" alt=""></p>
+<h3 id="msync">msync()</h3>
+<p>The kernel automatically carries modifications of the contents of a MAP_SHARED mapping
+through to the underlying file, but provides no guarantees about when such synchronization will occur.</p>
+<ul>
+<li>On Linux, the modified pages in the memory region will eventually be flushed as part of the automatic buffer flushing performed by the pdflush kernel thread.</li>
+</ul>
+<p>The msync() system call gives an application explicit control over when a shared mapping is synchronized with the mapped file.</p>
+<ul>
+<li>On Linux, there are two (nonstandard) methods of initiating the output sooner. We can follow the call to <code>msync()</code> with a call to <code>fsync()</code> (or <code>fdatasync()</code>) on the file descriptor corresponding to the mapping. This call will block until the buffer cache is synchronized with the disk. Alternatively, we can initiate asynchronous write out of the pages using the <code>posix_fadvise()</code> with <code>POSIX_FADV_DONTNEED</code> operation.</li>
+</ul>
+<h2 id="anonymous-mapping">Anonymous mapping</h2>
+<p>On Linux, there are two different, equivalent methods of creating an anonymous mapping with mmap():</p>
+<ul>
+<li>mmap() with MAP_ANONYMOUS in flags and fd as -1.</li>
+<li>Open the /dev/zero device file and pass the resulting file descriptor to mmap().</li>
+</ul>
+<p>With both the MAP_ANONYMOUS and the /dev/zero techniques, the bytes of the resulting mapping are initialized to 0.</p>
+<h3 id="devzero">/dev/zero</h3>
+<p>/dev/zero is a virtual device that always returns zeros when we read from it. Writes to this device are always discarded. A common use of /dev/zero is to populate a file with zeros (e.g., using the dd(1) command).</p>
+<br>
+<h1 id="malloc-kernel-implementation">malloc() kernel implementation</h1>
+<p><a href="https://cloud.tencent.com/developer/article/1805655">https://cloud.tencent.com/developer/article/1805655</a> <br>
+malloc函数的实现会根据分配内存的size来决定使用哪个分配函数，size可由M_MMAP_THRESHOLD选项调节</p>
+<ul>
+<li>当size小于等于128KB时，调用brk分配。sys_brk分配过过程主要是调整brk位置</li>
+<li>当size大于128KB时，调用mmap分配内存。sys_mmap分配过程中主要是在堆和栈中间(memory mapping segment)找一段空闲的虚拟内存</li>
+</ul>
+<p><strong>Use of mmap()</strong></p>
+<p>The glibc implementation of malloc() uses MAP_PRIVATE anonymous mappings to allocate blocks of memory larger than <code>MMAP_THRESHOLD</code> bytes.</p>
+<ul>
+<li><code>MMAP_THRESHOLD</code> is 128 kB by default, It is adjustable via the <code>mallopt()</code> library function.</li>
+<li>It also reduces the possibility of memory fragmentation when repeatedly allocating and deallocating large blocks of memory.</li>
+<li>This makes it possible to efficiently deallocate such blocks (via <code>munmap()</code>) if they are later given to <code>free()</code>.</li>
+</ul>
+<p><a href="#mmap-kernel-internals">mmap kernel implementation refer to below section</a></p>
+<p><strong>Use of brk()</strong></p>
+<p>brk moves top of heap, the addr parameter specifies the new value of <code>current-&gt;mm-&gt;brk</code>, and the return value is the new ending address of the memory region</p>
+<p>堆内存是由低地址向高地址方向增长。分配内存时，将heap段的最高地址指针mm-&gt;brk往高地址扩展。释放内存时，把mm-&gt;brk向低地址收缩。</p>
+<p>完成这段申请后，只是开辟了一段区域，通常还不会立马分配物理内存，物理内存的分配会发生在访问时出现缺页异常后再处理
+大概流程整理如下：</p>
+<p><img src="images/2022-02-13-14-42-08.png" alt=""></p>
+<p>An exmaple of using brk() directly</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> _GNU_SOURCE</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;assert.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+    <span class="hljs-keyword">void</span> *b = <span class="hljs-built_in">sbrk</span>(<span class="hljs-number">0</span>);
+    <span class="hljs-keyword">int</span> *p = (<span class="hljs-keyword">int</span> *)b;
+
+    <span class="hljs-comment">/* Move it 2 ints forward */</span>
+    <span class="hljs-built_in">brk</span>(p + <span class="hljs-number">2</span>);
+
+    <span class="hljs-comment">/* Use the ints. */</span>
+    *p = <span class="hljs-number">1</span>;
+    *(p + <span class="hljs-number">1</span>) = <span class="hljs-number">2</span>;
+    <span class="hljs-built_in">assert</span>(*p == <span class="hljs-number">1</span>);
+    <span class="hljs-built_in">assert</span>(*(p + <span class="hljs-number">1</span>) == <span class="hljs-number">2</span>);
+
+    <span class="hljs-comment">/* Deallocate back. */</span>
+    <span class="hljs-built_in">brk</span>(b);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br>
+<h1 id="virtual-memory-operations">Virtual Memory Operations</h1>
+<p>(Linux programming interface chatper 50)</p>
+<h2 id="mprotect">mprotect()</h2>
+<p>The <code>mprotect()</code> system call changes the protection on the virtual memory pages in the range starting at addr and continuing for length bytes.</p>
+<ul>
+<li>One use of <code>mprotect()</code> is to change the protection of a region of mapped memory originally set in a call to <code>mmap()</code>.</li>
+</ul>
+<h2 id="mlock">mlock()</h2>
+<p><code>int mlock(void *addr, size_t length);</code>
+The <code>mlock()</code> system call locks all of the pages of the calling process’s virtual address range starting at addr and continuing for length bytes.</p>
+<ul>
+<li>addr does not need to be page-aligned: the kernel locks pages starting at the next page boundary below addr.</li>
+<li>The end of the locked region is the next page boundary greater than length plus addr.</li>
+<li>With 4096 page size, mlock(2000, 4000) will lock bytes 0 through to 8191.</li>
+</ul>
+<p>The <code>mlock()</code> system call fails if there is insufficient physical memory or if the request violates the RLIMIT_MEMLOCK soft resource limit.</p>
+<ul>
+<li>For <code>mlock()</code>, <code>mlockall()</code>, and the <code>mmap()</code> <code>MAP_LOCKED</code> operation, <code>RLIMIT_MEMLOCK</code> defines a per-process limit on the number of bytes of its virtual address space that a process may lock.</li>
+<li>For the <code>shmctl()</code> <code>SHM_LOCK</code> operation, <code>RLIMIT_MEMLOCK</code> defines a per-user limit on the number of bytes in shared memory segments that may be locked by the real user ID of this process.</li>
+</ul>
+<p>Aside from the explicit use of <code>munlock()</code>, memory locks are automatically removed in the following circumstances:</p>
+<ul>
+<li>on process termination;</li>
+<li>if the locked pages are unmapped via <code>munmap()</code>; or</li>
+<li>if the locked pages are overlaid using the <code>mmap()</code> <code>MAP_FIXED</code> flag.</li>
+</ul>
+<p>Where multiple processes share a set of pages (e.g., a <code>MAP_SHARED</code> mapping), these pages remain locked in memory as long as at least one of the processes holds a memory lock on the pages.</p>
+<h3 id="mlockall">mlockall()</h3>
+<p><code>int mlockall(int flags);</code>
+The <code>mlockall()</code> system call locks all of the currently mapped pages in a process’s virtual address space, all of the pages mapped in the future, or both, according to the <code>flags</code> bit mask,</p>
+<p><strong><code>MCL_CURRENT</code></strong><br>
+Lock all pages that are currently mapped into the calling process’s virtual address space. This includes all pages currently allocated for the program text, data segments, memory mappings, and the stack.</p>
+<p>After a successful call specifying the <code>MCL_CURRENT</code> flag, all of the pages of the calling process are guaranteed to be memory-resident. This flag doesn’t affect pages that are
+subsequently allocated in the process’s virtual address space;</p>
+<p><strong><code>MCL_FUTURE</code></strong> <br>
+Lock all pages subsequently mapped into the calling process’s virtual address space. Such pages may, for example, be part of a shared memory region mapped via <code>mmap()</code> or <code>shmat()</code>, or part of the upwardly growing heap or downwardly growing stack.</p>
+<p>As a consequence of specifying the <code>MCL_FUTURE</code> flag, if the system runs out of RAM to allocate to the process or the <code>RLIMIT_MEMLOCK</code> soft resource limit is encountered:</p>
+<ul>
+<li>a later memory allocation operation (e.g., <code>mmap()</code>, <code>sbrk()</code>, or <code>malloc()</code>) may fail</li>
+<li>stack growth may yield a SIGSEGV signal</li>
+</ul>
+<h2 id="mincore">mincore()</h2>
+<p>The mincore() system call reports which pages in a virtual memory region are currently resident in physical memory.</p>
+<h2 id="madvise--posix_madvise">madvise() / posix_madvise()</h2>
+<p>It allows a process to advise the kernel about the process’s expected patterns of memory use.</p>
+<p><strong><code>MADV_NORMAL</code></strong><br>
+This is the default behavior. Pages are transferred in clusters (a small multiple of the system page size). This results in some read-ahead and read-behind.</p>
+<p><strong><code>MADV_RANDOM</code></strong><br>
+Pages in this region will be accessed randomly, so read-ahead will yield no benefit. Thus, the kernel should fetch the minimum amount of data on each read.</p>
+<p><strong><code>MADV_SEQUENTIAL</code></strong><br>
+Pages in this range will be accessed once, sequentially. Thus, the kernel can aggressively read ahead, and pages can be quickly freed after they have been accessed.</p>
+<p><strong><code>MADV_WILLNEED</code></strong><br>
+Read pages in this region ahead, in preparation for future access. The MADV_WILLNEED operation has an effect similar to the Linux-specific readahead() system call and the posix_fadvise() POSIX_FADV_WILLNEED operation.</p>
+<p><strong><code>MADV_DONTNEED</code></strong><br>
+The calling process no longer requires the pages in this region to be memory resident. In Linux,</p>
+<ul>
+<li>For a MAP_PRIVATE region, the mapped pages are explicitly discarded, which means that modifications to the pages are lost. The virtual memory address range remains accessible, but the next access of each page will result in a page fault reinitializing the page, either with the contents of the file or with zeros in the anonymous mapping case. This can be used as a means of explicitly reinitializing the contents of a MAP_PRIVATE region.</li>
+<li>For a MAP_SHARED region, the kernel may discard modified pages in some circumstances, depending on the architecture (this behavior doesn’t occur on x86).</li>
+</ul>
+<br>
+<h1 id="page-fault">Page fault</h1>
+<p>A page fault is an exception that the memory management unit (MMU) raises when a process accesses a memory page without proper preparations.</p>
+<ul>
+<li>
+<p>Minor page fault: If the page is loaded in memory at the time the fault is generated, but is not marked in the memory management unit as being loaded in memory, then it is called a minor or soft page fault.</p>
+<ul>
+<li>If the page is already in the page cache you will still incur a minor page fault on first access after calling mmap, during which the page table is updated to point to the correct page.</li>
+<li>For anonymous memory (eg. the data allocated by new). there will also be a minor page fault on first <strong>write</strong> access. The read accesses will result in the creation of a page table entry that references a special physical page filled with zeroes (just one page with zeros for any size of virtual address size). When the program performs a write, a regular physical page will be allocated to hold the written data.</li>
+</ul>
+</li>
+<li>
+<p>Major page fault: a Page Fault that blocks the current process is called a major fault. Major fault forced the current process to sleep (most likely because time was spent while filling the page frame assigned to the process with data read from disk, or load the data for a page that was previously swapped out or to read data from an mmap()'d file)</p>
+<ul>
+<li>Major page fault involves I/O operation, it is in <em>millisecond</em> territory.</li>
+</ul>
+</li>
+</ul>
+<h2 id="remediation">Remediation</h2>
+<ul>
+<li>To avoid page faults you can pre-fault /preallocate data and disable page cache eviction of the needed memory using the <code>mlock()</code> system call or the <code>MAP_LOCKED</code> and <code>MAP_POPULATE</code> flags to <code>mmap()</code>.</li>
+<li>Using 2M or 1G HugePages for the heap will also avoid page faults because HugePages are never demand-paged in by a minor fault or swapped out due to memory pressure. <strong>Hugepages are locked</strong>.</li>
+</ul>
+<h2 id="page-fault-handler">Page fault handler</h2>
+<p>The MMU detects the page fault, processor issues the page fault exception (exception number 14), the kernel handles the exception by page fault handler, it in turn makes the required page accessible in the physical memory or denys an illegal memory access.</p>
+<p><a href="#page-fault-handler-kernel-implementation">Refer to Page Fault Kernel Internal</a></p>
+<h1 id="segfaut">Segfaut</h1>
+<p>A segmentation fault is when your program attempts to access memory outside of the program's address space, or writing to a read-only segment of the address space, hence the name.</p>
+<ul>
+<li>Attempting to access a nonexistent memory address (outside process's address space)</li>
+<li>Attempting to access memory the program does not have rights to (such as kernel structures in process context)</li>
+<li>Attempting to write read-only memory (such as code segment)</li>
+</ul>
+<p>only the stack and the read/write portion of the data segment of a program are writable, while read-only data and the code segment are not writable.</p>
+<p>Some examples:</p>
+<ul>
+<li>Dereferencing a null pointer, which usually points to an address that's not part of the process's address space</li>
+<li>Dereferencing or assigning to an uninitialized pointer (wild pointer, which points to a random memory address)</li>
+<li>Dereferencing or assigning to a freed pointer (dangling pointer, which points to memory that has been freed/deallocated/deleted)</li>
+<li>A <a href="https://en.wikipedia.org/wiki/Buffer_overflow">buffer overflow</a></li>
+<li>A <a href="https://en.wikipedia.org/wiki/Stack_overflow">stack overflow</a></li>
+</ul>
+<p>At the hardware level, the fault is initially raised by the memory management unit (MMU) on illegal access (if the referenced memory exists), as part of its memory protection feature, or an invalid page fault (if the referenced memory does not exist)</p>
+<p>At the operating system level, this fault is caught and a signal is passed on to the offending process, activating the process's handler for that signal. On Unix-like operating systems, a signal called SIGSEGV (abbreviated from segmentation violation). Default signal handler for SIGSEGV is CORE (terminate the process and core dump)</p>
+<br>
+<h1 id="kernel-internals">Kernel Internals</h1>
+<p><img src="images/2022-03-07-12-53-14.png" alt=""></p>
+<p><img src="images/2022-03-07-12-53-43.png" alt=""></p>
+<h2 id="kernal-address-space">Kernal Address Space</h2>
+<p>From Kernel's view, a process's address space is very different. The address space is split into two parts, the userspace part which potentially changes with each full context switch and the kernel address space which remains constant. The location of the split is determined by the value of <em>PAGE_OFFSET</em> which is at <strong><code>0xC0000000</code></strong> on the x86. This means that <strong>3GiB</strong> is available for the process to use while the remaining 1GiB (3~4GB) is always mapped by the kernel.</p>
+<p><img src="images/2022-02-18-17-52-16.png" alt=""></p>
+<p><img src="images/2022-02-19-11-36-52.png" alt=""></p>
+<p><img src="images/2022-02-18-22-58-16.png" alt=""></p>
+<ul>
+<li>8MiB (the amount of memory addressed by two PGDs) is reserved at PAGE_OFFSET for loading the kernel image to run. The kernel image is placed in this reserved space during kernel page tables initialisation. 包含了内核初始化页表swapper_pg_dir，内核镜像等。内核也是由一个elf文件（比如vmlinux）加载启动的，加载后也有text段，data段，bss段等。</li>
+<li>The region between PAGE_OFFSET and VMALLOC_START - VMALLOC_OFFSET is the physical memory map.
+<ul>
+<li>in x86, the size is (1G - 128 vmalloc area) =  896M</li>
+<li>This also results in ZONE_HIGHMEM in 32bit system. direct mapping can only map physical memory up to 896M. The rest of physical memory needs to be virtually mapped to the rest of 128M virtual memory.</li>
+<li>The memory allocation in this area is done with <code>kmalloc()</code>, which returns virtual address, but guarantees the contiguous physical memory because of the direct mapping in this area.</li>
+</ul>
+</li>
+<li>Between the physical memory map and the vmalloc address space, there is a gap of space VMALLOC_OFFSET in size (8MiB on x86), to guard against out of bounds errors.</li>
+<li><code>vmalloc</code> area  representing non-contiguous memory allocations in a contiguous virtual address space. The memory allocation in this area is done with <code>vmalloc()</code>.</li>
+<li>area begins at PKMAP_BASE, is an area reserved for the mapping of high memory pages into low memory with <code>kmap()</code> or <code>alloc_page(_GFP_HIGHMEM)</code>.</li>
+<li>fixed virtual address mappings which extends from FIXADDR_START to FIXADDR_TOP. Fixed virtual addresses are needed for subsystems that need to know the virtual address at compile time such as the Advanced Programmable Interrupt Controller (APIC).</li>
+</ul>
+<h2 id="pyhsical-memory-overview">Pyhsical Memory Overview</h2>
+<p>Memory is arranged into <em><strong>nodes</strong></em> (eg, a bank of memory assigned to each CPU) that incur a different cost to access depending on the “distance” from the processor. This is concept of <em>Non-Uniform Memory Access (NUMA)</em>.</p>
+<ul>
+<li>a <em>node</em> is defined as <code>struct pglist_data</code>, typedef'ed as <code>pg_data_t</code>, declared in <code>&lt;linux/mmzone.h&gt;</code>.</li>
+<li>node is linked in <code>pgdat_list</code>.</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pglist_data</span> {</span>
+     <span class="hljs-keyword">int</span> nr_zones;
+     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">zone</span> <span class="hljs-title">node_zones</span>[<span class="hljs-title">MAX_NR_ZONES</span>];</span>
+     <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> node_size;
+     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> *<span class="hljs-title">node_mem_map</span>;</span>
+     <span class="hljs-keyword">int</span> node_id;
+     <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> node_start_paddr; <span class="hljs-comment">// change to node_start_pfn in kernel v2.6</span>
+     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pglist_data</span> *<span class="hljs-title">node_next</span>;</span>
+     <span class="hljs-keyword">spinlock_t</span> lru_lock;
+     ...
+} <span class="hljs-keyword">pg_data_t</span>; 
+</div></code></pre>
+<ul>
+<li><code>nr_zones</code> is number of zones in this node，<code>node_zones[]</code> array pointing to the zone data structures。</li>
+<li><code>node_size</code> is the number of page frames in this node.</li>
+<li><code>node_mem_map</code> points to struct page* array. This is ifdef'ed out when it is SPARSEMEM model.</li>
+<li><code>node_id</code> is node's logical id. It is the id of numa system.</li>
+<li><code>node_start_paddr</code> is node's physical starting address.</li>
+</ul>
+<p>Each <em>node</em> is divided up into a number of blocks called <em><strong>zones</strong></em>. The kernel uses the zones to group pages of similar properties.</p>
+<ul>
+<li>A <em>zone</em> is described by a <code>struct zone_struct</code>, typedef'ed to <code>zone_t</code>, declared in <code>&lt;linux/mmzone.h&gt;</code>.</li>
+<li>ZONE_DMA: memory in the lower physical memory ranges which certain ISA devices require.</li>
+<li>ZONE_NORMAL: This zone contains normal, regularly mapped, pages.</li>
+<li>ZONE_HIGHMEM: This zone contains “high memory,” which are pages not directly mapped into the kernel’s address space.
+<ul>
+<li>a 64-bit architecture such as Intel’s x86-64 can fully map and handle 64-bits of memory.Thus, x86-64 has no ZONE_HIGHMEM and all physical memory is contained within ZONE_DMA and ZONE_NORMAL.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">zone</span> {</span>
+     <span class="hljs-keyword">spinlock_t</span>         lock;
+
+     <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>      spanned_pages;
+     <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>      present_pages; 
+     <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>      nr_reserved_highatomic;    
+     <span class="hljs-keyword">atomic_long_t</span>      managed_pages;
+
+     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">free_area</span>   <span class="hljs-title">free_area</span>[<span class="hljs-title">MAX_ORDER</span>];</span>
+     <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>      _watermark[NR_WMARK];
+     <span class="hljs-keyword">long</span>               lowmem_reserve[MAX_NR_ZONES];
+     <span class="hljs-keyword">atomic_long_t</span>      vm_stat[NR_VM_ZONE_STAT_ITEMS];
+
+     <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>      zone_start_pfn;
+     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pglist_data</span> *<span class="hljs-title">zone_pgdat</span>;</span>
+     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span>        *<span class="hljs-title">zone_mem_map</span>;</span>
+     ...    
+} <span class="hljs-keyword">zone_t</span>
+</div></code></pre>
+<ul>
+<li><code>spanned_pages</code> is the total page frames</li>
+<li><code>zone_start_pfn</code> is the physical address of starting page frame</li>
+<li><code>managed_pages</code> is the numebr of page frame allocated by buddy system.</li>
+<li><code>free_area</code> is the free list, it contains the free page frames for allocation.</li>
+<li><code>zone_pgdat</code> is the back pointer to the belonging node.</li>
+<li><code>zone_mem_map</code> points to the mem_map array of &quot;<code>struct page</code>&quot;。</li>
+</ul>
+<p>Each physical <strong>page frame</strong> is represented by a <code>struct page</code> and all the structs are kept in a global mem_map array which is usually stored at the beginning of ZONE_NORMAL</p>
+<p><img src="images/2022-02-18-10-08-26.png" alt=""></p>
+<p><img src="images/2022-02-26-21-38-46.png" alt=""></p>
+<h2 id="physical-pages">Physical Pages</h2>
+<p>The kernel and MMU (the hardware that manages memory and performs virtual to physical address translations) treats physical pages (also called <em>page frame</em>) as the basic unit of memory management.</p>
+<p>The kernel represents every <strong>physical</strong> page (not virtual pages) on the system with a <code>struct page</code> structure. This structure is defined in <code>&lt;linux/mm_types.h&gt;</code>. An instance of this structure is allocated for <strong>each</strong> physical page in the system.</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> {</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> flags;
+  <span class="hljs-keyword">atomic_t</span> _count;
+  <span class="hljs-keyword">atomic_t</span> _mapcount; <span class="hljs-comment">// Number of Page Table entries that refer to the page frame (-1 if none).</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> <span class="hljs-keyword">private</span>;
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">address_space</span> *<span class="hljs-title">mapping</span>;</span>
+  <span class="hljs-keyword">pgoff_t</span> index;
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">lru</span>;</span> <span class="hljs-comment">// Contains pointers to the least recently used doubly linked list of pages.</span>
+  <span class="hljs-keyword">void</span> *<span class="hljs-keyword">virtual</span>;
+};
+</div></code></pre>
+<ul>
+<li><strong>flags</strong> field: stores the status of the page. Such flags include whether the page is dirty or whether it is locked in memory. The flag values are defined in <code>&lt;linux/page-flags.h&gt;</code>.
+<ul>
+<li>
+<p>higher 8 bits of flag stores its zone and node, so that we can find page zone and node via page flag. In SPARSEMEM model, it also includes section bits.</p>
+<p><img src="images/2022-03-05-14-50-47.png" alt=""></p>
+</li>
+</ul>
+</li>
+<li><strong>_count</strong> field: stores the usage count of the page—that is, how many references there are to this page.
+<ul>
+<li>use the function <code>page_count()</code> to check count field. It returns 0 to indicate avaiable for use in a new allocation.</li>
+</ul>
+</li>
+<li><strong>mapping</strong> field: When files or devices are memory mapped, their inode has an associated <code>address_space</code>. This field will point to this <code>address_space</code> if the page belongs to the file. And <strong>index</strong> is the offset (in terms of page size) of the page in the file. Details refer to <a href="cache.html#radix-tree-pages">here</a>
+<ul>
+<li>If the page is anonymous and unmapping from a process, the <code>address_space</code> is <code>swapper_space</code> which manages the swap address space.</li>
+</ul>
+</li>
+<li><strong>lru</strong> field: for the page replacement policy, pages that may be swapped out will exist on either the <em>active_list</em> or the <em>inactive_list</em> declared in <code>page_alloc.c</code>. This is the list head for these LRU lists.</li>
+<li><strong>virtual</strong> field is the page’s virtual address.</li>
+</ul>
+<h2 id="linux-physical-memory-model">Linux Physical Memory Model</h2>
+<p>There are three models supported in the kernel to manage physical memory layout: flat memory model (flatmem)，Discontiguous memory model (Discontigmem), sparse memory model (sparsemem).</p>
+<p>The memory model deals with the conversion between between a physical page-frame number (PFN) and its corresponding <code>struct page</code>.</p>
+<p>In 2008, SPARSEMEM_VMEMMAP became the only supported memory model for x86-64, as it was only slightly more expensive than FLATMEM but more efficient than DISCONTIGMEM.</p>
+<table>
+<thead>
+<tr>
+<th>Architecture</th>
+<th>default memory model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ARM</td>
+<td>flatmem</td>
+</tr>
+<tr>
+<td>ARM64</td>
+<td>sparsemem</td>
+</tr>
+<tr>
+<td>x86_32</td>
+<td>flatmem</td>
+</tr>
+<tr>
+<td>x86_32 with NUMA</td>
+<td>discontigmem</td>
+</tr>
+<tr>
+<td>x86_64</td>
+<td>sparsemem</td>
+</tr>
+</tbody>
+</table>
+<p><strong>flatmem</strong></p>
+<p>在平坦内存模型中，毗邻连续地排列所有页帧描述符。全局指针变量mem_map指向首个page frame。The conversion b/w PFN and <code>strcut page*</code> is simply an array index.</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __pfn_to_page(pfn)    (mem_map + ((pfn) - ARCH_PFN_OFFSET))</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __page_to_pfn(page)    ((unsigned long)((page) - mem_map) + ARCH_PFN_OFFSET)</span>
+</div></code></pre>
+<p><img src="images/2022-03-05-16-07-30.png" alt=""></p>
+<p>A major drawback: it couldn't deal well with large holes in the physical address space. Either the part of the memory map corresponding to a hole would be wasted or, as was done on ARM, the memory map would also have holes.</p>
+<p><strong>Discontigmem</strong></p>
+<p>The <code>node</code> data represented by struct <code>pglist_data</code> contains a node-specific <code>node_mem_map</code>. Assuming that each node has contiguous physical memory, having an array of page structures per node solves the  the problem of large holes in the flat memory map.</p>
+<p>从PFN转换到具体的struct page会稍微复杂一点，我们首先要从PFN得到node ID，然后根据这个ID找到对于的pglist_data 数据结构，也就找到了对应的page数组，之后的方法就类似flat memory了。</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __pfn_to_page(pfn)            \ </span>
+({    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> __pfn = (pfn);        \ 
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> __nid = <span class="hljs-built_in">arch_pfn_to_nid</span>(__pfn);  \ 
+    <span class="hljs-built_in">NODE_DATA</span>(__nid)-&gt;node_mem_map + <span class="hljs-built_in">arch_local_page_offset</span>(__pfn, __nid);\ 
+})
+
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __page_to_pfn(pg)                        \
+({    const struct page *__pg = (pg);                    \
+    struct pglist_data *__pgdat = NODE_DATA(page_to_nid(__pg));    \
+    (unsigned long)(__pg - __pgdat-&gt;node_mem_map) +            \
+     __pgdat-&gt;node_start_pfn;                    \
+})</span>
+</div></code></pre>
+<p><img src="images/2022-03-05-16-15-27.png" alt=""></p>
+<p><strong>sparsemem</strong></p>
+<p>SPARSEMEM represents memory as a collection of same-sized <em>sections</em>.</p>
+<ul>
+<li>A section is represented with <code>struct mem_section</code> that contains <code>section_mem_map</code> that is, logically, a pointer to an array of struct pages.</li>
+<li>section的大小取决于具体的硬件架构，在代码中由&quot;<code>SECTION_SIZE_BITS</code>&quot;宏定义，比如x64支持128MiB的section，这个宏的值就是27。</li>
+<li>每個內存section段都可以支持內存熱插拔。</li>
+<li>每個section內部，物理內存是連續的。</li>
+</ul>
+<p>In classic SPARSEMEM, For efficient conversion between a PFN and <code>struct page</code>, several high bits of the PFN are used to index into the sections array. For the other direction, the section number was encoded in the page flags.</p>
+<p><img src="images/2022-03-05-20-21-46.png" alt=""></p>
+<p>Soon, SPARSEMEM was extended with SPARSEMEM_EXTREME. SPARSEMEM_EXTREME added a second dimension to the sections array. The first level became pointers to mem_section structures, and the actual mem_section objects were dynamically allocated based on the actually populated physical memory.</p>
+<p><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8f6aac419bd">SPARSEMEM_VMEMMAP</a> was introduced in 2007. The idea is that the entire memory map is mapped into a virtually contiguous area (pointed by <code>vmemmap</code>), but only the active sections are backed with physical pages.</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __pfn_to_page(pfn)    (vmemmap + (pfn))</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __page_to_pfn(page)    (unsigned long)((page) - vmemmap)</span>
+</div></code></pre>
+<p>对于SPARSEMEM_VMEMMAP而言，虚拟地址一开始就分配好了，是vmemmap开始的一段连续的虚拟地址空间，每一个page都有一个对应的<code>struct page</code>，当然，只有虚拟地址，没有物理地址。因此，当一个section被发现后，可以立刻找到对应的<code>struct page</code>的虚拟地址，当然，还需要分配一个物理的page frame，然后建立页表什么的，因此，对于这种sparse memory，开销会稍微大一些（多了个建立映射的过程）。</p>
+<p><img src="images/2022-03-05-20-40-12.png" alt=""></p>
+<h3 id="getting-whole-pages">Getting Whole Pages</h3>
+<p>The kernel provides one low-level mechanism for requesting memory, along with several interfaces to access it. they are declared in <code>&lt;linux/gfp.h&gt;</code></p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// This allocates 2^order (that is, 1 &lt;&lt; order) contiguous physical pages </span>
+<span class="hljs-comment">// and returns a pointer to the first page’s page structure.</span>
+<span class="hljs-comment">// on error it returns NULL.</span>
+<span class="hljs-function">struct page * <span class="hljs-title">alloc_pages</span><span class="hljs-params">(<span class="hljs-keyword">gfp_t</span> gfp_mask, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> order)</span></span>;
+
+<span class="hljs-comment">//You can convert a given page to its logical address with below, </span>
+<span class="hljs-comment">// This returns a pointer to the logical address where the given physical page currently resides.</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> * <span class="hljs-title">page_address</span><span class="hljs-params">(struct page *page)</span></span>;
+
+<span class="hljs-comment">// Below function combines above two calls, returns the local address of the page</span>
+<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> __get_free_pages(<span class="hljs-keyword">gfp_t</span> gfp_mask, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> order);
+
+<span class="hljs-comment">// If you need only one page, two functions are implemented as wrappers to save you a bit of typing:</span>
+<span class="hljs-comment">// They are equivilent to pass zero for the order in above calls.</span>
+<span class="hljs-function">struct page * <span class="hljs-title">alloc_page</span><span class="hljs-params">(<span class="hljs-keyword">gfp_t</span> gfp_mask)</span></span>;
+<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> __get_free_page(<span class="hljs-keyword">gfp_t</span> gfp_mask);
+
+<span class="hljs-comment">//If you need the returned page filled with zeros, use the function</span>
+<span class="hljs-function"><span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> <span class="hljs-title">get_zeroed_page</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> gfp_mask)</span></span>;
+
+<span class="hljs-comment">//A family of functions enables you to free allocated pages when you no longer need them:</span>
+<span class="hljs-keyword">void</span> __free_pages(struct page *page, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> order)
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">free_pages</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> addr, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> order)</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title">free_page</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> addr)</span>
+</span></div></code></pre>
+<p>These low-level page functions are useful when you need page-sized chunks of physically
+contiguous pages, especially if you need exactly a single page or two. For more general
+byte-sized allocations, the kernel provides <code>kmalloc()</code>.</p>
+<p>The zone allocator is the frontend of the kernel page frame allocator. This component
+must locate a memory zone that includes a number of free page frames large enough to satisfy the memory request. every request for a group of contiguous page frames is eventually handled by executing the <code>alloc_pages</code> macro. This macro, in turn, ends up invoking the <code>__alloc_pages()</code> function in <code>mm/page_alloc.c</code>, which is the core of the zone allocator.</p>
+<ul>
+<li>This function, which is never called directly, examines the selected zone and checks if it is suitable to allocate from based on the number of available pages.</li>
+<li>If number of free pages reaches the pages_low watermark, it will wake kswapd to begin freeing up pages from zones</li>
+<li>if memory is extremely tight, the caller will do the work of kswapd itself.</li>
+<li>Once the zone has finally been decided on, the function rmqueue() is called to allocate the block of pages or split higher level blocks if one of the appropriate size is not available. Which leads us to the Buddy System.</li>
+</ul>
+<h2 id="buddy-system">Buddy system</h2>
+<p>The kernel must establish a robust and efficient strategy for allocating groups of contiguous
+page frames to avoid <em>external fragmentation</em>.</p>
+<ul>
+<li>External fragmentation is the inability to service a request because the available memory exists only in small blocks.</li>
+<li>Internal fragmentation is defined as the wasted space where a large block had to be assigned to service a small request.
+<ul>
+<li>buddy system causes high internal fragmentation. This is why linux has slab allocation for small objects.</li>
+</ul>
+</li>
+</ul>
+<p>Linux uses well-known <em>buddy system algorithm</em>. All free page frames are grouped into 11 lists of blocks that contain groups of 1 (4KB), 2, 4, 8, 16, 32, 64, 128, 256, 512, and 1024 (4MB) contiguous page frames, respectively. If a block of the desired size is not available, a large block is broken up in half and the two blocks are <em>buddies</em> to each other. One half is used for the allocation and the other is free. The blocks are continuously halved as necessary until a block of the desired size is available. When a block is later freed, the buddy is examined and the two coalesced if it is free.</p>
+<p><img src="images/2022-02-18-21-39-53.png" alt=""></p>
+<p>buddy 算法的管理结构在每个 zone 下面都有一个。</p>
+<ul>
+<li>由 node 管理结构 <code>struct pglist_data</code> 下，存在着一个 <code>struct zone</code> 数组结构</li>
+<li>Each zone has a <code>free_area_t</code> struct array called <code>free_area[MAX_ORDER]</code>.</li>
+<li>每个 <code>struct free_area</code> 下面又根据内存页面的迁移类型进行分类管理，每个类型有着自己独立的链表，来帮助实现内存页面迁移特性
+<ul>
+<li>内存页面迁移，主要涉及的就是可移动页面的处理，会唤醒 kcompactd 线程执行迁移动作。实现主要是通过 freepages 空闲链表和 migratepages 迁移链表实现的</li>
+</ul>
+</li>
+</ul>
+<p><img src="images/2022-02-17-22-40-45.png" alt=""></p>
+<p>Also, the page allocator keeps a per-CPU list of free pages in the <a href="https://elixir.bootlin.com/linux/v5.16.8/source/include/linux/mmzone.h#L498">zone structure</a> to reduce write access to any global data structures.  Whenever a given CPU needs to allocate a page, it looks first in its per-CPU list and grabs a page from there if one is available. When that CPU frees a page, it puts it back into the per-CPU list.</p>
+<p><strong>How to view buddy system information?</strong></p>
+<pre><code class="language-bash"><div>[lemon]]<span class="hljs-comment"># cat /proc/buddyinfo </span>
+Node 0, zone      DMA      1      0      0      0      2      1      1      0      1      1      3 
+Node 0, zone    DMA32   3198   4108   4940   4773   4030   2184    891    180     67     32    330 
+Node 0, zone   Normal  42438  37404  16035   4386    610    121     22      3      0      0      1
+</div></code></pre>
+<p><img src="images/2022-02-17-22-45-23.png" alt=""></p>
+<h2 id="zone-watermarks-and-kswapd">Zone watermarks and kswapd</h2>
+<p>Each zone has three watermarks (three unsigned long fields in <em>zone_struct</em>) called <em>pages_low</em>, <em>pages_min</em> and <em>pages_high</em> which help track how much pressure a zone is under.</p>
+<p><strong>pages_low</strong>: When pages_low number of free pages is reached, <strong>kswapd</strong> is woken up by the buddy allocator to start freeing pages. This is also called  <em><strong>background-reclaim</strong></em>. The value is twice the value of <em>pages_min</em> by default;</p>
+<p><strong>pages_min</strong>: When pages_min is reached, the allocator will do the <strong>kswapd</strong> work in a synchronous fashion, sometimes referred to as the <em><strong>direct-reclaim</strong></em> path.</p>
+<ul>
+<li><em>pages_min</em> is calculated in <code>free_area_init_core()</code> during memory init as <code>ZoneSizeInPages / 128</code></li>
+<li>can view and change via <code>/proc/sys/vm/min_free_kbytes</code></li>
+<li>An exception is if memory allocation is called with <code>PF_MEMALLOC</code> flag, and there is enough memory, then no direct-reclaim is triggered. This is used in kswapd itself.</li>
+</ul>
+<p><strong>pages_high</strong>: Once the watermark has been reached, kswapd will go back to sleep. The default for pages_high is three times the value of pages_min.</p>
+<p><img src="images/2022-03-05-22-22-27.png" alt=""></p>
+<p>使用&quot;<code>cat /proc/zoneinfo</code>&quot;可以查看这三个值的大小（注意这里是以page为单位的）：</p>
+<p>在Linux内核4.6版本中，诞生了一种新的调节watermark的方式。具体做法是引入一个叫做&quot;<code>watermark_scale_factor</code>&quot;的系数，其默认值为10，对应内存占比0.1%(10/10000)，可通过&quot;<code>/proc/sys/vm/watermark_scale_factor</code>&quot;设置，最大为1000。当它的值被设定为1000时，意味着&quot;low&quot;与&quot;min&quot;之间的差值，以及&quot;high&quot;与&quot;low&quot;之间的差值都将是内存大小的10%</p>
+<p>Kswapd虽然名字中含有&quot;swap&quot;，但它不光处理anonymous page的swap out回收，同样处理page cache的回收，而且它还肩负着平衡active list和inactive list的重任，所以被它调用的函数叫做balance_pgdat()。</p>
+<h2 id="page-frame-reclaim">Page frame Reclaim</h2>
+<p>Linux’s cache eviction works by selecting clean (not dirty) pages and replacing them with other data. If not enough clean pages, the kernel forces a writeback of dirty pages.</p>
+<ul>
+<li>回收一个页面之前，如果该页面当前是被映射的（根据struct page的_mapcount域判断），需要调用try_to_unmap()，通过reserve mapping更改所有指向这个页面的PTEs。对于anonymous page，还需要在swap space中分配slot，并且将这个page标记为dirty的，swap out会引起相对慢速的I/O操作。对于page cache的回收，如果是&quot;dirty&quot;的，也需要write back，也会引起I/O操作。</li>
+<li>如果检测到页面的flag是PG_locked或者是PG_reserved的，则只能跳过。对于正在回写的（flag是PG_writeback的），通常也是放弃回收</li>
+</ul>
+<p>Linux implements a modified version of LRU, called the <strong>two-list strategy</strong>. It solves the only-used-once failure in a classic LRU. This two-list approach is also known as LRU/2 (it can be generalized to n-lists, called LRU/n).</p>
+<ul>
+<li>maintain two list: active_list and inactive_list, in a pseudo-LRU manner, items are added to the tail and removed from the head. (<code>struct page-&gt;lru</code> points to next/prev nodes of the belonging list of the current page)
+<ul>
+<li>The lists are kept in balance. IF active list too large, then items from active_list's head is moved to inactive_list tail.</li>
+</ul>
+</li>
+<li><code>struct page-&gt;flags</code> contains two flags:
+<ul>
+<li><code>PG_active</code> (active list always 1, inactive list always 0).</li>
+<li><code>PG_referenced</code> (if the page is recently used)</li>
+</ul>
+</li>
+</ul>
+<p>When page is accessed:</p>
+<ul>
+<li>PG_active=0, PG_referenced=0 -&gt; PG_active=0, PG_referenced=1</li>
+<li>PG_active=1, PG_referenced=0 -&gt; PG_active=1, PG_referenced=1</li>
+<li><strong>promotion</strong>: inactive, referenced -&gt; PG_active=1, PG_referenced=0 (move to active_list tail)</li>
+</ul>
+<p>Inactive_list head node:</p>
+<ul>
+<li>PG_active=0,, PG_referenced=0 -&gt; reclaimed</li>
+<li>PG_active=0,, PG_referenced=1 -&gt; ?</li>
+</ul>
+<p>Active_list head node:</p>
+<ul>
+<li><strong>deomotion</strong>: PG_active=1, PG_referenced=0 -&gt; PG_active=0,, PG_referenced=0 (move to inactive_list tail)</li>
+<li>PG_active=1, PG_referenced=1 -&gt; PG_active=1, PG_referenced=0 (move to active_list tail)</li>
+</ul>
+<p><strong>lru cache</strong></p>
+<p>Inactive list 中尾端的页面不断被释放，相当于一个消费者，active list 则不断地将尾端PG_referenced为0的页面放入inactive list，相当于一个生产者。不难想象，这2个链表的锁（lru_lock）应该是高度竞争的，如果从active list 向inactive list 的页面转移是一个一个进行的，那对锁的争抢将会十分严重。</p>
+<p>为了解决这个问题，内核加入了一个per-CPU的lru cache（用struct pagevec表示），从active list 换出的页面先放入当前CPU的lru cache中，直到lru cache中已经积累了PAGEVEC_SIZE（15）个页面，再获取lru_lock，将这些页面批量放入inactive list 中。</p>
+<p><strong>Page frame is inserted into three data structures</strong></p>
+<p>对于一个基于文件的page frame，好像它既在page cache结构中，又在active/inactive list结构中？没错，放在page cache中以radix tree/xarray的方式组织，是为了方便快速查找和读写它的内容，放在active/inactive list中则是为了方便内存回收。当一个基于文件的page frame被创建时，它就已经被加入到这2个结构中了：</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">add_to_page_cache_lru</span><span class="hljs-params">(struct page *page, struct address_space *mapping,
+			  <span class="hljs-keyword">pgoff_t</span> offset, <span class="hljs-keyword">gfp_t</span> gfp_mask)</span>
+</span>{
+    __add_to_page_cache_locked(page, mapping, offset,  gfp_mask, &amp;shadow);
+    <span class="hljs-built_in">lru_cache_add</span>(page);					
+}
+</div></code></pre>
+<p><strong>Page reclaim favors page cache</strong></p>
+<p>对于anonymous pages，总是需要先写入swap area才能回收。而对于page cache，有一些可以直接discard（比如elf的text段对应的页面，data段对应的页面中clean的部分），有一些dirty的页面需要先write back同步到磁盘。同时由于有flusher thread定期的write back，回收时还是dirty的page cache页面不会太多。因此，内核通常更倾向于换出page cache中的页面。</p>
+<p>为了实现优先回收page cache，之后每个链表拆分成了LRU_ANON和LRU_FILE，因此形成了LRU_INACTIVE_ANON, LRU_ACTIVE_ANON, LRU_INACTIVE_FILE和LRU_ACTIVE_FILE四种链表，而且改成了一个node对应一组链表（per-node），由代表node的struct pglist_data中的struct lruvec包含各个链表的头结点 。</p>
+<p>split list reference: <a href="https://lwn.net/Articles/226756/">Toward improved page replacement</a></p>
+<p><strong>Page Reclaim Parameters</strong></p>
+<p>用户可以根据具体应用场景的需要，通过&quot;<code>/proc/sys/vm/swappiness</code>&quot;调节内存回收时anonymous pages和page cache的比重。</p>
+<ul>
+<li>swappiness ranges [0, 100], 60 being a common default.</li>
+<li>With swappiness at 100, anonymous and file have the same priority.</li>
+<li>With swappiness at 0, page reclaim will ignore anonymous pages. It only works well with systems with large page caches, otherwise, it can cause frequenet direct reclaim and kswapd, and in turn OOM kill.</li>
+</ul>
+<blockquote>
+<p>don't confuse page write-back (with pdflush, used to sync data with storage medium) and page reclaim (with kswapd, used to free up pages when free memory is low)</p>
+</blockquote>
+<h3 id="oom-killer">OOM Killer</h3>
+<p>Out Of Memory (OOM) manager has one simple task; check if there is enough available memory to satisfy, verify that the system is truely out of memory and if so, select a process to kill.</p>
+<p>When the machine is low on memory, old page frames will be reclaimed but despite reclaiming pages is may find that it was unable to free enough pages to satisfy a request even when scanning at highest priority. If it does fail to free page frames, <code>out_of_memory()</code> is called to see if the system is out of memory and needs to kill a process. If so, <code>select_bad_process()</code> is called to select a process, then <code>oom_kill_task()</code> will send a <code>SIGKILL</code> signal to the process.</p>
+<p><code>oom_kill.c::select_bad_process()</code> is responsible for choosing a process to kill:</p>
+<ul>
+<li>It steps through each running task and calculating how suitable its <code>badness()</code><pre><code class="language-C++"><div>badness_for_task = total_vm_for_task / (<span class="hljs-built_in">sqrt</span>(cpu_time_in_seconds) * <span class="hljs-built_in">sqrt</span>(<span class="hljs-built_in">sqrt</span>(cpu_time_in_minutes))) * (nice&gt;<span class="hljs-number">0</span>? <span class="hljs-number">2</span> : <span class="hljs-number">1</span>)
+</div></code></pre>
+</li>
+<li>Basically, a process that is using a large amount of memory but is not that long lived.</li>
+</ul>
+<p>Not selected:</p>
+<ul>
+<li>进程号为1的init进程。</li>
+<li>内核线程，因为内核线程往往执行的都是比较关键的任务。
+<ul>
+<li>If the process is a root process or has CAP_SYS_ADMIN capabilities, the points are divided by four as it is assumed that root privilege processes are well behaved.</li>
+</ul>
+</li>
+<li>直接访问硬件设备的进程，如果强行终结这样的进程，可能将硬件置于一个不确定的状态。
+<ul>
+<li>if it has CAP_SYS_RAWIO capabilities (access to raw devices) privileges, the points are further divided by 4 as it is undesirable to kill a process that has direct access to hardware.</li>
+</ul>
+</li>
+</ul>
+<h3 id="overcommit">overcommit</h3>
+<p><a href="https://www.kernel.org/doc/Documentation/vm/overcommit-accounting">https://www.kernel.org/doc/Documentation/vm/overcommit-accounting</a></p>
+<p>Overcommit的意思是操作系统承诺给进程的内存大小超过了实际可用的内存。Linux是允许memory overcommit的, 因为内存申请不等于内存分配，内存只在实际用到的时候才分配。</p>
+<p>Kernel Config <code>vm.overcommit_memory</code></p>
+<ul>
+<li>0 – Heuristic overcommit handling. default，root is allowed to allocate slightly more memory in this mode，Obvious overcommits of 	address space are refused (比如malloc一次性申请的内存大小就超过了系统可用总内存)
+<ul>
+<li>Code in <code>source/mm/mmap.c:__vm_enough_memory()</code>, 基本上是申请的内存大小不能超过 【free memory + free swap + pagecache的大小 + SLAB中可回收的部分】，否则本次申请就会失败。</li>
+</ul>
+</li>
+<li>1 – Always overcommit. 允许overcommit，对内存申请来者不拒。</li>
+<li>2 – Don’t overcommit (only allocate according to ratio). The total address space commit is not permitted to exceed swap + a configurable amount (default is 50%) of physical RAM.
+<ul>
+<li>如果使用了huge pages，那么需要从物理内存中减去，公式变成：
+CommitLimit = ([total RAM] – [total huge TLB RAM]) * vm.overcommit_ratio / 100 + swap</li>
+</ul>
+</li>
+</ul>
+<p>The overcommit policy is set via the sysctl <code>vm.overcommit_memory</code>.</p>
+<p>The overcommit amount can be set via <code>vm.overcommit_ratio</code> (percentage) or <code>vm.overcommit_kbytes</code> (absolute value).</p>
+<p>The overcommit values can be shown in <code>/proc/meminfo</code></p>
+<pre><code class="language-C++"><div><span class="hljs-meta"># grep -i commit /proc/meminfo</span>
+CommitLimit:     <span class="hljs-number">5967744</span> kB
+Committed_AS:    <span class="hljs-number">5363236</span> kB
+</div></code></pre>
+<ul>
+<li>CommitLimit 就是overcommit的阈值</li>
+<li>Committed_AS 表示所有进程已经申请的内存总大小，（注意是已经申请的，不是已经分配的），如果 Committed_AS 超过 CommitLimit 就表示发生了 overcommit</li>
+</ul>
+<p>“<code>sar -r</code>”是查看内存使用状况的常用工具，它的输出结果中有两个与overcommit有关，kbcommit 和 %commit：</p>
+<ul>
+<li>kbcommit对应/proc/meminfo中的 Committed_AS；</li>
+<li>%commit的计算公式并没有采用 CommitLimit作分母，而是Committed_AS/(MemTotal+SwapTotal)，意思是_内存申请_占_物理内存与交换区之和_的百分比。</li>
+</ul>
+<pre><code class="language-bash"><div>$ sar -r 
+05:00:01 PM kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact
+05:10:01 PM    160576   3648460     95.78         0   1846212   4939368     62.74   1390292   1854880
+</div></code></pre>
+<br>
+<h2 id="slab-allocator"><a href="memory_allocator.html#slab-allocator">slab allocator</a></h2>
+<p><strong>Interaction between buddy and slab</strong></p>
+<p>如果一个 slab 分配满了，那么需要从它的后备存储，即 page level 的 buddy 系统分配。但从 buddy 分配意味着需要持有对应的 zone lock，这还是个要求关中断配合的 spinlock，应尽量避免，所以其实在中间，增加了一个 per-cpu page allocator（简称 pcp）作为 zone buddy 的缓存。</p>
+<p>5.14 版本之前的 pcp 只储存 order 为 0 的空闲页面（对应 4 KB），自<a href="https://link.zhihu.com/?target=https%3A//github.com/torvalds/linux/commit/44042b4498728f4376e84bae1ac8016d146d850b">这个 patch</a> 之后，扩展为可存储 order 为 0 到 3 的页面，即小于和等于 32 KB 的页面分配都从 pcp 走（此处为了简化，忽略 migrate type 的影响），大于则直接找 zone buddy，以进一步降低 &quot;zone-&gt;lock&quot; 的竞争。</p>
+<p>当 pcp 没有空闲页面可分配时，就得从 zone buddy 里面捞，由于此过程只是一个空闲页面的转移（从 zone buddy 的 freelist 到 pcp 的 freelist），所以并不算是 &quot;alloc&quot;，而是 &quot;refill&quot;。</p>
+<p>反过来，如果一个 CPU 上的 pcp 的空闲页面太多了（超过一个上限），就要还一些给 zone buddy，该过程叫做 &quot;drain&quot;。</p>
+<p><img src="images/2022-05-13-10-31-01.png" alt=""></p>
+<br>
+<h2 id="kmalloc">kmalloc()</h2>
+<p>The <code>kmalloc()</code> function is a simple interface for obtaining kernel memory in byte-sized chunks. The <code>kmalloc()</code> function guarantees that the pages are <strong>physically contiguous</strong> (and virtually contiguous).</p>
+<p>The function is declared in <code>&lt;linux/slab.h&gt;</code>:</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> * <span class="hljs-title">kmalloc</span><span class="hljs-params">(<span class="hljs-keyword">size_t</span> size, <span class="hljs-keyword">gfp_t</span> flags)</span>
+
+<span class="hljs-comment">// Do not call this function on memory not previously allocated with kmalloc(), </span>
+<span class="hljs-comment">// or on memory that has already been freed. </span>
+<span class="hljs-comment">// Doing so is a serious kernel bug</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title">kfree</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">void</span> *ptr)</span>
+</span></div></code></pre>
+<p>kmalloc 和 kfree 实际上是没有管理算法实现的，它只是实现了统一化入口，提供丰富的控制参数，便于内核开发者使用。</p>
+<ul>
+<li>对于小于 KMALLOC_MAX_CACHE_SIZE (2个pages大小)的内存，将会通过 slab 算法申请</li>
+<li>否则将通过alloc_pages(), 即使用buddy分配器。</li>
+</ul>
+<p><img src="images/2022-02-17-19-58-16.png" alt=""></p>
+<h3 id="gfp_mask-flag">gfp_mask flag</h3>
+<p>Flags are represented by the <code>gfp_t</code> type, which is defined in <code>&lt;linux/types.h&gt;</code> as an unsigned int. <em>gfp</em> stands
+for <code>__get_free_pages()</code>.</p>
+<p>The flags are broken up into three categories:</p>
+<ul>
+<li>action modifiers: specify <em>how</em> the kernel is supposed to allocate the requested memory
+<ul>
+<li>eg. interrupt handlers must instruct the kernel not to sleep</li>
+</ul>
+</li>
+<li>zone modifiers: specify from <em>where</em> to allocate memory.</li>
+<li>types: specify a combination of action and zone modifiers as needed by a certain type of memory allocation to simplify flag specification.
+<ul>
+<li>eg. The GFP_KERNEL is a type flag, which is used for code in process context inside the kernel.</li>
+</ul>
+</li>
+</ul>
+<p>For complete flags, refer to &quot;Linux Kernel Development Chapter 12 section kmalloc()&quot;</p>
+<p><strong>Common flags</strong></p>
+<ul>
+<li>The vast majority of allocations in the kernel use the <strong><code>GFP_KERNEL</code></strong> flag.
+<ul>
+<li>Because the call can block, this flag can be used only from process context that can safely reschedule.</li>
+<li>It can put the caller to sleep to swap inactive pages to disk, flush dirty pages to disk, and so on.</li>
+</ul>
+</li>
+<li><strong><code>GFP_ATOMIC</code></strong> flag specifies a memory allocation that cannot sleep
+<ul>
+<li>If no sufficiently sized contiguous chunk of memory is available, the kernel is not likely to free memory because it cannot put the caller to sleep.</li>
+</ul>
+</li>
+<li><strong><code>GFP_NOIO</code></strong> allocation does not initiate any disk I/O to fulfill the request. <strong><code>GFP_NOFS</code></strong> might initiate disk I/O, but does not initiate filesystem I/O.
+<ul>
+<li>For example, filesystem code can allocate using <code>GFP_NOFS</code>, so that it doesn't reuslt in more filesystem operations.</li>
+</ul>
+</li>
+<li>The <strong><code>GFP_DMA</code></strong> flag is used to specify that the allocator must satisfy the request from ZONE_DMA.This flag is used by device drivers, which need DMA-able memory for their devices.</li>
+</ul>
+<p><strong>Which flag to use when</strong></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Process context, can sleep</td>
+<td>Use GFP_KERNEL.</td>
+</tr>
+<tr>
+<td>Process context, cannot sleep</td>
+<td>Use GFP_ATOMIC, or perform your allocations with GFP_KERNEL at an earlier or later point when you can sleep.</td>
+</tr>
+<tr>
+<td>Interrupt handler</td>
+<td>Use GFP_ATOMIC.</td>
+</tr>
+<tr>
+<td>Softirq</td>
+<td>Use GFP_ATOMIC.</td>
+</tr>
+<tr>
+<td>Tasklet</td>
+<td>Use GFP_ATOMIC.</td>
+</tr>
+<tr>
+<td>Need DMA-able memory, can sleep</td>
+<td>Use (GFP_DMA | GFP_KERNEL).</td>
+</tr>
+<tr>
+<td>Need DMA-able memory, cannot sleep</td>
+<td>Use (GFP_DMA | GFP_ATOMIC), or perform your allocation at an earlier point when you can sleep.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="vmalloc">vmalloc()</h2>
+<p>The <code>vmalloc()</code> function works in a similar fashion to <code>kmalloc()</code>, except it allocates
+memory that is only virtually contiguous and not necessarily physically contiguous. This
+is similar to user-space allocation function <code>malloc()</code> works.</p>
+<p>It does this by allocating potentially noncontiguous chunks of physical memory and “fixing up” the page
+tables to map the memory into a contiguous chunk of the logical address space.</p>
+<p>most kernel code uses <code>kmalloc()</code> and not <code>vmalloc()</code> because:</p>
+<ul>
+<li>vmalloc must specifically set up the page table entries</li>
+<li>pages obtained via vmalloc() must be mapped by their individual pages, which results in much greater TLB thrashing</li>
+<li><code>vmalloc()</code> is used only when absolutely necessary—typically, to obtain large regions of memory.
+<ul>
+<li>For example, when modules are dynamically inserted into the kernel, they are loaded into memory
+created via vmalloc().</li>
+</ul>
+</li>
+</ul>
+<p>The <code>vmalloc()</code> function is declared in <code>&lt;linux/vmalloc.h&gt;</code> and defined in
+<code>mm/vmalloc.c</code>. Usage is identical to user-space’s <code>malloc()</code>.</p>
+<p>vmalloc</p>
+<ul>
+<li>线性空间连续，但是对应的物理地址空间不一定连续。</li>
+<li>vmalloc 分配的线性地址所对应的物理页可能处于低端内存，也可能处于高端内存。</li>
+<li>vmalloc 分配的地址则限于vmalloc_start与vmalloc_end之间。</li>
+<li>每一块vmalloc分配的内核虚拟内存都对应一个vm_struct结构体，不同的内核空间虚拟地址之间有4k大小的防越界空闲区间隔区。</li>
+<li>与用户空间的虚拟地址特性一样，这些虚拟地址与物理内存没有简单的映射关系，必须通过内核页表才可转换为物理地址或物理页，它们有可能尚未被映射，当发生缺页时才真正分配物理页面。</li>
+</ul>
+<p><img src="images/2022-02-19-11-41-35.png" alt=""></p>
+<p>On how vmalloc is implemented:</p>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/68501351">https://zhuanlan.zhihu.com/p/68501351</a></li>
+<li><a href="https://www.kernel.org/doc/gorman/html/understand/understand010.html">https://www.kernel.org/doc/gorman/html/understand/understand010.html</a></li>
+</ul>
+<h2 id="memory-descriptor">Memory descriptor</h2>
+<p>The kernel represents a process’s address space with a data structure called the <em>memory
+descriptor</em>.This structure contains all the information related to the process address space.
+The memory descriptor is represented by <code>struct mm_struct</code> and defined in <code>&lt;linux/mm_types.h&gt;</code>.</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mm_struct</span> {</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">vm_area_struct</span> *<span class="hljs-title">mmap</span>;</span>        <span class="hljs-comment">/* list of memory areas */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rb_root</span> <span class="hljs-title">mm_rb</span>;</span>               <span class="hljs-comment">/* red-black tree of VMAs */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">vm_area_struct</span> *<span class="hljs-title">mmap_cache</span>;</span>  <span class="hljs-comment">/* last used memory area */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> free_area_cache;      <span class="hljs-comment">/* 1st address space hole */</span>
+  <span class="hljs-keyword">pgd_t</span> *pgd;                         <span class="hljs-comment">/* page global directory */</span>
+  <span class="hljs-keyword">atomic_t</span> mm_users;                  <span class="hljs-comment">/* address space users */</span>
+  <span class="hljs-keyword">atomic_t</span> mm_count;                  <span class="hljs-comment">/* primary usage counter */</span>
+  <span class="hljs-keyword">int</span> map_count;                      <span class="hljs-comment">/* number of memory areas */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rw_semaphore</span> <span class="hljs-title">mmap_sem</span>;</span>       <span class="hljs-comment">/* memory area semaphore */</span>
+  <span class="hljs-keyword">spinlock_t</span> page_table_lock;         <span class="hljs-comment">/* page table lock */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">mmlist</span>;</span>            <span class="hljs-comment">/* list of all mm_structs */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> start_code;           <span class="hljs-comment">/* start address of code */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> end_code;             <span class="hljs-comment">/* final address of code */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> start_data;           <span class="hljs-comment">/* start address of data */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> end_data;             <span class="hljs-comment">/* final address of data */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> start_brk;            <span class="hljs-comment">/* start address of heap */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> brk;                  <span class="hljs-comment">/* final address of heap */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> start_stack;          <span class="hljs-comment">/* start address of stack */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> arg_start;            <span class="hljs-comment">/* start of arguments */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> arg_end;              <span class="hljs-comment">/* end of arguments */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> env_start;            <span class="hljs-comment">/* start of environment */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> env_end;              <span class="hljs-comment">/* end of environment */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> rss;                  <span class="hljs-comment">/* pages allocated */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> total_vm;             <span class="hljs-comment">/* total number of pages */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> locked_vm;            <span class="hljs-comment">/* number of locked pages */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> saved_auxv[AT_VECTOR_SIZE]; <span class="hljs-comment">/* saved auxv */</span>
+  <span class="hljs-keyword">cpumask_t</span> cpu_vm_mask;              <span class="hljs-comment">/* lazy TLB switch mask */</span>
+  <span class="hljs-keyword">mm_context_t</span> context;               <span class="hljs-comment">/* arch-specific data */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> flags;                <span class="hljs-comment">/* status flags */</span>
+  <span class="hljs-keyword">int</span> core_waiters;                   <span class="hljs-comment">/* thread core dump waiters */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">core_state</span> *<span class="hljs-title">core_state</span>;</span>      <span class="hljs-comment">/* core dump support */</span>
+  <span class="hljs-keyword">spinlock_t</span> ioctx_lock;              <span class="hljs-comment">/* AIO I/O list lock */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">hlist_head</span> <span class="hljs-title">ioctx_list</span>;</span>       <span class="hljs-comment">/* AIO I/O list */</span>
+};
+</div></code></pre>
+<ul>
+<li>The <code>mm_users</code> field is the number of processes using this address space. For example, if
+two threads share this address space, <code>mm_users</code> is equal to two.</li>
+<li>The <code>mm_count</code> field is the primary reference count for the mm_struct. All <code>mm_users</code> equate to one increment of <code>mm_count</code>. Thus, even if nine threads shared an address space, <code>mm_users</code> would be nine, but again mm_count would be only one.</li>
+<li>The <code>mmap</code> and <code>mm_rb</code> fields are different data structures (one linked list, one rb tree) that contain the same thing: all the memory areas in this address space.
+<ul>
+<li>Overlaying a linked list onto a tree, and using both to access the same set of data, is sometimes called a threaded tree.</li>
+</ul>
+</li>
+<li>The <code>pgd</code> and <code>page_table_lock</code> fields, refer to <a href="#page-tables">page tables section</a></li>
+</ul>
+<p><img src="images/2022-02-13-14-38-13.png" alt=""></p>
+<p><strong>mm field in process descriptor</strong></p>
+<p>The memory descriptor associated with a given task is stored in the <code>mm</code> field of the task’s
+process descriptor. (The process descriptor is represented by the <code>task_struct</code> structure,
+defined in &lt;linux/sched.h&gt;.) Thus, <code>current-&gt;mm</code> is the current process’s memory descriptor.</p>
+<ul>
+<li>The <code>mm_struct</code> structure is allocated from the <code>mm_cachep</code> slab cache via the <code>allocate_mm()</code> macro in <code>kernel/fork.c</code>.</li>
+<li>When the process exists, the <code>exit_mm()</code>, defined in <code>&lt;kernel/exit.c&gt;</code> is called, it then calls <code>mmput()</code> which decrements the <code>mm_users</code> count. If user count goes to zero, <code>mmdrop()</code> is called to decrement the <code>mm_count</code> counter. If that reaches 0, then <code>free_mm()</code> is called and returns the <code>mm_struct</code> to the <code>mm_cachep</code> slab via <code>the kmem_cache_free()</code>.</li>
+</ul>
+<p>The <code>copy_mm()</code> function copies a parent’s memory descriptor to its child during <code>fork()</code>.</p>
+<ul>
+<li>Processes may elect to share their address spaces with their children by means of the
+<code>CLONE_VM</code> flag to <code>clone()</code>.</li>
+<li>The process is then called a thread. (this is essentially the only difference between normal
+processes and so-called threads in Linux;)<pre><code class="language-C++"><div><span class="hljs-keyword">if</span> (clone_flags &amp; CLONE_VM) {
+  <span class="hljs-comment">// current is the parent process and tsk is the child process during a fork()</span>
+  <span class="hljs-built_in">atomic_inc</span>(&amp;current-&gt;mm-&gt;mm_users);
+  tsk-&gt;mm = current-&gt;mm;
+}
+</div></code></pre>
+</li>
+</ul>
+<p><strong>kernel thread's mm field is NULL</strong></p>
+<p>Note kernel threads do not have a process address space, thus the <code>mm</code> field of a kernel thread’s process descriptor is NULL.</p>
+<ul>
+<li>when a kernel thread is scheduled, the kernel notices that mm is NULL and keeps the previous process’s address space loaded.</li>
+<li>The kernel then updates the <code>active_mm</code> field of the kernel thread’s process descriptor to refer to the previous process’s memory descriptor.</li>
+<li>The kernel thread can then use the previous process’s page tables to access kernel memory. This is fine because kernel threads do not access user-space memory, they make use of only the
+information in the address space pertaining to kernel memory, which is the same for all
+processes.</li>
+</ul>
+<h2 id="virtual-memory-area">virtual memory area</h2>
+<p>The memory area structure, <code>vm_area_struct</code>, describes a single memory area over a contiguous
+interval in a given address space. In the Linux kernel, memory areas are often called virtual memory
+areas (abbreviated VMAs).</p>
+<ul>
+<li>Each VMA structure can represent different types of memory areas, for example, memory-mapped files or the process’s user-space stack or the process's heap area.</li>
+<li>Each VMA possesses certain properties, such as permissions and a set of associated operations.</li>
+</ul>
+<p>Below figure describes the relationship between the different address space related structures:</p>
+<p><img src="images/2022-02-18-17-41-22.png" alt=""></p>
+<p>It is defined in <code>&lt;linux/mm_types.h&gt;</code>.</p>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">vm_area_struct</span> {</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mm_struct</span> *<span class="hljs-title">vm_mm</span>;</span> <span class="hljs-comment">/* associated mm_struct */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> vm_start; <span class="hljs-comment">/* VMA start, inclusive */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> vm_end; <span class="hljs-comment">/* VMA end , exclusive */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">vm_area_struct</span> *<span class="hljs-title">vm_next</span>;</span> <span class="hljs-comment">/* list of VMA’s */</span>
+  <span class="hljs-keyword">pgprot_t</span> vm_page_prot; <span class="hljs-comment">/* access permissions */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> vm_flags; <span class="hljs-comment">/* flags */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rb_node</span> <span class="hljs-title">vm_rb</span>;</span> <span class="hljs-comment">/* VMA’s node in the tree */</span>
+  <span class="hljs-class"><span class="hljs-keyword">union</span> {</span> <span class="hljs-comment">/* links to address_space-&gt;i_mmap or i_mmap_nonlinear */</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> {</span>
+      <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">list</span>;</span>
+      <span class="hljs-keyword">void</span> *parent;
+      <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">vm_area_struct</span> *<span class="hljs-title">head</span>;</span>
+    } vm_set;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">prio_tree_node</span> <span class="hljs-title">prio_tree_node</span>;</span>
+  } shared;
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">anon_vma_node</span>;</span> <span class="hljs-comment">/* anon_vma entry */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">anon_vma</span> *<span class="hljs-title">anon_vma</span>;</span> <span class="hljs-comment">/* anonymous VMA object */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">vm_operations_struct</span> *<span class="hljs-title">vm_ops</span>;</span> <span class="hljs-comment">/* associated ops */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> vm_pgoff; <span class="hljs-comment">/* offset within file */</span>
+  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file</span> *<span class="hljs-title">vm_file</span>;</span> <span class="hljs-comment">/* mapped file, if any */</span>
+  <span class="hljs-keyword">void</span> *vm_private_data; <span class="hljs-comment">/* private data */</span>
+};
+</div></code></pre>
+<ul>
+<li>The <code>vm_mm</code> field points to this VMA’s associated <code>mm_struct</code>.</li>
+<li>The VMA exists over the interval [<code>vm_start</code>, <code>vm_end</code>).</li>
+<li>The <code>vm_flags</code> field contains bit flags, defined in <code>&lt;linux/mm.h&gt;</code>.
+<ul>
+<li>Unlike permissions associated with a specific physical page, the VMA flags specify behavior for
+which the <strong>kernel is responsible</strong>, not the hardware.</li>
+<li>vm_flags contains information that relates to <strong>the whole area</strong> (ie. all pages in the area)</li>
+</ul>
+</li>
+</ul>
+<p>Some of the important flags</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect on the VMA and Its Pages</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VM_READ</td>
+<td>Pages can be read from.</td>
+</tr>
+<tr>
+<td>VM_WRITE</td>
+<td>Pages can be written to.</td>
+</tr>
+<tr>
+<td>VM_EXEC</td>
+<td>Pages can be executed.</td>
+</tr>
+<tr>
+<td>VM_SHARED</td>
+<td>Pages are shared. If set, it is a a <em>shared mapping</em>, otherwise, it is a <em>private mapping</em></td>
+</tr>
+<tr>
+<td>VM_LOCKED</td>
+<td>The pages in this area are locked. Can be set by <code>mlock()</code>.</td>
+</tr>
+<tr>
+<td>VM_RESERVED</td>
+<td>This area must not be swapped out.</td>
+</tr>
+<tr>
+<td>VM_IO</td>
+<td>The area maps a device’s I/O space. This field is typically set by device drivers when mmap() is called on their I/O space.</td>
+</tr>
+<tr>
+<td>VM_SEQ_READ</td>
+<td>The pages seem to be accessed sequentially.</td>
+</tr>
+<tr>
+<td>VM_RAND_READ</td>
+<td>The pages seem to be accessed randomly. These flags are set via the madvise() system call with the MADV_SEQUENTIAL and MADV_RANDOM flags, respectively</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Lists and Trees of Memory Areas</strong></p>
+<p>memory areas are accessed via both the <code>mmap</code> and the <code>mm_rb</code> fields of the
+memory descriptor <code>struct mm_struct</code>.</p>
+<p>The first field, <code>mmap</code>, links together all the memory area objects in a singly linked list, by <code>vm_next</code> field. The areas are sorted by ascending address in the list.</p>
+<ul>
+<li>The linked list is used when every node needs to be traversed.</li>
+</ul>
+<p>The second field, <code>mm_rb</code>, links together all the memory area objects in a red-black tree, by <code>vm_rb</code> field. The root of the red-black tree is <code>mm_rb</code> in <code>mm_struct</code>.</p>
+<ul>
+<li>The red-black tree is used when locating a specific memory area in the address space.</li>
+</ul>
+<h3 id="procpidmaps">/proc/&lt;pid&gt;/maps</h3>
+<p>The output from /proc/&lt;pid&gt;/maps lists the memory areas in this process’s address
+space. Each of the memory areas associated with the process corresponds to a
+vm_area_struct structure.</p>
+<p>Example:</p>
+<pre><code class="language-bash"><div>rlove@wolf:~$ cat /proc/1426/maps
+00e80000-00faf000 r-xp 00000000 03:01 208530 /lib/tls/libc-2.5.1.so
+00faf000-00fb2000 rw-p 0012f000 03:01 208530 /lib/tls/libc-2.5.1.so
+00fb2000-00fb4000 rw-p 00000000 00:00 0
+08048000-08049000 r-xp 00000000 03:03 439029 /home/rlove/src/example
+08049000-0804a000 rw-p 00000000 03:03 439029 /home/rlove/src/example
+40000000-40015000 r-xp 00000000 03:01 80276 /lib/ld-2.5.1.so
+40015000-40016000 rw-p 00015000 03:01 80276 /lib/ld-2.5.1.so
+4001e000-4001f000 rw-p 00000000 00:00 0
+bfffe000-c0000000 rwxp fffff000 00:00 0
+<span class="hljs-comment"># The data is in the form</span>
+<span class="hljs-comment"># start-end permission offset major:minor inode file</span>
+</div></code></pre>
+<ul>
+<li>The first three rows are the text section, data section, and bss of <a href="http://libc.so">libc.so</a>, the C library.</li>
+<li>The next two rows are the text and data section of our executable object.</li>
+<li>The following three rows are the text section, data section, and bss for <a href="http://ld.so">ld.so</a>, the dynamic linker.</li>
+<li>The last row is the process’s stack.</li>
+</ul>
+<p>Note:</p>
+<ul>
+<li>the text sections are all readable and executable</li>
+<li>the data section and bss (which both contain global variables) are marked readable and writable, but not executable.</li>
+<li>The stack is, naturally, readable, writable, and executable</li>
+<li>the memory areas without a mapped file on device 00:00 and inode zero. This is zero page. as soon as the process writes to this data, a copy is made (à la copyon- write) and the value updated from zero.</li>
+</ul>
+<h2 id="mmap-kernel-internals">mmap() Kernel Internals</h2>
+<p>The do_mmap()function is used by the kernel to create a new linear address interval (ie. VMA).</p>
+<ul>
+<li>if the created address interval is adjacent to an existing address interval, and if they share the same permissions, the two intervals are merged into one.</li>
+<li>If this is not possible, a new <code>vm_area_struct</code> structure is allocated from the
+<code>vm_area_cachep</code> slab cache, and the new memory area is added to the address space’s
+linked list and red-black tree of memory areas via the <code>vma_link()</code> function. the
+<code>total_vm</code> field in the memory descriptor is updated too.</li>
+</ul>
+<p>The <code>do_mmap()</code> function is declared in <code>&lt;linux/mm.h&gt;</code>:</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> <span class="hljs-title">do_mmap</span><span class="hljs-params">(struct file *file, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> addr,
+                      <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> len, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> prot,
+                      <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> flag, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> offset)</span>
+</span></div></code></pre>
+<p>This function maps the file specified by file at offset offset for length len.The
+file parameter can be NULL and offset can be zero, in which case the mapping will not
+be backed by a file. In that case, this is called an <em>anonymous mapping</em>. If a file and offset are
+provided, the mapping is called a <em>file-backed mapping</em>.</p>
+<p>The prot and flags parameters are defined in &lt;asm/mman.h&gt;, similar to user-space mmap().</p>
+<p>The <code>do_mmap()</code> functionality is exported to user-space via the <code>mmap2()</code> system call. The C library call <code>mmap()</code> calls <code>mmap2()</code> system call.</p>
+<h2 id="page-tables">Page Tables</h2>
+<p>When an application accesses a virtual memory address, it must first be converted to a physical address before the processor can resolve the request. Performing this lookup is done via page tables. <strong>Page tables are stored in main memory</strong> and must be properly initialized by the kernel before enabling the paging unit.</p>
+<p>In Linux, the page tables consist of three levels [1]. The multiple levels enable a sparsely
+populated address space, even on 64-bit machines. In most architectures, page table lookups are handled (at least to some degree) by hardware. The kernel must set things up, however, in such a way that the hardware is happy and can do its thing.</p>
+<p><img src="images/2022-02-18-13-48-41.png" alt=""></p>
+<blockquote>
+<p>[1] This is not true any more. Up to version 2.6.10, the Linux paging model consisted of three paging levels. Starting with version 2.6.11, a four-level paging model has been adopted with additional PUD (page upper directory) level.</p>
+</blockquote>
+<p><img src="images/2022-02-27-12-59-07.png" alt=""></p>
+<p>Different architectures need to emulate the same level of page tables. For example, on the x86 without PAE enabled, only two page table levels are available. The Page Middle Directory (PMD) is defined to be of size 1 and “folds back” directly onto the Page Global Directory (PGD) which is optimised out at compile time.</p>
+<p>为什么64位系统的页表每级占9位呢？大部分64位处理器依然使用4KB作为默认的页大小，而64位系统中，每级页表的每个entry的大小为8个字节，如果index为9位，则每个页表的大小也刚好是4KB。</p>
+<p><strong>Each process has its own page tables</strong> (threads share them). The <code>pgd</code> field of the memory descriptor <code>mm_struct</code> points to the process’s <em>Page Global Directory (PGD)</em>. Manipulating and traversing page tables requires the <code>page_table_lock</code>, also a field of <code>mm_struct</code>.</p>
+<ul>
+<li>On the x86, the process page table is loaded by copying <code>mm_struct→pgd</code> into the <code>cr3</code> register which has the side effect of flushing the TLB. In fact this is how the function <code>__flush_tlb()</code> is implemented in the architecture dependent code.</li>
+</ul>
+<p><strong>page tage descriptor</strong></p>
+<p>Page table data structures (page table descriptor) are quite architecture-dependent and thus are defined in <code>&lt;asm/page.h&gt;</code>.</p>
+<p><img src="images/2022-02-27-22-45-55.png" alt=""></p>
+<p>Some of the fields in page table descriptor:<br></p>
+<ul>
+<li><em><code>Present</code></em> flag: If it is set, the Page Table is contained in main memory; If an adress translation is needed when <code>Present</code> field is cleared, the paging unit generates exception 14: the <em>page fault</em> exception.</li>
+<li><em><code>Read/Write</code></em> flag: Contains the access right (Read/Write or Read) of the page or of the Page Table</li>
+<li><em><code>User/Supervisor</code></em> flag: Contains the privilege level required to access the page or Page Table. When this flag is 0, the page can be addressed only when the CPL is less than 3, ie. when the processor is in Kernel mode.</li>
+<li>PCD和PWT和cache属性相关：
+<ul>
+<li>PCD（Page Cache Disabled）- 页表既然是放在普通内存中的，自然也可以被缓存到普通cache中。在x86处理器中，CR3寄存器和每级页表的entry的PCD位，可以控制该entry对应的下级页表（对于PTE对应的就是page）是否需要被缓存到普通cache中。置为1表示disable，即该page中的内容是不可以被cache的。如果置为0（enable），还要看CR0寄存器中的CD位这个总控开关是否也是0。</li>
+<li>PWT （Page Write Through）- 置为1表示该page对应的cache部分采用write through的方式，否则采用write back。</li>
+</ul>
+</li>
+<li>A（Access） - 当这个page被访问（读/写）过后，硬件将该位置1，TLB只会缓存access的值为1的page对应的映射关系。软件可将该位置0，然后对应的TLB将会被flush掉。这样，软件可以统计出每个page被访问的次数，作为内存不足时，判断该page是否应该被回收的参考。</li>
+<li><em><code>Dirty</code></em> flag: It is set each time a write operation is performed on the page frame. 这个标志位只对file backed的page有意义，对anonymous的page是没有意义的。当page被写入后，硬件将该位置1，表明该page的内容比外部disk/flash对应部分要新，当系统内存不足，要将该page回收的时候，需首先将其内容flush到外部存储。之后软件将该标志位清0。</li>
+<li>G （Global）- 主要是用于context switch的时候不用flush掉kernel对应的TLB，所以这个标志位在TLB entry中也是存在的。</li>
+<li>PAT - used in page directory entry (PDE), 1 means large page, PDE points to large page directly.</li>
+</ul>
+<h2 id="tlb"><a href="cache.html#tlb">TLB</a></h2>
+<h2 id="page-fault-handler-kernel-implementation">Page Fault Handler Kernel Implementation</h2>
+<p>The page fault handler is defined in <code>arch/x86/mm/fault.c</code></p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">do_page_fault</span><span class="hljs-params">(struct pt_regs *regs, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> error_code)</span>
+</span></div></code></pre>
+<ul>
+<li>The regs address of a pt_regs structure containing the values of the microprocessor
+registers when the exception occurred.</li>
+<li>A 3-bit error_code:
+<ul>
+<li>If bit 0 is clear, the exception was caused by an access to a page that is not present, otherwise, the exception was caused by an invalid access right.</li>
+<li>If bit 1 is clear, the exception was caused by a read or execute access; if set, by a write access.</li>
+<li>If bit 2 is clear, the exception occurred while the processor was in Kernel Mode; otherwise, in User Mode.</li>
+</ul>
+</li>
+</ul>
+<p>The page fault handler in Linux is expected to recognise and act on a number of different types of page faults listed below.</p>
+<table>
+<thead>
+<tr>
+<th>Exception</th>
+<th>Type</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Region valid but page not allocated</td>
+<td>Minor</td>
+<td>Allocate a page frame from the physical page allocator</td>
+</tr>
+<tr>
+<td>Region not valid but is beside an expandable region like the stack</td>
+<td>Minor</td>
+<td>Expand the region and allocate a page</td>
+</tr>
+<tr>
+<td>Page swapped out but present in swap cache</td>
+<td>Minor</td>
+<td>Re-establish the page in the process page tables and drop a reference to the swap cache</td>
+</tr>
+<tr>
+<td>Page swapped out to backing storage</td>
+<td>Major</td>
+<td>Find where the page with information stored in the PTE and read it from disk</td>
+</tr>
+<tr>
+<td>Page write when marked read-only</td>
+<td>Minor</td>
+<td>If the page is a COW page, make a copy of it, mark it writable and assign it to the process. If it is in fact a bad write, send a <code>SIGSEGV</code> signal</td>
+</tr>
+<tr>
+<td>Region is invalid or process has no permissions to access</td>
+<td>Error</td>
+<td>Send a <code>SEGSEGV</code> signal to the process</td>
+</tr>
+<tr>
+<td>Fault occurred in the kernel portion address space</td>
+<td>Minor</td>
+<td>If the fault occurred in the <code>vmalloc</code> area of the address space, the current process page tables are updated against the master page table held by <code>init_mm</code>. This is the only valid kernel page fault that may occur</td>
+</tr>
+<tr>
+<td>Fault occurred in the userspace region while in kernel mode</td>
+<td>Error</td>
+<td>If a fault occurs, it means a kernel system did not copy from userspace properly and caused a page fault. This is a kernel bug which is treated quite severely.</td>
+</tr>
+</tbody>
+</table>
+<p><img src="images/2022-02-16-18-44-21.png" alt=""></p>
+<p><strong>The Fix-up Code</strong></p>
+<p>If the exception occurred in Kernel Mode (bit 2 of error_code is clear), there are still
+two alternatives:</p>
+<ul>
+<li>The exception occurred while using some linear address that has been passed to the kernel as a parameter of a system call.</li>
+<li>The exception is due to a real kernel bug.</li>
+</ul>
+<p>In order to differentiate these two cases, Kernel puts the address of each kernel instruction that accesses the process address space into a structure called the <em>exception table</em>.</p>
+<p>Each entry of an exception table is an exception_table_entry structure that has two
+fields:</p>
+<ul>
+<li><code>insn</code>: The linear address of an instruction that accesses the process address space</li>
+<li><code>fixup</code>:  The address of the assembly language code to be invoked when a Page Fault
+exception triggered by the instruction located at <code>insn</code> occurs</li>
+</ul>
+<p>When a Page Fault exception occurs in Kernel Mode, the do_page_fault( ) handler examines the exception table: if it includes the address of the instruction that triggered the exception, the error is caused by a bad system call parameter; otherwise, it is caused by a more serious bug.</p>
+<ul>
+<li>In the first case, kernel jumps to a &quot;fix-up code&quot;, which typically sends a SIGSEGV signal to
+current or terminates a system call handler with a proper error code</li>
+<li>In the second case, the function prints a complete dump of the CPU registers and of
+the Kernel Mode stack both on the console and on a system message buffer; it then
+kills the current process by invoking the do_exit( ) function. This is
+the so-called <strong><code>Kernel oops</code></strong> error</li>
+</ul>
+<p><strong>Handle a valid page fault</strong></p>
+<p>Once the exception handler has decided the fault is a valid page fault in a valid memory region, the architecture-independent function <code>handle_mm_fault()</code> takes over.</p>
+<ul>
+<li>It allocates the required page table entries if they do not already exist</li>
+<li>then calls <code>handle_pte_fault()</code>
+<ul>
+<li>If no PTE has been allocated (<code>pte_none()</code> returned true), <code>do_no_page()</code> is called which handles <em><strong>Demand Allocation</strong></em>.</li>
+<li>If PTE exists, it is a page that has been swapped out to disk and <code>do_swap_page()</code> performs <em><strong>Demand Paging</strong></em>.</li>
+<li>If the PTE is write protected, then <code>do_wp_page()</code> is called as the page is a <em>Copy-On-Write (COW)</em> page. A COW page is one which is shared between multiple processes (usually a parent and child after COW <code>fork()</code>) until a write occurs after which a private copy is made for the writing process. A COW page is recognised because the VMA for the region is marked writable even though the individual PTE is marked as read-only (by <code>fork()</code>)</li>
+</ul>
+</li>
+</ul>
+<p><strong>Demand Allocation</strong></p>
+<p>When a process accesses a page for the very first time, the page has to be allocated and possibly filled with data by the <code>do_no_page()</code> function.</p>
+<p>Handling anonymous pages:</p>
+<ul>
+<li>If <code>vm_area_struct→vm_ops</code> field is not filled or a nopage() function is not supplied, the function <code>do_anonymous_page()</code> is called to handle an anonymous access.</li>
+<li>the first read case: the system-wide <em>empty_zero_page</em>, which is just a page of zeros, is mapped for the PTE and the PTE is write protected.
+<ul>
+<li>The write protection is set so that another page fault will occur if the process writes to the page.</li>
+</ul>
+</li>
+<li>the first write case: the page <code>alloc_page()</code> is called to allocate a free page. When success, the Resident Set Size (RSS) field in the mm_struct will be incremented, the page is then inserted on the LRU lists so it may be reclaimed later, finally the page table entries is updated.</li>
+</ul>
+<blockquote>
+<p>对于anonymous page，用户空间使用malloc()进行内存申请时（对应底层的实现是mmap或者brk），内核并不会立刻为其分配物理内存，而只是为请求的进程的rbtree管理的vma信息中记录（添加或更改）诸如内存范围和标志之类的信息。
+只有当内存被真正使用，触发page fault，才会真正分配物理页面和对应的页表项，即demand alloction.</p>
+</blockquote>
+<p>Handling file/device backed pages:</p>
+<ul>
+<li>If backed by a file or device, a <code>nopage()</code> function will be provided by different fileysstem / device driver. In the file-backed case, the function <code>filemap_nopage()</code> is frequently used for allocating a page and reading a page-sized amount of data from disk.</li>
+<li>One successful page allocation, a check is then made with <code>pte_none()</code> to ensure there is not a PTE already in the page table to prevent two faults occur for the same page in SMP. If no race, the PTE is assigned and statistics updated.</li>
+</ul>
+<p><strong>Demand Paging</strong></p>
+<p>If a PTE exists, but the page is swapped out to backing storage, the function <code>do_swap_page()</code> is responsible for reading the page back in. The information needed to find it is stored within the PTE itself.</p>
+<p><img src="images/2022-03-01-09-19-02.png" alt=""></p>
+<p>As pages may be shared between multiple processes, they can not always be swapped out immediately. Instead, when a page is swapped out, it is placed within the swap cache.</p>
+<ul>
+<li>A <em>Reverse Mapping (RMAP)</em> introduced in v2.6 may speed up looking up a page in all processes' PTE.</li>
+</ul>
+<p>With the swap cache existing, it is possible that when a fault occurs it still exists in the swap cache. If it is, the reference count to the page is simply increased and it is placed within the process page tables again and it is as a minor page fault.</p>
+<p>If the page exists only on disk <code>swapin_readahead()</code> is called which reads in the requested page and a number of pages after it. The number of pages read in is 2^<em>page_cluster</em> (<em>page_cluster</em> defined in <code>mm/swap.c</code>)</p>
+
+        <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+        
+    </body>
+    </html>

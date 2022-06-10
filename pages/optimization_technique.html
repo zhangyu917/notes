@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Misc Optimization Techniques</title>
+        <style>
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Caligraphic;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Caligraphic;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Fraktur;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Fraktur;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype");font-weight:700;font-style:italic}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype");font-weight:400;font-style:italic}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Math;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype");font-weight:700;font-style:italic}@font-face{font-family:KaTeX_Math;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype");font-weight:400;font-style:italic}@font-face{font-family:"KaTeX_SansSerif";src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:"KaTeX_SansSerif";src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype");font-weight:400;font-style:italic}@font-face{font-family:"KaTeX_SansSerif";src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Script;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size1;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size2;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size3;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size4;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Typewriter;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype");font-weight:400;font-style:normal}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto;border-color:currentColor}.katex *{-ms-high-contrast-adjust:none!important}.katex .katex-version:after{content:"0.13.0"}.katex .katex-mathml{position:absolute;clip:rect(1px,1px,1px,1px);padding:0;border:0;height:1px;width:1px;overflow:hidden}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-weight:700;font-style:italic}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{display:inline-table;table-layout:fixed;border-collapse:collapse}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;vertical-align:bottom;position:relative}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;vertical-align:bottom;font-size:1px;width:2px;min-width:2px}.katex .vbox{display:inline-flex;flex-direction:column;align-items:baseline}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{width:0;max-width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{display:inline-block;width:100%;border-bottom-style:solid}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{width:0;position:relative}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{display:inline-block;border:0 solid;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{display:inline-block;width:100%;border-bottom-style:solid}.katex .hdashline{display:inline-block;width:100%;border-bottom-style:dashed}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{display:block;position:absolute;width:100%;height:inherit;fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex svg path{stroke:none}.katex img{border-style:none;min-width:0;min-height:0;max-width:none;max-height:none}.katex .stretchy{width:100%;display:block;position:relative;overflow:hidden}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{width:100%;position:relative;overflow:hidden}.katex .halfarrow-left{position:absolute;left:0;width:50.2%;overflow:hidden}.katex .halfarrow-right{position:absolute;right:0;width:50.2%;overflow:hidden}.katex .brace-left{position:absolute;left:0;width:25.1%;overflow:hidden}.katex .brace-center{position:absolute;left:25%;width:50%;overflow:hidden}.katex .brace-right{position:absolute;right:0;width:25.1%;overflow:hidden}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{box-sizing:border-box;border:.04em solid}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{box-sizing:border-content;border-top:.049em solid;border-right:.049em solid;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{counter-increment:katexEqnNo;content:"(" counter(katexEqnNo) ")"}.katex .mml-eqn-num:before{counter-increment:mmlEqnNo;content:"(" counter(mmlEqnNo) ")"}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;position:absolute;left:calc(50% + .3em);text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{text-align:left;padding-left:2em}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        
+        
+        
+    </head>
+    <body class="vscode-body vscode-light">
+        <ul>
+<li><a href="#misc-optimization-techniques">Misc Optimization Techniques</a>
+<ul>
+<li><a href="#argument-passing">Argument passing</a>
+<ul>
+<li><a href="#argument-to-store-data">Argument to store data</a></li>
+</ul>
+</li>
+<li><a href="#break-dependency-chain">Break dependency chain</a>
+<ul>
+<li><a href="#break-dependency-on-flag-register">break dependency on flag register</a></li>
+<li><a href="#loops-can-have-every-long-dependency-chains">Loops can have every long dependency chains.</a></li>
+</ul>
+</li>
+<li><a href="#use-lookup-table">Use lookup table</a>
+<ul>
+<li><a href="#lookup-table-for-branches">Lookup table for branches</a></li>
+<li><a href="#lookup-table-for-switches">Lookup table for switches</a></li>
+</ul>
+</li>
+<li><a href="#bounds-checking">Bounds Checking</a></li>
+<li><a href="#using-integer-operations-for-fp">Using integer operations for FP</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="misc-optimization-techniques">Misc Optimization Techniques</h1>
+<h2 id="argument-passing">Argument passing</h2>
+<p>(The art of writing efficient programs chapter 9)</p>
+<ul>
+<li>Use reference or const reference if the function doesn’t need a copy of the argument.</li>
+<li>If the function needs a copy of argument, and if argument type is move-enabled, pass-by-value works for both lvalue (a copy is moved) argument and rvalue argument (a move is used)</li>
+</ul>
+<p>A technique to avoid copying large elements - create and sort a vector of pointers without moving the original vector elements.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print_sorted</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt;&amp; v)</span> </span>{
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-keyword">const</span> T*&gt; vp; vp.reserve(v.size());
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> T&amp; x: v) vp.push_back(&amp;x);
+        <span class="hljs-built_in">std</span>::sort(vp.begin(), vp.end(),
+            [](<span class="hljs-keyword">const</span> T* a, <span class="hljs-keyword">const</span> T* b) { <span class="hljs-keyword">return</span> *a &lt; *b;});
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> T* x: vp) 
+        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; *x &lt;&lt; “\n”;
+}
+</div></code></pre>
+<h3 id="argument-to-store-data">Argument to store data</h3>
+<ul>
+<li>Use const reference to copy lvalue</li>
+<li>Use move constructor to move rvalue</li>
+<li>Use pass-by-value only if argument if movable
+<ul>
+<li>If the argument is an lvalue, a copy is made to construct the parameter v, then moved into the class.</li>
+<li>If the argument is an rvalue, it is moved into the parameter v and again moved into the class.</li>
+<li>If the object is not movable (so they are copied instead), we end up doing two copies instead of one.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span> {</span>
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-keyword">int</span>&gt; v_;
+    C(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-keyword">int</span>&gt; v) : v_(<span class="hljs-built_in">std</span>::move(v))
+    { … <span class="hljs-keyword">do</span> <span class="hljs-keyword">not</span> use v here!!! … }
+};
+</div></code></pre>
+<h2 id="break-dependency-chain">Break dependency chain</h2>
+<p>In example below, There is a dependency chain where each addition has to wait for the result of the preceding one.</p>
+<ul>
+<li>You cannot assume that an optimizing compiler will change the code to the right because of the potential floating point precision loss, you have to set the parentheses manually.</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-comment">// unoptimzied</span>
+<span class="hljs-keyword">float</span> a, b, c, d, y;
+y = a + b + c + d;
+<span class="hljs-comment">// optimized</span>
+<span class="hljs-keyword">float</span> a, b, c, d, y;
+y = (a + b) + (c + d);
+</div></code></pre>
+<h3 id="break-dependency-on-flag-register">break dependency on flag register</h3>
+<p>Setting a register to zero: <code>XOR EAX,EAX</code> or <code>SUB EAX,EAX</code> can be used to break dependences on the flags.
+You cannot use CLC for breaking dependencies on the carry flag.</p>
+<h3 id="loops-can-have-every-long-dependency-chains">Loops can have every long dependency chains.</h3>
+<p>You can improve the performance dramatically by unrolling the loop and splitting the dependency chain in two.</p>
+<p>In example below, the two summation variables sum1 and sum2 are called accumulators. Separate long dependency into separate accumulators to take advantage of pipelining</p>
+<ul>
+<li>The optimal number of accumulators for floating point addition and multiplication may be three or four, depending on the CPU.</li>
+<li>It can be theoretically calculated as the latency of the instruction (in this case floating point addition), divided by the reciprocal throughput.</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-comment">// unoptimzied</span>
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> size = <span class="hljs-number">100</span>;
+<span class="hljs-keyword">float</span> <span class="hljs-built_in">list</span>[size], sum = <span class="hljs-number">0</span>; <span class="hljs-keyword">int</span> i;
+<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; size; i++) 
+         sum += <span class="hljs-built_in">list</span>[i];
+<span class="hljs-comment">// optimized</span>
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> size = <span class="hljs-number">100</span>;
+<span class="hljs-keyword">float</span> <span class="hljs-built_in">list</span>[size], sum1 = <span class="hljs-number">0</span>, sum2 = <span class="hljs-number">0</span>; <span class="hljs-keyword">int</span> i;
+<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; size; i += <span class="hljs-number">2</span>) {
+    sum1 += <span class="hljs-built_in">list</span>[i];
+    sum2 += <span class="hljs-built_in">list</span>[i+<span class="hljs-number">1</span>];
+}
+sum1 += sum2;
+</div></code></pre>
+<h2 id="use-lookup-table">Use lookup table</h2>
+<p>This implementation uses a lookup table instead of calculating the value each time the function is called.</p>
+<ul>
+<li>Replacing a function with a lookup table is advantageous in most cases where the number of possible inputs is limited</li>
+<li>The table should be declared const in order to enable constant propagation and other optimizations.</li>
+<li>Table lookup cannot be vectorized with the current instruction set. Do not use lookup tables if this prevents a faster vectorized code.</li>
+<li>If caching is a problem (static data are likely to be scattered around at different memory addresses), then it may be useful to copy the table from static memory to stack memory.</li>
+</ul>
+<p>In below example, the compiler will store the table in static memory and insert a code that copies the table to stack memory at the start of the function.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Example 14.1c</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">CriticalInnerFunction</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-comment">// Table of factorials:</span>
+    <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> FactorialTable[<span class="hljs-number">13</span>] = {<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">6</span>, <span class="hljs-number">24</span>, <span class="hljs-number">120</span>, <span class="hljs-number">720</span>,
+        <span class="hljs-number">5040</span>, <span class="hljs-number">40320</span>, <span class="hljs-number">362880</span>, <span class="hljs-number">3628800</span>, <span class="hljs-number">39916800</span>, <span class="hljs-number">479001600</span>};
+    ...
+    <span class="hljs-keyword">int</span> i, a, b;
+    <span class="hljs-comment">// Critical innermost loop:</span>
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">1000</span>; i++) {
+        ...
+        a = FactorialTable[b];
+        ...
+    }
+}
+</div></code></pre>
+<h3 id="lookup-table-for-branches">Lookup table for branches</h3>
+<p>table lookup can be used in any situation where a program chooses between two or more constants.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// unoptimized</span>
+<span class="hljs-keyword">float</span> a; <span class="hljs-keyword">int</span> b;
+a = (b == <span class="hljs-number">0</span>) ? <span class="hljs-number">1.0f</span> : <span class="hljs-number">2.5f</span>;
+
+<span class="hljs-comment">// optimized</span>
+<span class="hljs-keyword">float</span> a; <span class="hljs-keyword">int</span> b;
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">float</span> OneOrTwo5[<span class="hljs-number">2</span>] = {<span class="hljs-number">1.0f</span>, <span class="hljs-number">2.5f</span>};
+a = OneOrTwo5[b &amp; <span class="hljs-number">1</span>];
+
+<span class="hljs-comment">// optimized alternative</span>
+a = OneOrTwo5[b!=<span class="hljs-number">0</span>];  <span class="hljs-comment">// only efficient for int b</span>
+
+<span class="hljs-comment">// optimized alternative2</span>
+a = <span class="hljs-number">1.0f</span> + b * <span class="hljs-number">1.5f</span>; <span class="hljs-comment">// only efficient for float b</span>
+</div></code></pre>
+<p>Writing <code>a = OneOrTwo5[b!=0];</code> will also work, although slightly less efficiently.</p>
+<ul>
+<li>However, not for float/double. compilers implement <code>OneOrTwo5[b!=0]</code> as <code>OneOrTwo5[(b!=0) ? 1 : 0]</code>, so the branch is still there.</li>
+</ul>
+<p>The solution <code>a = 1.0f + b * 1.5f;</code> is efficient when b is a float, but not if b is an integer because the integer-to-float conversion takes more time than the table lookup.</p>
+<p>An example:</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f2</span><span class="hljs-params">(<span class="hljs-keyword">bool</span> b, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> x, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>&amp; s)</span> </span>{  <span class="hljs-keyword">if</span> (b) s += x; }
+<span class="hljs-comment">//Can be optmized with </span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f2</span><span class="hljs-params">(<span class="hljs-keyword">bool</span> b, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> x, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>&amp; s)</span> </span>{  s += b*x; }
+</div></code></pre>
+<h3 id="lookup-table-for-switches">Lookup table for switches</h3>
+<p>Lookup tables are particular advantageous as replacements for switch statements because switch statements often suffer from poor branch prediction.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Unoptimized</span>
+<span class="hljs-comment">// Example 14.3a</span>
+<span class="hljs-keyword">int</span> n;
+<span class="hljs-keyword">switch</span> (n) {
+    <span class="hljs-keyword">case</span> <span class="hljs-number">0</span>:
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Alpha&quot;</span>); <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-number">1</span>:
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Beta&quot;</span>); <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-number">2</span>:
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Gamma&quot;</span>); <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-number">3</span>:
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Delta&quot;</span>); <span class="hljs-keyword">break</span>;
+}
+<span class="hljs-comment">// optimized</span>
+<span class="hljs-comment">// Example 14.3b</span>
+<span class="hljs-keyword">int</span> n;
+<span class="hljs-comment">// The declaration of the table has const twice because both the pointers and</span>
+<span class="hljs-comment">// the texts they point to are constant.</span>
+<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> * <span class="hljs-keyword">const</span> Greek[<span class="hljs-number">4</span>] = {
+    <span class="hljs-string">&quot;Alpha&quot;</span>, <span class="hljs-string">&quot;Beta&quot;</span>, <span class="hljs-string">&quot;Gamma&quot;</span>, <span class="hljs-string">&quot;Delta&quot;</span>
+};
+<span class="hljs-keyword">if</span> ((<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>)n &lt; <span class="hljs-number">4</span>) { <span class="hljs-comment">// Check that index is not out of range</span>
+    <span class="hljs-built_in">printf</span>(Greek[n]);
+}
+</div></code></pre>
+<h2 id="bounds-checking">Bounds Checking</h2>
+<p>The two comparisons i &lt; 0 and i &gt;= size can be replaced by a single comparison:
+A possible negative value of i will appear as a large positive number when i is interpreted as an unsigned integer and this will trigger the error condition.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// unoptimized</span>
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> size = <span class="hljs-number">16</span>; <span class="hljs-keyword">int</span> i;
+<span class="hljs-keyword">if</span> (i &lt; <span class="hljs-number">0</span> || i &gt;= size) {
+    <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">&quot;Error: Index out of range&quot;</span>;
+}
+<span class="hljs-comment">// optimized</span>
+<span class="hljs-keyword">if</span> ((<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>)i &gt;= (<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>)size) {
+     <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">&quot;Error: Index out of range&quot;</span>;
+}
+</div></code></pre>
+<p>This can be applied in general whether an integer is within a certain interval.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// unoptimized</span>
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> min = <span class="hljs-number">100</span>, max = <span class="hljs-number">110</span>; <span class="hljs-keyword">int</span> i;
+<span class="hljs-keyword">if</span> (i &gt;= min &amp;&amp; i &lt;= max) { ...
+<span class="hljs-comment">// optimized</span>
+<span class="hljs-keyword">if</span> ((<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>)i - (<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>)min &lt;= (<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>)(max - min))
+{ ...
+</div></code></pre>
+<p>There is an even faster way to limit the range of an integer if the length of the desired interval is a power of 2.</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">float</span> <span class="hljs-built_in">list</span>[<span class="hljs-number">16</span>]; <span class="hljs-keyword">int</span> i;
+...
+<span class="hljs-built_in">list</span>[i &amp; <span class="hljs-number">15</span>] += <span class="hljs-number">1.0f</span>;
+</div></code></pre>
+<p>The value of <code>i &amp; 15</code> is guaranteed to be in the interval from 0 to 15. If i is outside this interval, for example i = 18, then the &amp; operator (bitwise and) will cut off the binary value of i to four bits, and the result will be 2. The result is the same as i modulo 16.</p>
+<p>The <code>&amp;</code> operator is also useful for testing multiple conditions in a single operation.</p>
+<p>By giving each constant a value that is a power of 2, the expression <code>(Tuesday | Wednesday | Friday)</code> in example 14.7b is converted by the compiler to the value 0x2C so that the if condition can be calculated by a single <code>&amp;</code> operation, which is very fast.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Example 14.7a. Testing multiple conditions</span>
+<span class="hljs-keyword">enum</span> Weekdays {
+    Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
+};
+Weekdays Day;
+<span class="hljs-keyword">if</span> (Day == Tuesday || Day == Wednesday || Day == Friday) {
+    DoThisThreeTimesAWeek();
+}
+<span class="hljs-comment">// optimized</span>
+<span class="hljs-keyword">enum</span> Weekdays {
+    Sunday = <span class="hljs-number">1</span>, Monday = <span class="hljs-number">2</span>, Tuesday = <span class="hljs-number">4</span>, Wednesday = <span class="hljs-number">8</span>,
+    Thursday = <span class="hljs-number">0x10</span>, Friday = <span class="hljs-number">0x20</span>, Saturday = <span class="hljs-number">0x40</span>
+};
+Weekdays Day;
+<span class="hljs-keyword">if</span> (Day &amp; (Tuesday | Wednesday | Friday)) {
+    DoThisThreeTimesAWeek();
+}
+</div></code></pre>
+<h2 id="using-integer-operations-for-fp">Using integer operations for FP</h2>
+<p>The fact that the floating point format is standardized allows us to manipulate the different parts of the floating point representation directly with the use of integer operations.</p>
+<p>Couple points of below examples:</p>
+<ul>
+<li>They all use single precision double in 32 bit system.</li>
+<li>In general, it is faster to access a floating point variable as an integer if it is stored in memory, but not if it is a register variable. The union forces the variable to be stored in memory</li>
+<li>examples use unions rather than type casting of pointers because it is safer. Type casting of pointers may not work on compilers that rely on the strict aliasing, ie. specifying that pointers of different types cannot point to the same object, except for char pointers.</li>
+</ul>
+<p>We can change the sign of a floating point number simply by inverting the sign bit:</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Example 14.22</span>
+<span class="hljs-keyword">union</span> {
+    <span class="hljs-keyword">float</span> f;
+    <span class="hljs-keyword">int</span> i;
+} u;
+u.i ^= <span class="hljs-number">0x80000000</span>; <span class="hljs-comment">// flip sign bit of u.f</span>
+</div></code></pre>
+<p>We can take the absolute value by setting the sign bit to zero:</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Example 14.23</span>
+<span class="hljs-keyword">union</span> {
+    <span class="hljs-keyword">float</span> f;
+    <span class="hljs-keyword">int</span> i;
+} u;
+u.i &amp;= <span class="hljs-number">0x7FFFFFFF</span>; <span class="hljs-comment">// set sign bit to zero</span>
+</div></code></pre>
+<p>We can check if a floating point number is zero by testing all bits except the sign bit:</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Example 14.24</span>
+<span class="hljs-keyword">union</span> {
+    <span class="hljs-keyword">float</span> f;
+    <span class="hljs-keyword">int</span> i;
+} u;
+<span class="hljs-keyword">if</span> (u.i &amp; <span class="hljs-number">0x7FFFFFFF</span>) { <span class="hljs-comment">// test bits 0 - 30</span>
+    <span class="hljs-comment">// f is nonzero</span>
+}
+<span class="hljs-keyword">else</span> {
+    <span class="hljs-comment">// f is zero</span>
+}
+</div></code></pre>
+<p>We can multiply a nonzero floating point number by 2n by adding n to the exponent:</p>
+<ul>
+<li>The example does not check for overflow and works only for positive n. You can divide by 2n by subtracting n from the exponent if there is no risk of underflow.</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Example 14.25</span>
+<span class="hljs-keyword">union</span> {
+    <span class="hljs-keyword">float</span> f;
+    <span class="hljs-keyword">int</span> i;
+} u;
+<span class="hljs-keyword">int</span> n;
+<span class="hljs-keyword">if</span> (u.i &amp; <span class="hljs-number">0x7FFFFFFF</span>) { <span class="hljs-comment">// check if nonzero</span>
+    u.i += n &lt;&lt; <span class="hljs-number">23</span>; <span class="hljs-comment">// add n to exponent</span>
+}
+</div></code></pre>
+<p>The fact that the representation of the exponent is biased allows us to compare two positive floating point numbers simply by comparing them as integers:</p>
+<ul>
+<li>Example 14.26 assumes that we know that u.f and v.f are both positive. It will fail if both are negative or if one is 0 and the other is -0 (zero with sign bit set).</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Example 14.26</span>
+<span class="hljs-keyword">union</span> {
+    <span class="hljs-keyword">float</span> f;
+    <span class="hljs-keyword">int</span> i;
+} u, v;
+<span class="hljs-keyword">if</span> (u.i &gt; v.i) {
+    <span class="hljs-comment">// u.f &gt; v.f if both positive</span>
+}
+</div></code></pre>
+<p>We can convert an integer in the interval 0 &lt;= n &lt; 223 to a floating point number in the
+interval [1.0, 2.0) by setting the fraction bits:
+This method is useful for random number generators.</p>
+<pre><code class="language-C++"><div><span class="hljs-comment">// Example 14.28</span>
+<span class="hljs-keyword">union</span> {
+    <span class="hljs-keyword">float</span> f;
+    <span class="hljs-keyword">int</span> i;
+} u;
+<span class="hljs-keyword">int</span> n;
+u.i = (n &amp; <span class="hljs-number">0x7FFFFF</span>) | <span class="hljs-number">0x3F800000</span>; <span class="hljs-comment">// Now 1.0 &lt;= u.f &lt; 2.0</span>
+</div></code></pre>
+
+    </body>
+    </html>

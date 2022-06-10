@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>CPU scheduler</title>
+        <style>
+/* From extension vscode.github */
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+    display: none;
+}
+
+/* From extension vscode.markdown-math */
+@font-face{font-family:KaTeX_AMS;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Caligraphic;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Caligraphic;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Fraktur;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Fraktur;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype");font-weight:700;font-style:italic}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype");font-weight:400;font-style:italic}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Math;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype");font-weight:700;font-style:italic}@font-face{font-family:KaTeX_Math;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype");font-weight:400;font-style:italic}@font-face{font-family:"KaTeX_SansSerif";src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype");font-weight:700;font-style:normal}@font-face{font-family:"KaTeX_SansSerif";src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype");font-weight:400;font-style:italic}@font-face{font-family:"KaTeX_SansSerif";src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Script;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size1;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size2;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size3;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size4;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Typewriter;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype");font-weight:400;font-style:normal}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto;border-color:currentColor}.katex *{-ms-high-contrast-adjust:none!important}.katex .katex-version:after{content:"0.13.0"}.katex .katex-mathml{position:absolute;clip:rect(1px,1px,1px,1px);padding:0;border:0;height:1px;width:1px;overflow:hidden}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-weight:700;font-style:italic}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{display:inline-table;table-layout:fixed;border-collapse:collapse}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;vertical-align:bottom;position:relative}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;vertical-align:bottom;font-size:1px;width:2px;min-width:2px}.katex .vbox{display:inline-flex;flex-direction:column;align-items:baseline}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{width:0;max-width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{display:inline-block;width:100%;border-bottom-style:solid}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{width:0;position:relative}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{display:inline-block;border:0 solid;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{display:inline-block;width:100%;border-bottom-style:solid}.katex .hdashline{display:inline-block;width:100%;border-bottom-style:dashed}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{display:block;position:absolute;width:100%;height:inherit;fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex svg path{stroke:none}.katex img{border-style:none;min-width:0;min-height:0;max-width:none;max-height:none}.katex .stretchy{width:100%;display:block;position:relative;overflow:hidden}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{width:100%;position:relative;overflow:hidden}.katex .halfarrow-left{position:absolute;left:0;width:50.2%;overflow:hidden}.katex .halfarrow-right{position:absolute;right:0;width:50.2%;overflow:hidden}.katex .brace-left{position:absolute;left:0;width:25.1%;overflow:hidden}.katex .brace-center{position:absolute;left:25%;width:50%;overflow:hidden}.katex .brace-right{position:absolute;right:0;width:25.1%;overflow:hidden}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{box-sizing:border-box;border:.04em solid}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{box-sizing:border-content;border-top:.049em solid;border-right:.049em solid;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{counter-increment:katexEqnNo;content:"(" counter(katexEqnNo) ")"}.katex .mml-eqn-num:before{counter-increment:mmlEqnNo;content:"(" counter(mmlEqnNo) ")"}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;position:absolute;left:calc(50% + .3em);text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{text-align:left;padding-left:2em}body{counter-reset:katexEqnNo mmlEqnNo}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        
+        
+        
+    </head>
+    <body class="vscode-body vscode-light">
+        <ul>
+<li><a href="#cpu-scheduler">CPU scheduler</a>
+<ul>
+<li><a href="#policies">Policies</a></li>
+<li><a href="#nice-value">nice value</a>
+<ul>
+<li><a href="#sched_reset_on_fork">SCHED_RESET_ON_FORK</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#context-switch">Context switch</a></li>
+<li><a href="#preemption">Preemption</a>
+<ul>
+<li><a href="#when-need_resched-is-set">When <em>need_resched</em> is set</a></li>
+<li><a href="#prempt_count"><em>prempt_count</em></a></li>
+<li><a href="#user-preemption">User preemption</a></li>
+<li><a href="#kernel-preemption">Kernel preemption</a></li>
+</ul>
+</li>
+<li><a href="#kernel-internals">Kernel Internals</a>
+<ul>
+<li><a href="#history">History</a></li>
+<li><a href="#designs">Designs</a></li>
+<li><a href="#completely-fair-scheduler-cfs">Completely Fair Scheduler (CFS)</a>
+<ul>
+<li><a href="#example-1-proportion-of-load">Example 1 (proportion of load)</a></li>
+<li><a href="#example-2-weighted-proportion-with-nice-value">Example 2 (weighted proportion with nice value)</a></li>
+<li><a href="#cfs-implementation">CFS Implementation</a></li>
+</ul>
+</li>
+<li><a href="#context-switch-kernel-internal">Context Switch Kernel Internal</a></li>
+<li><a href="#preempt_count-kernel-internals">preempt_count Kernel Internals</a>
+<ul>
+<li><a href="#interrupt-context">interrupt context</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="cpu-scheduler">CPU scheduler</h1>
+<p>The scheduler is the kernel component that decides which runnable thread will be executed by the CPU next. The linux uses CFS (mainly for OTHER policy).</p>
+<p>each thread has:</p>
+<ul>
+<li>policy</li>
+<li>priority (sched_priority)
+<ul>
+<li>
+<p>normal policy (SCHED_OTHER, SCHED_IDLE, SCHED_BATCH), priority is not used, always 0</p>
+</li>
+<li>
+<p>real-time policy (SCHED_FIFO, SCHED_R), priority is 1 (low) to 99 (high)</p>
+</li>
+<li>
+<p>Priority value is what kernel sees, ranges from 0 to 139</p>
+<ul>
+<li>0 -99 for real-time processes</li>
+<li>100 to 139 for normal processes (nice value -20 to 19 is mapped to this range)</li>
+<li>real-time priorities shown in <strong>RTPRIO</strong> column with <code>ps -eo rtprio</code>, &quot;-&quot; means not real-time.</li>
+</ul>
+<p><img src="images/2022-03-01-15-01-57.png" alt=""></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="policies">Policies</h3>
+<p><strong>SCHED_FIFO</strong> - set with sched_setscheduler(2)</p>
+<ul>
+<li>A SCHED_FIFO thread runs until either it is blocked by an I/O request, it is preempted by a higher priority thread, or it calls sched_yield(2). It has no timeslice.</li>
+</ul>
+<p><strong>SCHED_RR</strong> (default 100ms slice)</p>
+<ul>
+<li>threads with the same priority are scheduled round-robin style within a certain quantum, or time slice. If a SCHED_RR thread has been running for a time period equal to or longer than the time quantum (time-slice), it will be put at the end of the list for its priority.</li>
+</ul>
+<p><strong>SCHED_OTHER</strong>: Default Linux time-sharing scheduling</p>
+<h2 id="nice-value">nice value</h2>
+<ul>
+<li>for SCHED_OTHER and SCHED_BATCH</li>
+<li>The range on modern Linux, the range is -20 (high priority) to +19 (low priority), with a default of 0.</li>
+<li>It is user-space values (what shows in <strong>NI</strong> column in top or <code>ps -el</code> output)</li>
+<li>get by getpriority()
+<ul>
+<li>getpriority() system call returns range (1 low, 40 high), this is kernel priority, but it is invisible to the user because of glibc wrapper.</li>
+<li>getpriority() glibc library call returns adjusted 20-knice</li>
+<li>to convert to kernel priority: Priority_value = Nice_value + 20</li>
+</ul>
+</li>
+<li>set by setpriority(2)
+<ul>
+<li>For privileged process, it can use setpriority() to raise or lower the priority</li>
+<li>For unprivileged processes, it can raise up to RLIMIT_NICE limit, which is defined in range 1 (low) to 40 (high).  if a process’s RLIMIT_NICE soft limit is 25, then its nice value can be raised to –5.</li>
+</ul>
+</li>
+<li>For user-space processes</li>
+</ul>
+<h3 id="sched_reset_on_fork">SCHED_RESET_ON_FORK</h3>
+<p>a value that can be specified in policy when calling sched_setscheduler(). If this flag is set, then children that are created by this process using fork() do not inherit privileged scheduling policies and priorities.
+If the calling process has a realtime scheduling policy (SCHED_RR or SCHED_FIFO), the child’s policy is reset to SCHED_OTHER.
+If the process has a negative (high) nice value, the child's nice value is reset to 0.</p>
+<br>
+<h1 id="context-switch">Context switch</h1>
+<p>Cost ~1us (or more if without pinning process)</p>
+<ul>
+<li>The first thing that happens during a context switch is a switch to kernel mode, either through an explicit system call (such as write to some file or pipe) or a timer interrupt (when the kernel preempts a user thread whose time slice has expired). This requires saving the user space thread's registers and jumping into kernel code.</li>
+<li>The driver/system call runs and may change the set of ready threads by adding/removing TCB's from internal queues for the different thread priorities, eg. network card driver may have set an event or signaled a semaphore that another thread was waiting on, so that thread will be added to the ready set, or a running thread may have called sleep() and so elected to remove itself from the ready set.</li>
+<li>Next, the scheduler kicks in to figure out which thread should run next. Typically the highest-priority ready thread that is at the front of the queue for that priority. When we know which thread runs next, there's the important bookkeeping of virtual memory to take care of; the page tables of the new thread have to be loaded into memory, etc.</li>
+<li>Finally, the kernel restores the new thread's registers and cedes control back to user space.</li>
+</ul>
+<p>There are additional factors context switching time depends on; for example, on a multi-core CPU, the kernel can occasionally migrate a thread between cores because the core a thread has been previously using is occupied. While this helps utilize more cores, such switches cost more than staying on the same core (again, due to cache effects).</p>
+<p><a href="#context-switch-kernel-internal">Context Switch Kernel Internal</a></p>
+<p><strong>Voluntary Switch</strong></p>
+<p>A voluntary context switch can occur whenever a thread/process makes a system call that blocks. (task's state is changed to INTERRUPTIBLE or UNINTERRUPTIBLE)</p>
+<p><strong>Involuntary Switch</strong></p>
+<p>the kernel switches the process out due to another processs with smaller vruntime. (task's state keeps in TASK_RUNNING)</p>
+<p>Counting the switches:</p>
+<ul>
+<li>both variables are kept in <code>task_struct</code> as <code>unsigned long  nvcsw, nivcsw;</code>. Kernel code counts them by checking if current process is in TASK_RUNNING state.</li>
+<li>When user calls <code>sched_yield()</code> or kernel calls <code>cond_resched()</code> or <code>yield()</code>. These cases all count towards nr_involuntary_switches because when they call schedule(), the process is still in TASK_RUNNING state.</li>
+</ul>
+<blockquote>
+<p>yield() is not recommended. From kernel comment: If you want to use yield() to wait for something, use wait_event(). If you want to use yield() to be 'nice' for others, use cond_resched(). If you still want to use yield(), do not!</p>
+</blockquote>
+<p><strong>Showing the count</strong></p>
+<ul>
+<li>in <code>/proc/&lt;pid&gt;/sched</code>, shown as nr_voluntary_switches and nr_involuntary_switches</li>
+<li>in <code>/proc/&lt;pid&gt;/status</code>, shown as voluntary_ctxt_switches and nonvoluntary_ctxt_switches</li>
+</ul>
+<p>也可以用 pidstat -w 命令查看进程切换的每秒统计值：</p>
+<pre><code class="language-bash"><div><span class="hljs-comment"># pidstat -w 1</span>
+Linux 3.10.0-229.14.1.el7.x86_64 (bj71s060)     02/01/2018      _x86_64_       (2 CPU)
+ 
+12:05:20 PM   UID       PID   cswch/s nvcswch/s  Command
+12:05:21 PM     0      1299      0.94      0.00  httpd
+12:05:21 PM     0     27687      0.94      0.00  pidstat
+</div></code></pre>
+<p>大致而言，如果一个进程的自愿切换占多数，意味着它对CPU资源的需求不高。如果一个进程的强制切换占多数，意味着对它来说CPU资源可能是个瓶颈，这里需要排除进程频繁调用sched_yield()导致强制切换的情况。</p>
+<br>
+<h1 id="preemption">Preemption</h1>
+<p>抢占(Preemption)是指内核强行切换正在CPU上运行的进程。发生抢占的原因主要有：进程的时间片用完了，或者优先级更高的进程来争夺CPU了。</p>
+<p>抢占的过程分两步，第一步触发抢占，第二步执行抢占，这两步中间不一定是连续的，有些特殊情况下甚至会间隔相当长的时间：</p>
+<ul>
+<li>触发抢占：给正在CPU上运行的当前进程设置一个请求重新调度的标志(<code>TIF_NEED_RESCHED</code>)，仅此而已，此时进程并没有切换。</li>
+<li>执行抢占：在随后的某个时刻，内核会检查<code>TIF_NEED_RESCHED</code>标志并调用<code>schedule()</code>执行抢占。</li>
+</ul>
+<p>调度（任务切换）的发生要同时满足两个条件：能够调度（could）和需要调度（should）。前者由 per-CPU 的<code>preempt_count</code> 变量决定，即在 atomic 上下文(preempt_count != 1)不能执行调度。而后者取决于 <code>TIF_NEED_RESCHED</code> 标志位。该标志位被设定后，意味着当前有更值得（应该）运行的任务，当下一个调度时机出现时，就会检查这个标志位，并执行调度。</p>
+<p>从标记调度，到真正执行调度，以 tick 时钟中断为例，一个简略的流程示意图大致如下：</p>
+<p><img src="images/2022-03-01-18-24-55.png" alt=""></p>
+<h2 id="when-need_resched-is-set">When <em>need_resched</em> is set</h2>
+<ul>
+<li>
+<p>时钟中断处理函数会调用<code>scheduler_tick()</code>，这是调度器核心层(scheduler core)的函数，它通过调度类(scheduling class)的task_tick方法 检查进程的时间片是否耗尽，如果耗尽则触发抢占：</p>
+</li>
+<li>
+<p>当进程被唤醒的时候，如果优先级高于CPU上的当前进程，就会触发抢占。相应的内核代码中，<code>try_to_wake_up()</code>最终通过check_preempt_curr()检查是否触发抢占。</p>
+<ul>
+<li>当 CPU(B) 给 CPU(A) 上正在执行的任务设置了「需要切换」的标志位后，再通过 IPI（核间中断）的方式通知CPU(A)。</li>
+</ul>
+</li>
+<li>
+<p>如果进程修改nice值导致优先级高于CPU上的当前进程，也会触发抢占。内核代码参见 <code>set_user_nice()</code></p>
+</li>
+<li>
+<p>在多CPU的系统上，进程调度器尽量使各个CPU之间的负载保持均衡，而负载均衡操作可能会需要触发抢占。比如CFS类在<code>load_balance()</code>中触发抢占.</p>
+</li>
+</ul>
+<h2 id="prempt_count"><em>prempt_count</em></h2>
+<p>The kernel can preempt a task running in the kernel as long as it does not hold a lock (lock count is maintained in <strong><code>prempt_count</code></strong> in each process's <code>thread_info</code>). When <em>prempt_count</em> is 0, kernel is said to be preemptible.</p>
+<p><a href="#preempt_count-kernel-internals">preempt_count Kenel Internal</a></p>
+<h2 id="user-preemption">User preemption</h2>
+<p>User preemption occurs when the kernel is about to return to user-space:</p>
+<ul>
+<li>When returning to user-space from a system call</li>
+<li>When returning to user-space from an interrupt handler
+In these cases, if <em><strong>need_resched</strong></em> is set, the scheduler is invoked.</li>
+</ul>
+<h2 id="kernel-preemption">Kernel preemption</h2>
+<p>The Linux kernel is a fully preemptive kernel since v2.6.</p>
+<p>具体取决于内核编译时的选项：</p>
+<ul>
+<li>CONFIG_PREEMPT_NONE=y: 不允许内核抢占。这是SLES的默认选项。</li>
+<li>CONFIG_PREEMPT_VOLUNTARY=y: 在一些耗时较长的内核代码中主动调用cond_resched()让出CPU。这是RHEL的默认选项。</li>
+<li>CONFIG_PREEMPT=y: 允许完全内核抢占。</li>
+</ul>
+<p>Kernel preemption can occur in below cases:</p>
+<ul>
+<li>Upon return from interrupt, if returning to kernel-space, If <em><strong>need_resched</strong></em> is set and <em><strong>preempt_count</strong></em> is zero, and a more important task is runnable.</li>
+<li>When all the locks that the current task is holding are released, <em>preempt_count</em> returns to zero. At that time, the unlock code checks whether <em>need_resched</em> is set. If so, the scheduler is invoked.</li>
+<li>If a task in the kernel explicitly calls schedule()</li>
+<li>If a task in the kernel blocks (which results in a call to schedule())</li>
+</ul>
+<p>Refer to: <a href="http://linuxperf.com/?p=211">http://linuxperf.com/?p=211</a></p>
+<br>
+<h1 id="kernel-internals">Kernel Internals</h1>
+<h2 id="history">History</h2>
+<ul>
+<li>through the 2.4 kernel series, the Linux scheduler was simple. It was easy to understand, but scaled poorly in light of many runnable processes or many processors.</li>
+<li>In 2.5 kernel the Linux kernel received a scheduler overhaul. A new scheduler, commonly called the O(1) scheduler.
+<ul>
+<li>By introducing a constant-time algorithm for timeslice calculation and per-processor runqueues, it rectified the design limitations of the earlier scheduler.</li>
+<li>It had several issues related to scheduling latency-sensitive applications, including interactive processes.</li>
+</ul>
+</li>
+<li>Beginning 2.6 kernel series, a new Rotating Staircase Deadline scheduler, which introduced the concept of fair scheduling, borrowed from queuing theory.</li>
+<li>In kernel 2.6.23, the Completely Fair Scheduler, or CFS, replaced O(1) scheduler.
+<ul>
+<li>CFS is the registered scheduler class for normal processes, called SCHED_NORMAL in Linux (and SCHED_OTHER in POSIX).</li>
+</ul>
+</li>
+</ul>
+<h2 id="designs">Designs</h2>
+<p>Linux, aiming to provide good interactive response and desktop performance, optimizes for process response (low latency), thus favoring I/O-bound processes over processor-bound processors. As we
+will see, this is done in a creative manner that does not neglect processor-bound processes.</p>
+<p>In O(1) scheduler, each nice value maps to an alloted time slice. Eg. nice 0 maps to timeslice 100millisec, nice 1 maps to timeslice 95 millisec, ... , nice 18 to 10 millisec and nice 19 to 5 millisec. These creates couple problems:</p>
+<ul>
+<li>given that low priority processes (high nice value) tend to be background/processor-intensive task, while normal priroioty processes tend to be forground user task, this timeslice allotment is actually <em>backwards</em> from ideal</li>
+<li>For nice value 18-&gt;19, the timeslice maps to 10 and 5 millisec, twice as much for one step of nice value.</li>
+<li>the timeslice value depends on how OS time tick accuracy.</li>
+<li>If the scheduler wants to give freshly woken-up process a priority boost, it opens the door where certain sleep/wake-up use cases can game the scheduler into providing unfair processor time.</li>
+</ul>
+<p>Linux’s <strong>CFS scheduler, however, does not directly assign timeslices to processes</strong>. CFS assigns processes a proportion of the processor.</p>
+<h2 id="completely-fair-scheduler-cfs">Completely Fair Scheduler (CFS)</h2>
+<p>Instead of assigning each process a timeslice, CFS calculates how long a process should run as a function of the total number of runnable processes. CFS uses the nice value to weight the proportion of processor a process is to receive:</p>
+<ul>
+<li>Higher nice valued (lower priority) processes receive a fractional weight relative to the default nice value</li>
+<li>lower nice valued (higher priority) processes receive a larger weight</li>
+<li>&quot;nice&quot;值每增加1，weight减少10%，减1则增加10%。基准的nice值为0，对应的weight值由&quot;NICE_0_LOAD&quot;给出</li>
+</ul>
+<p>Each process then runs for a “timeslice” proportional to its weight divided by the total weight of all runnable threads.</p>
+<p><img src="images/2022-03-01-15-27-46.png" alt=""></p>
+<p>If a newly runnable process has consumed a smaller proportion of the processor than the currently executing process, it runs immediately, preempting the current process. If not, it is scheduled to run at a later time.</p>
+<h3 id="example-1-proportion-of-load">Example 1 (proportion of load)</h3>
+<ul>
+<li>Let’s assume the targeted latency (<em><strong>sched_latency</strong></em>) is 20 milliseconds and we have two runnable tasks at the same priority. Regardless of those task’s priority, each will run for 10 milliseconds before preempting in favor of the other.</li>
+<li>If we have four tasks at the same priority, each will run for 5 milliseconds. If there are 20 tasks, each will run for 1 millisecond.</li>
+<li>CFS imposes a floor on the timeslice assigned to each process, called <em><strong>sched_min_granularity</strong></em>. By default it is 1 millisec. Thus, even as the number of runnable processes approaches infinity, each will run for at least 1 millisecond to avoid switching cost.</li>
+</ul>
+<h3 id="example-2-weighted-proportion-with-nice-value">Example 2 (weighted proportion with nice value)</h3>
+<ul>
+<li>two processes, one with the default nice value (zero) and one with a nice value of 5.</li>
+<li>the weights work out to about a 1⁄3 penalty for the nice 5 process.</li>
+<li>If our target latency is again 20 milliseconds, our two processes will receive 15 milliseconds and 5 milliseconds each of processor time</li>
+<li>If our two runnable processes instead had nice values of 10 and 15. It is also 15 and 5 milliseconds each. <strong>Absolute nice values no longer affect scheduling decisions; only relative values matter.</strong></li>
+</ul>
+<p>CFS causes relative differences in nice values to have a much stronger effect.  In the current implementation, each unit of difference in the nice values of two processes results in a factor of 1.25 in the degree to which the scheduler favors the higher priority process.</p>
+<p><strong>CFS Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>含义解释</th>
+<th>初始值</th>
+<th>启动后使用的值（前提条件: 4个CPU）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sched_latency</td>
+<td>default的调度延迟（单位：ns）	6ms</td>
+<td>18ms</td>
+<td></td>
+</tr>
+<tr>
+<td>sched_min_granularity</td>
+<td>进程的最小时间片</td>
+<td>0.75ms</td>
+<td>2.25ms</td>
+</tr>
+<tr>
+<td>sched_wakeup_granularity</td>
+<td>唤醒进程能够抢占当前进程的条件，也就是说唤醒进程与当前进程的vruntime之差要大于这个参数才能够抢占</td>
+<td>1ms</td>
+<td>3ms</td>
+</tr>
+<tr>
+<td>nr_latency</td>
+<td>在默认调度等待时间内能够调度的最大进程数</td>
+<td>8 (sched_latency / sched_min_granularity)</td>
+<td>same</td>
+</tr>
+<tr>
+<td>sched_tunable_scaling</td>
+<td>根据CPU数量缩放相关变量值的方法</td>
+<td>SCHED_TUNABLESCALING_LOG</td>
+<td>same</td>
+</tr>
+<tr>
+<td>sched_child_runs_first</td>
+<td>创建子进程后，保证子进程会在父进程之前运行。<br>比较父进程和子进程的vruntime，若是父进程的vruntime更小，就对换父、子进程的vruntime</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="cfs-implementation">CFS Implementation</h3>
+<p>Each per-CPU run-queue of type cfs_rq sorts sched_entity structures in a time-ordered fashion into a red-black tree (or 'rbtree' in Linux lingo), where the leftmost node is occupied by the entity that has received the least slice of execution time (<code>vruntime</code>, the key of rb-tree).</p>
+<ul>
+<li>sched_entity keeps a <code>vruntime</code> variable, it is measurement of runtime of a given process. It is updated periodically by the system timer and whenever a process becomes runnable or blocks. nice值为0的任务，<code>vruntime</code>增量等于实际物理时间，其他nice值的任务的<code>vruntime</code>，由实际时间乘以weight的比值得到（对应函数实现为&quot;calc_delta_fair&quot;）. Code in <code>update_curr()</code> in <code>kernel/sched_fair.c</code></li>
+<li>core of CFS’s scheduling algorithm: Pick the task with the smallest <code>vruntime</code>.</li>
+<li>Choosing the next entity to run is made in constant time because the leftmost node is always cached. Code in <code>__pick_next_entity()</code> in <code>kernel/sched_fair.c</code></li>
+<li>Inserts nodes into the cfs_rq runqueue of the CFS scheduler is O(log N). Code in <code>enqueue_entity()</code> and <code>__enqueue_entity()</code> in <code>kernel/sched_fair.c</code></li>
+<li>Remove from rb_three happens when a process blocks. Code in <code>dequeue_entity()</code></li>
+</ul>
+<p><strong>Some points on vruntime</strong></p>
+<ul>
+<li>新进程的vruntime的初值: If setting to zero, it is not fair to old processes. In CFS, 每个CPU的运行队列cfs_rq都维护一个min_vruntime字段，记录该运行队列中所有进程的vruntime最小值，新进程的初始vruntime值就以它所在运行队列的min_vruntime为基础来设置，与老进程保持在合理的差距范围内。</li>
+<li>休眠进程的vruntime: If vruntime stays the same for sleep process, it is not fair for other processes. In CFS, 在休眠进程被唤醒时重新设置vruntime值，以min_vruntime值为基础，给予一定的补偿，但不能补偿太多。</li>
+<li>sched_features的WAKEUP_PREEMPT位:
+由于休眠进程在唤醒时会获得vruntime的补偿，所以它在醒来的时候有能力抢占CPU是大概率事件，这也是CFS调度算法的本意，即保证交互式进程的响应速度。但是频繁的唤醒进程，eg nanosleep(), 可能导致其他进程被频繁抢占。<pre><code class="language-bash"><div><span class="hljs-comment"># echo NO_WAKEUP_PREEMPT &gt; /sys/kernel/debug/sched_features</span>
+</div></code></pre>
+禁用唤醒抢占特性之后，刚唤醒的进程不会立即抢占运行中的进程，而是要等到运行进程用完时间片之后。</li>
+</ul>
+<p>The main entry point into the process schedule is the function <code>schedule()</code>, defined in <code>kernel/sched.c</code>.</p>
+<ul>
+<li>This is the function that the rest of the kernel uses to invoke the process scheduler, deciding which process to run and then running it.</li>
+<li>It iterates over each scheduler class in order of priority.The highest priority scheduler class that has a runnable process wins, selecting who runs next. Code in <code>pick_next_task()</code></li>
+</ul>
+<p><img src="images/2022-02-04-13-40-29.png" alt=""></p>
+<p>When task gets blocked, it marks itself as sleeping, puts itself on a wait queue, removes itself from the red-black tree of runnable, and calls schedule() to select a new process to execute.</p>
+<ul>
+<li>both TASK_INTERRUPTIBLE and TASK_UNINTERRUPTIBLE tasks sit on wait queue.</li>
+<li>Waking is handled via wake_up(), which wakes up all the tasks waiting on the given wait
+queue. It calls try_to_wake_up(), which sets the task’s state to TASK_RUNNING, calls
+enqueue_task() to add the task to the red-black tree, and sets need_resched if the
+awakened task’s priority is higher than the priority of the current task.</li>
+</ul>
+<p><img src="images/2022-02-07-13-05-20.png" alt=""></p>
+<h2 id="context-switch-kernel-internal">Context Switch Kernel Internal</h2>
+<p>Context switching, the switching from one runnable task to another, is handled by the
+<code>context_switch()</code> function defined in <code>kernel/sched.c</code>.</p>
+<ul>
+<li>It is called by <code>schedule()</code> when a new process has been selected to run.</li>
+<li>Calls <code>switch_mm()</code>, which is declared in <code>&lt;asm/mmu_context.h&gt;</code>, to switch the virtual
+memory mapping from the previous process’s to that of the new process.</li>
+<li>Calls <code>switch_to()</code>, declared in <code>&lt;asm/system.h&gt;</code>, to switch the processor state from
+the previous process’s to the current’s.
+<ul>
+<li>This involves saving and restoring stack information and the processor registers and any other architecture-specific state that must be managed and restored on a per-process basis.</li>
+</ul>
+</li>
+</ul>
+<h2 id="preempt_count-kernel-internals">preempt_count Kernel Internals</h2>
+<p>preempt_count本质上是一个per-CPU的32位变量，它在各种处理器架构下的存放位置和命名不尽相同，但其值都可以使用<code>preempt_count()</code>函数统一获取。It is defined in <code>&lt;include/linux/preempt.h&gt;</code></p>
+<p><img src="images/2022-03-03-17-25-45.png" alt=""></p>
+<p>preempt_count中的第16到19个bit表示hardirq count，它记录了进入hardirq/top half的嵌套次数. It is incremented by 1 in <code>irq_enter()</code> and decreased in <code>irq_exit()</code>。如果hardirq count的值为正数，说明现在正处于hardirq上下文中，代码中可借助in_irq()宏实现快速判断。Linux系统并不支持hardirq的嵌套执行，所以实际使用的只有1个bit。</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> hardirq_count()	 (preempt_count() &amp; HARDIRQ_MASK)</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> in_irq()  (hardirq_count())</span>
+</div></code></pre>
+<p>preempt_count中的第8到15个bit表示softirq count，它记录了进入softirq的嵌套次数，如果softirq count的值为正数，说明现在正处于softirq上下文中。由于softirq在单个CPU上是不会嵌套执行的，实际只需要一个bit (bit 8). 在进程上下文中，为了防止进程被softirq所抢占，关闭/禁止softirq的次数，比如每使用一次<code>local_bh_disable()</code>，softirq count高7个bits(bit 9到bit 15)的值就会加1，<code>local_bh_enable()</code> will decrease it by 1。</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> softirq_count()  (preempt_count() &amp; SOFTIRQ_MASK)</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> in_softirq()	 (softirq_count())</span>
+</div></code></pre>
+<h3 id="interrupt-context">interrupt context</h3>
+<p>Also refer to <a href="interrupts.html#interrupt-handler-and-interrupt-context">here</a></p>
+<p>不管是hardirq上下文还是softirq上下文，都属于我们俗称的<em>interrupt context</em>。</p>
+<p>在中断上下文中，调度是关闭的，不会发生进程的切换，这属于一种隐式的禁止调度，而在代码中，也可以使用<code>preempt_disable()</code>来显示地关闭调度，关闭次数由第0到7个bits组成的preemption count(注意不是preempt count)来记录。每使用一次<code>preempt_disable()</code>，preemption count的值就会加1，使用<code>preempt_enable()</code>则会让preemption count的值减1。preemption count占8个bits，因此一共可以表示最多256层调度关闭的嵌套。</p>
+<p>处于中断上下文，或者显示地禁止了调度，<code>preempt_count()</code>的值都不为0，都不允许睡眠/调度的发生，这两种场景被统称为atomic上下文，可由in_atomic()宏给出判断。</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> in_atomic()	(preempt_count() != 0)</span>
+</div></code></pre>
+<p>中断上下文、进程上下文和atomic上下文的关系大概可以表示成这样：</p>
+<p><img src="images/2022-03-03-17-34-10.png" alt=""></p>
+<br>
+<br>
+    </body>
+    </html>
