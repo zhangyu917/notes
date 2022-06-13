@@ -45,20 +45,24 @@
         <style>
 #button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
 </style>
-        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
-        
     </head>
     <body class="vscode-body vscode-light">
         <ul>
-<li><a href="#huge-pages">Huge pages</a>
-<ul>
+<li><a href="#huge-pages">Huge pages</a></li>
+<li><a href="#huge-page-tlb">Huge Page TLB</a></li>
+<li><a href="#how-do-i-check-for-hugepages-usage-and-what-is-using-it">How do I check for hugepages usage and what is using it?</a></li>
 <li><a href="#huge-page-fault-behavior">Huge page fault behavior</a></li>
+<li><a href="#use-huge-page">Use Huge Page</a>
+<ul>
 <li><a href="#use-huge-pages-for-anonymous-mmap">Use huge pages for anonymous mmap()</a></li>
 <li><a href="#use-huge-pages-for-file-backed-mmap">Use huge pages for file-backed mmap()</a></li>
 <li><a href="#using-huge-pages-for-malloc">Using huge pages for malloc</a></li>
 <li><a href="#using-huge-pages-for-shmem">Using huge pages for shmem</a></li>
 <li><a href="#using-huge-pages-for-textdatabss-section">Using huge pages for text/data/bss section</a></li>
-<li><a href="#other-things-to-keep-in-mind">Other things to keep in mind</a></li>
+</ul>
+</li>
+<li><a href="#other-things-to-keep-in-mind">Other things to keep in mind</a>
+<ul>
 <li><a href="#can-huge-page-have-a-negative-impact">Can huge page have a negative impact?</a></li>
 </ul>
 </li>
@@ -68,39 +72,87 @@
 <p>Huge pages means big page size (either 2M or 1G), supported in recent Intel and AMD CPUs. It means TLB can hold large address spaces, which in turns means less TLB misses, and less page table lookups.</p>
 <p>Linux official doc - 5 parts:
 <a href="https://lwn.net/Articles/374424/">https://lwn.net/Articles/374424/</a></p>
-<p>64位的x86-64系统，huge page的大小是2MB或者1GB，初始数目由启动时的&quot;<code>vm.nr_hugepages</code>&quot; 内核参数确定。</p>
+<p>In x86-64 system, huge page size can be 2MB or 1GB. The initial numbers of huge pages at startup are determined by <code>vm.nr_hugepages</code> kernel parameter.</p>
 <ul>
-<li>对于2MB的huge page，运行过程中可通过&quot;<code>/proc/sys/vm/nr_hugepages</code>&quot;修改。</li>
-<li>对于1GB的huge page，就只能在启动时分配（且分配后不能释放），而不支持在运行时修改。</li>
+<li>for 2MB huge page, it can be configured by <code>/proc/sys/vm/nr_hugepages</code> at runtime.</li>
+<li>for 1GB huge page, it can't be configured at runtime, only at startup.
+Later on, huge page will be allocated from these reserved pool.</li>
 </ul>
-<h2 id="huge-page-fault-behavior">Huge page fault behavior</h2>
+<p>huge page doesn't support swapping. (<a href="#transparent-huge-page">THP</a> does support swapping, with extra cost).</p>
+<br>
+<br>
+<h1 id="huge-page-tlb">Huge Page TLB</h1>
+<p>In systems supporting huge pages, multiple different page sizes (4KB, 2MB, 1GB) can co-exist, this requires different TLBs to support them.</p>
+<p>Below is an example TLB sizes in one particular model of Intel processor.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>4KB pages</th>
+<th>2MB pages</th>
+<th>1G pages</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instruction TLBs</td>
+<td>128 entries,4 ways</td>
+<td>8 entries</td>
+<td>none</td>
+</tr>
+<tr>
+<td>data TLBs</td>
+<td>64 entries, 4 ways</td>
+<td>32 entries, 4 ways</td>
+<td>4 entries, 4 way</td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>
+<h1 id="how-do-i-check-for-hugepages-usage-and-what-is-using-it"><a href="https://access.redhat.com/solutions/320303">How do I check for hugepages usage and what is using it?</a></h1>
+<br>
+<br>
+<h1 id="huge-page-fault-behavior">Huge page fault behavior</h1>
 <p>Since 2.6.18, huge pages were faulted the same as normal mappings when the page was first referenced. To guarantee that faults would succeed, huge pages were reserved at the time when mapping is created. This applies to both shared and private mapping (since 2.6.29).</p>
 <ul>
 <li>Shared mappings are guaranteed to successfully fault regardless of what process accesses the mapping.</li>
 <li>For private mappings, only the process that creates the mapping <code>mmap()</code> is guaranteed to successfully fault. When that process <code>fork()</code>s, two processes are now accessing the same pages. If the child performs COW, an attempt will be made to allocate a new page. If it succeeds, the fault successfully completes. If the fault fails, the child gets terminated with a message logged to the kernel log noting that there were insufficient huge pages.</li>
 </ul>
+<br>
+<h1 id="use-huge-page">Use Huge Page</h1>
+<p>In general, there are two ways to use huge page</p>
+<ul>
+<li>Using libhugetlbfs: <a href="https://github.com/libhugetlbfs/libhugetlbfs/blob/master/HOWTO">https://github.com/libhugetlbfs/libhugetlbfs/blob/master/HOWTO</a></li>
+<li>Using hugectl (recommended): <a href="https://linux.die.net/man/8/hugectl">https://linux.die.net/man/8/hugectl</a></li>
+</ul>
 <h2 id="use-huge-pages-for-anonymous-mmap">Use huge pages for anonymous mmap()</h2>
-<p>As of kernel 2.6.32, support is available that allows anonymous mappings to be created backed by huge pages with <code>mmap()</code> by specifying the flags <code>MAP_ANONYMOUS|MAP_HUGETLB</code>. These mappings can be private or shared.</p>
+<p>As of kernel 2.6.32, support is available that allows anonymous mappings to be created backed by huge pages with <code>mmap()</code> by specifying the flags <code>MAP_ANONYMOUS|MAP_HUGETLB</code>. These mappings can be private or shared. The size of a huge page mapping needs to be a multiple of the page size.</p>
+<p>In C++ we can use a custom allocator to enable containers to use huge pages, See <a href="https://rigtorp.se/hugepages.cpp">hugepages.cpp</a> for example usage.</p>
 <h2 id="use-huge-pages-for-file-backed-mmap">Use huge pages for file-backed mmap()</h2>
 <p>For the creation of shared or private mappings, Linux provides a RAM-based filesystem called &quot;hugetlbfs.&quot; Every file on this filesystem is backed by huge pages and is accessed with mmap() or read().</p>
 <h2 id="using-huge-pages-for-malloc">Using huge pages for malloc</h2>
 <p>Glibc defines a <code>__morecore</code> hook that is is called when the heap size needs to be increased; libhugetlbfs uses this hook to create regions of memory backed by huge pages.</p>
 <p>We don't need to make any modifications to use huge pages for malloc. You can use huge pages for malloc by one of the following options:</p>
 <p>Option 1: using environment variables</p>
-<ul>
-<li><code>LD_PRELOAD=libhugetlbfs.so</code></li>
-<li><code>LD_LIBRARY_PATH</code> to directly containing <code>libhugetlbfs.so</code> which will generally be either in <code>/usr/lib</code> or <code>/usr/lib64</code>. You can set it to <code>/usr/lib:/usr/lib64:</code> in general.</li>
-<li><code>HUGETLB_MORECORE=yes</code></li>
-</ul>
+<pre><code class="language-bash"><div>`LD_PRELOAD=libhugetlbfs.so` <span class="hljs-comment"># tell the dynmaic linker to load libhugetlbfs shared library, skip this if program is already linked with libhugetlbfs</span>
+
+<span class="hljs-built_in">set</span> `LD_LIBRARY_PATH` to directory containing `libhugetlbfs.so`. In general, you can <span class="hljs-built_in">set</span> it to `/usr/lib:/usr/lib64:`
+
+`HUGETLB_MORECORE=yes` <span class="hljs-comment"># to use the default huge page size, or</span>
+`HUGETLB_MORECORE=&lt;pagesize&gt;` <span class="hljs-comment"># to use a specific page size</span>
+</div></code></pre>
 <p>Option 2: using hugectl (Recommended)</p>
 <ul>
 <li>You simply need to run your binary with prefix &quot;<code>hugectl --heap</code>&quot;. This will use the default page size for pages used for malloc. In case you have multiple options for huge pages and want to use non-default page size, you can do so by prefixing your binary with &quot;<code>hugectl --heap=$PAGE_SIZE</code>&quot; instead.</li>
 </ul>
 <h2 id="using-huge-pages-for-shmem">Using huge pages for shmem</h2>
 <p>Similar to malloc, you don't need to make any modifications to your binary. You can use huge pages using one of the following options:</p>
+<p>Hugepages are used for shared memory segments if the <code>SHM_HUGETLB</code> flag is set when calling <code>shmget()</code> and the pool is large enough.</p>
 <p>Option 1: using environment variables</p>
 <ul>
 <li>same as enviroment variables used in malloc case.</li>
+<li>set <code>HUGETLB_SHM=yes</code></li>
 </ul>
 <p>Option 2: using hugectl (Recommended)</p>
 <ul>
@@ -129,7 +181,9 @@ Notice that you can either choose to map both data and BSS section or none of th
 <ul>
 <li>Run your binary with prefix &quot;<code>hugectl --text=$PAGE_SIZE --data=$PAGE_SIZE --bss=$PAGE_SIZE</code>&quot;. Note that using either --data or --bss option will put both data and bss section in huge pages.</li>
 </ul>
-<h2 id="other-things-to-keep-in-mind">Other things to keep in mind</h2>
+<br>
+<br>
+<h1 id="other-things-to-keep-in-mind">Other things to keep in mind</h1>
 <p><strong>Are you using mmap syscall with <code>MAP_HUGETLB</code> flag enabled?</strong></p>
 <ul>
 <li>mmap syscall has a parameter flags and you have enabled <code>MAP_HUGETLB</code> flag, then irrespective of the hugectl prefix or those environment variable, your program will consume huge pages for heap memory if available.</li>
@@ -166,15 +220,24 @@ Notice that you can either choose to map both data and BSS section or none of th
 <ul>
 <li>there might be some cases in which they will have some negative impact. Consider 2 threads running on 2 different NUMA nodes, using huge pages increases the chances that both threads are using same page. When both threads are writing to same page, then page access for one of the thread will have to be from remote NUMA node instead of local NUMA node.</li>
 <li>Using more memory than offered by huge pages. Please be warned that the HugePages pool must be sized appropriately.  If the HugePages pool is exhausted and a process faults in a HugePage which has not yet been allocated the kernel will sent the process a SIGBUS.</li>
-<li>由于各种内存操作基本都要求按照page对齐，比如一个可执行文件映射到进程地址空间，根据文件大小的不同，平均算下来会浪费掉半个page size的物理内存，使用large page的话这个消耗就显得比较大了。</li>
-<li>系统运行一段时间后，会很难再也大块的连续物理内存，这时分配large page将会变的很困难，所以通常需要在系统初始化的时候就划分出一段物理内存给large page用（类似于DMA的内存分配），这样就减少了一些灵活性。</li>
-<li>动态large page（THP）在换出到外部的flash/disk和从flash/disk换入物理内存的过程会比normal size的page带来更大的开销（可参考这篇文章）。</li>
+<li>most memory operations require page aligning, such as mapping an executable into application address space. On average, half page size is wasted due to this, which is a bigger problem when using huge page.</li>
+<li>After running the system for a while, memory becomes fragmented, thus allocating a huge page becomes difficult.</li>
+<li>For THP, when swapping between external flash/disk and memory, there is more cost than regular sized page. Refer to <a href="https://zhuanlan.zhihu.com/p/117239320">this page</a>.</li>
 </ul>
 <br>
+<br>
 <h1 id="transparent-huge-page">Transparent huge page</h1>
-<p>自2.6.38版本开始支持THP。在应用需要huge page的时候，可通过memory compaction操作移动页面，以形成一个huge page，因为该过程不会被应用感知到，所以被称为&quot;transparent&quot;。</p>
-<p>THP还只支持anonymous pages，而不支持page cache。</p>
-<p>总的来说，目前THP优劣的平衡还存在一定的不确定性，在虚拟化的应用中，如果物理内存充足，通常建议使用单独划分的静态huge page，而不使用THP。</p>
+<p>Since v2.6.38, Linux supports <a href="https://www.kernel.org/doc/html/latest/admin-guide/mm/transhuge.html">transparent huge page (THP)</a>.</p>
+<p>THP is an alternative mean of using huge pages that supports the automatic promotion (memory compaction to form a huge page) and demotion of page sizes.</p>
+<p>Currently THP only works for anonymous memory mappings, not for page cache.</p>
+<p>THP will try to automatically promote pages into huge pages at the time of allocation during minor page faults. Additionaly, <em>khugepaged</em> does the background promotion of pages, and <em>kcompactd</em> does on-demand compaction of pages. These could cause latency spikes. Because of this, it is recommneded to turn off THP.</p>
+<p>The THP behaviour is controlled via sysfs interface and using <code>madvise(MADV_HUGEPAGE)</code> system calls.</p>
+<p>THP can be entirely disabled or only enabled inside <code>MADV_HUGEPAGE</code> regions.</p>
+<pre><code class="language-bash"><div><span class="hljs-built_in">echo</span> always &gt;/sys/kernel/mm/transparent_hugepage/enabled
+<span class="hljs-built_in">echo</span> madvise &gt;/sys/kernel/mm/transparent_hugepage/enabled
+</div></code></pre>
 
+        <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+        
     </body>
     </html>

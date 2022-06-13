@@ -89,7 +89,7 @@
 </li>
 </ul>
 <h1 id="interrupts">Interrupts</h1>
-<p>An interrupt enable hardware to signal to the processor.</p>
+<p>An interrupt enables hardware to signal to the processor.</p>
 <ul>
 <li>hardware devices physically produced electronic signals
 <ul>
@@ -394,7 +394,7 @@ $ perf <span class="hljs-built_in">stat</span> -C 1 -e irq_vectors:local_timer_e
 <br>
 <h1 id="kernel-internals">Kernel Internals</h1>
 <h2 id="kernel-code-flow-for-calling-interrupt-handler">Kernel code flow for calling interrupt handler</h2>
-<p>C Code is in <code>arch/x86/kernel/irq.c</code>.</p>
+<p>Code in <code>arch/x86/kernel/irq.c</code>.</p>
 <ul>
 <li>For each interrupt line, the kernel jumps to a unique location in memory and executes the code located
 there. The initial entry point (written in assembly, in <code>arch/x86/kernel/entry_64.S</code>) simply saves this IRQ number and stores the current register values on the interruption stack. then the kernel calls <code>do_IRQ()</code>.</li>

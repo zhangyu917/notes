@@ -117,17 +117,17 @@ back to disk.</li>
 <p>Some caching techniques:
 <a href="https://stackoverflow.com/questions/49092541/which-cache-mapping-technique-is-used-in-intel-core-i7-processor">https://stackoverflow.com/questions/49092541/which-cache-mapping-technique-is-used-in-intel-core-i7-processor</a></p>
 <h2 id="cache-coherence">Cache Coherence</h2>
-<p>cache一致性的维护由硬件CPU自动完成，同时处理器也会提供一些指令，以支持软件对cache的操作。以x86为例，有四条指令可以对cache进行invalidate/flush.</p>
+<p>Cachce coherence is handled by the hardware (processor). Processor also provides some instructions to operate on cache. In x86, there are below instructions to invalidate/flush the cache.</p>
 <ul>
-<li>全部invaliate/flush
+<li>full invaliate/flush
 <ul>
-<li><code>WBINVD</code>, 即write back invalidate的缩写，具体操作是先将cache中标记为modified的内容全部write back到外部内存，再清空整个cache。</li>
-<li><code>INVD</code>, 相比WBINVD少了个write back的操作，所以没法保证数据一致性，这条指令只在cache和外部内存不需要保持一致的情况下使用（如某些测试环境）。</li>
+<li><code>WBINVD</code>, short for &quot;write back invalidate&quot;. It first writes back all cache contents that are marked as &quot;modified&quot; to memory, then clear the whole cache.</li>
+<li><code>INVD</code>, unlike <code>WBINVD</code>, it doesn't do write back, so it doesn't guarantee the data consistency. It is used when there is no need to keep consistency bewteen cache and memory, such as some testing environment.</li>
 </ul>
 </li>
-<li>部分invalidate/flush
+<li>partial invalidate/flush
 <ul>
-<li><code>CLFLUSH</code>/<code>CLFLUSHOPT</code>，即cache line flush的缩写，可针对某些cache lines单独操作，适用于该cache line对应的内存区域之后不会再被访问（access）到的情况。</li>
+<li><code>CLFLUSH</code>/<code>CLFLUSHOPT</code>, short for &quot;cache line flush&quot;. It works on the granularity of cache lines, normally used when this cache line doesn't need to be accessed anymore.</li>
 </ul>
 </li>
 </ul>
@@ -358,7 +358,7 @@ using the same set of page tables, if any.</li>
 <li>Every thread in a process shares the same  mm_struct memory descriptor, so calls to <code>munmap()</code> or <code>mremap()</code> in one thread cause TLB shootdowns to occur in the threads running on other cores.</li>
 <li>Any operation that narrows a process’ access to memory like <code>munmap()</code> and <code>mprotect()</code> will cause a TLB shootdown.</li>
 <li>Calls to the C standard library allocator (<code>malloc</code>, <code>free</code>, etc) will call <code>madvise(...MADV_FREE)</code>/<code>munmap</code> internally, but not necessarily on each invocation.</li>
-<li>Other causes of TLB shootdowns are: transparent huge pages (THP), memory compaction, kernel samepage merging (KSM), automatic NUMA memory balancing, page migration and page cache writeback.</li>
+<li>Other causes of TLB shootdowns are: transparent huge pages (THP), memory compaction, kernel samepage merging (KSM), automatic NUMA memory balancing, page migration and page cache writeback. Details refer to <a href="https://rigtorp.se/virtual-memory/">https://rigtorp.se/virtual-memory/</a></li>
 </ul>
 <p>Cost:<br>
 A TLB shootdown is an IPI so it has the usual interrupt overhead (1us or so).</p>
@@ -375,32 +375,7 @@ A TLB shootdown is an IPI so it has the usual interrupt overhead (1us or so).</p
 <ul>
 <li>To avoid TLB shootdowns you can map all needed memory at program startup and avoid calling any functions that modifies the page table after that.</li>
 </ul>
-<h2 id="hugepage-tlb">Hugepage TLB</h2>
-<p>在使用large page的系统中，可能存在4KB，2MB，1GB等不同大小的page共存的情况，这就需要不同的TLB支持。以intel的某款处理器为例，其含有的TLB种类如下：</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>4KB pages</th>
-<th>2MB pages</th>
-<th>1G pages</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>instruction TLBs</td>
-<td>128 entries,4 ways</td>
-<td>8 entries</td>
-<td>none</td>
-</tr>
-<tr>
-<td>data TLBs</td>
-<td>64 entries, 4 ways</td>
-<td>32 entries, 4 ways</td>
-<td>4 entries, 4 way</td>
-</tr>
-</tbody>
-</table>
+<h2 id="hugepage-tlb"><a href="hugepage.html#huge-page-tlb">Hugepage TLB</a></h2>
 <br>
 <br>
 <h1 id="page-cache">Page cache</h1>
