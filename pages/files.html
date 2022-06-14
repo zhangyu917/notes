@@ -158,11 +158,11 @@ more memory. Its size can be seen via <code>/proc</code>.</p>
 <p>The inode cache grows dynamically, holding at least all inodes mapped by the Dcache. Its size can be seen via the <code>/proc/sys/fs/inode*</code> files.</p>
 <br>
 <h1 id="file-monitoring">File monitoring</h1>
-<p>如果file descriptor占满了，会发生 too many open files。Linux 对可打开的文件描述符的数量分别作了三个方面的限制：</p>
+<p>If file descriptor is used up, you will get &quot;too many open files&quot; error.  Linux has three ways to control the number of open file descriptors.</p>
 <ul>
-<li>系统级：当前系统可打开的最大数量，通过 <code>cat /proc/sys/fs/file-max</code> 查看；</li>
-<li>用户级：指定用户可打开的最大数量，通过 <code>cat /etc/security/limits.conf</code> 查看；</li>
-<li>进程级：单个进程可打开的最大数量，通过 <code>cat /proc/sys/fs/nr_open</code> 查看；</li>
+<li>system level: max number of files a system can open. <code>cat /proc/sys/fs/file-max</code>.</li>
+<li>user level: max number of files a user can open. <code>cat /etc/security/limits.conf</code></li>
+<li>process level: max number of files a process can open. <code>cat /proc/sys/fs/nr_open</code></li>
 </ul>
 <br>
 <h1 id="file-io-interfaces">File IO Interfaces</h1>
