@@ -56,8 +56,12 @@
 <li><a href="#tasks-performed-by-kernel">Tasks performed by kernel</a></li>
 <li><a href="#the-init-process">The init process</a></li>
 <li><a href="#proc-virtual-file-system"><code>/proc</code> virtual file system</a></li>
-<li><a href="#sys-virtual-file-system"><code>/sys</code> virtual file system</a></li>
-<li><a href="#sysctl">Sysctl</a></li>
+<li><a href="#sys-virtual-file-system"><code>/sys</code> virtual file system</a>
+<ul>
+<li><a href="#sysctl"><code>sysctl</code></a></li>
+<li><a href="#proc-vs-sys"><code>/proc</code> vs <code>/sys</code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#kernel-is-special">Kernel is special</a>
@@ -220,7 +224,7 @@ $ grep . /sys/devices/system/cpu/cpu0/cache/index*/size
 /sys/devices/system/cpu/cpu0/cache/index2/size:1024K
 /sys/devices/system/cpu/cpu0/cache/index3/size:33792K
 </div></code></pre>
-<h2 id="sysctl">Sysctl</h2>
+<h3 id="sysctl"><code>sysctl</code></h3>
 <p>To view a system config</p>
 <pre><code class="language-bash"><div>$ sysctl net.ipv4.tcp_sack
 net.ipv4.tcp_sack = 1
@@ -232,6 +236,10 @@ net.ipv4.tcp_sack = 0
 <p>Settings are persisted in the <code>/etc/sysctl.conf</code> file, and in separate <code>.conf</code> files in the <code>/etc/sysctl.d/</code> directory in later Red Hat releases. These files can be edited directly with a text editor. The values are applied at reboot.</p>
 <pre><code class="language-bash"><div>$ <span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;net.ipv4.tcp_sack = 0&#x27;</span> &gt;&gt; /etc/sysctl.conf
 </div></code></pre>
+<h3 id="proc-vs-sys"><code>/proc</code> vs <code>/sys</code></h3>
+<p>The <code>/proc</code> filesystem was originally designed to publish process information and a few key system attributes, required by '<code>ps</code>', '<code>top</code>', '<code>free</code>' and a few other system utilities. Because it was easy to use, it became a dumping ground for a whole range of system information, which soon grew into a tangled mess.</p>
+<p>The <code>/sys</code> filesystem was designed to add structure to this mess and provide a uniform way to expose/control system information. Many of the legacy system information and control points are still accessible in <code>/proc</code>, but all new busses and drivers should expose their info and control points via <code>sysfs</code>.</p>
+<p>Implementation wise, <code>procfs</code> allows arbitrary <code>file_operations</code>, which contains function pointers that determine what happens to every file-based system call, e.g. <code>open</code>, <code>read</code>, <code>mmap</code>, etc., and you can take arbitrary actions from those. sysfs is more restricted, you implement only two methods <code>show</code> and <code>store</code>, which Linux uses to implement <code>open</code>, <code>close</code>, <code>read</code>, <code>write</code> and <code>lseek</code> for you.</p>
 <br>
 <br>
 <h1 id="kernel-is-special">Kernel is special</h1>
