@@ -137,7 +137,7 @@ $ tcpdump -AXr packets.pcap <span class="hljs-comment"># -X prints only ASCII</s
 </ul>
 <h2 id="tcpdump-implementation">TCPdump implementation:</h2>
 <p>Refer to <a href="https://mp.weixin.qq.com/s/ZX8Jluh-RgJXcVh3OvycRQ">this</a>.</p>
-<p>用户态 tcpdump 命令是通过 <code>socket(AF_PACKET, SOCK_RAW, ...)</code> 系统调用，在内核源码中用到的 ptype_all 中挂载了函数钩子上去。无论是在网络包接收过程中，还是在发送过程中，都会在网络设备层遍历 ptype_all 中的协议，并执行其中的回调。tcpdump 命令就是基于这个底层原理来工作的。</p>
+<p>tcpdump create socket via <code>socket(AF_PACKET, SOCK_RAW, ...)</code> system call, there is a hook in <code>ptype_all</code> in kernel, tcpdump registers virtual protocol into <code>ptype_all</code>. When receving/sending packet, the kernel (network layer code) will iterate all protocols in <code>ptype_all</code>, and calls its callback</p>
 <p>A simple hand-written tcpdump: <a href="https://github.com/yanfeizhang/coder-kung-fu/blob/main/tests/network/test04/main.c">https://github.com/yanfeizhang/coder-kung-fu/blob/main/tests/network/test04/main.c</a></p>
 <br>
 <br>
