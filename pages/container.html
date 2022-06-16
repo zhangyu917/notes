@@ -237,7 +237,7 @@ struct fixed_point_hash
 <span class="hljs-keyword">using</span> fixed_point_table = std::unordered_map&lt;fixed_point_value&lt;P&gt;, V, fixed_point_hash&lt;P&gt;&gt;;
 </div></code></pre>
 <h2 id="separate-chaining-vs-open-address">Separate chaining vs. Open address</h2>
-<p>(<em>open</em> means value doesn’t always stored at hash location)</p>
+<p>(<em>open</em> means value doesn’t always stored at hash location. Separate chaining also known as <em>closed address</em>)</p>
 <p>The main difference is the speed of retrieving the value being hashed under different conditions.</p>
 <p><strong>Open address Pros:</strong></p>
 <ul>
@@ -254,6 +254,20 @@ struct fixed_point_hash
 <li>Open address usually store key and value inline, so it invalidates any references and pointers to elements within the table after rehash</li>
 </ul>
 </li>
+</ul>
+<p><strong><code>std::unordered_map</code>(or compliant implementations like Boost.Unordered) vs. open addressing implementation</strong></p>
+<p><code>std::unordered_map</code></p>
+<ul>
+<li>Code uses some specific parts of its API (like the bucket interface or setting the maximum load factor)</li>
+<li>Pointer stability, non-moveability etc. required (though some OA alternatives support that)</li>
+<li>O(1) iteration required</li>
+<li>Hash functions used are only mid-quality (open addressing requires that the hash function have better quality in terms of avalanching etc.)</li>
+</ul>
+<p>Open-addressing alternatives</p>
+<ul>
+<li>Speed is the main concern</li>
+<li>Existing code can be adapted to a basically more stringent API and more demanding requirements on the element type (moveability)</li>
+<li>Hash functions are of good quality (or the default ones from the container provider are used)</li>
 </ul>
 <h3 id="open-address-probing-techniques">Open address probing techniques</h3>
 <p>The below three common techniques have worst-case  O(n) Insert, lookup and remove.</p>
@@ -306,6 +320,8 @@ struct fixed_point_hash
 <li>So that it is easy to iterate the hash-table.</li>
 <li>And iteration order is fixed for a certain insertion order</li>
 <li>If we dont have this linkage, iteration will be iterating of capacity (bucket list) + all linked_list (all nodes), it might not be good in case of big map reuse case.</li>
+<li>this caused extra indirection when accessing the node.</li>
+<li>A good illustration of how libc++/libstdc++ implement this: <a href="https://www.boost.org/doc/libs/develop/libs/unordered/doc/html/unordered.html#buckets_fast_closed_addressing_implementation">https://www.boost.org/doc/libs/develop/libs/unordered/doc/html/unordered.html#buckets_fast_closed_addressing_implementation</a></li>
 </ul>
 </li>
 <li>Integer module
