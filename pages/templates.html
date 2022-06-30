@@ -167,6 +167,22 @@ Widget w;   <span class="hljs-comment">// decltype(w) is Widget</span>
 <br>
 <h1 id="extern-template">extern template</h1>
 <p><a href="https://arne-mertz.de/2019/02/extern-template-reduce-compile-times/">https://arne-mertz.de/2019/02/extern-template-reduce-compile-times/</a></p>
+<p>Pro</p>
+<ul>
+<li>faster build time, because the function only needs to be compiled once</li>
+</ul>
+<p>Con</p>
+<ul>
+<li>the function could be inlined if it is regular template, as the template instantiation happens in the same file. When it is declared as <code>extern</code> template, the function in general won't be inlined as it is defined in another compilation unit.
+<ul>
+<li>LTO can sometimes solve above issue <a href="https://www.youtube.com/watch?v=pyiKhRmvMF4&amp;ab_channel=C%E1%90%A9%E1%90%A9WeeklyWithJasonTurner">refer to this video</a>, but you can't rely on that.</li>
+</ul>
+</li>
+</ul>
+<p>Guideline</p>
+<ul>
+<li>Consider use <code>extern</code> template for a heavliy used expensive function (it won't be inlined anyway) to reduce compilation time.</li>
+</ul>
 <br>
 <br>
 <h1 id="fibonacci">Fibonacci</h1>

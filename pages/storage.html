@@ -417,7 +417,7 @@ When a block is placed on the (doubly linked) free list, <code>free()</code> use
 <li>Used for static member or function in a class or inside a function</li>
 </ol>
 <ul>
-<li>It defines storage duration. The storage for the object is allocated when the program begins (or enters the function for static in function) and deallocated when the program ends. Only one instance of the object exists. It retains its memory and contents throughout the program execution.</li>
+<li>It defines <em>storage duration</em>. The storage for the object is allocated when the program begins (or enters the function for static in function) and deallocated when the program ends. Only one instance of the object exists. It retains its memory and contents throughout the program execution.</li>
 <li>Static data members are not associated with any object. They exist even if no objects of the class have been defined. There is only one instance of the static data member in the entire program with static storage duration</li>
 <li>Static member functions are not associated with any object. When called, they have no this pointer.
 <ul>
@@ -435,6 +435,12 @@ When a block is placed on the (doubly linked) free list, <code>free()</code> use
 <li>The name can be referred to from all scopes in the current translation unit.</li>
 </ul>
 </li>
+</ul>
+<p><em><strong>static initialization</strong></em> <a href="https://eel.is/c++draft/basic.start#static">6.9.3.2</a></p>
+<ul>
+<li><em>Constant initialization</em> is performed if a variable or temporary object with static or thread storage duration is constant-initialized. Eg. it is initialized with a constexpr.</li>
+<li>If <em>constant initialization</em> is not performed, a variable with static storage duration or thread storage duration is <em>zero-initialized</em>.</li>
+<li>Together, <em>zero-initialization</em> and <em>constant initialization</em> are called static initialization;</li>
 </ul>
 <br>
 <h1 id="register-storage">Register storage</h1>
@@ -494,7 +500,7 @@ The compiler must store the number two, read the variable i, store the variable 
 <li>The <code>__thread</code> keyword must immediately follow the static or extern keyword, if either of these is specified in the variable’s declaration.</li>
 <li>The C address (&amp;) operator can be used to obtain the address of a thread-local variable.</li>
 </ul>
-<p>Thread-local storage is inefficient because it is accessed through a pointer stored in a thread environment block.</p>
+<p><strong>Thread-local storage is inefficient (slow)</strong> because it is accessed through a pointer stored in a thread environment block.</p>
 <p>Static thread-local storage should be avoided when possible. Use storage on the thread's own stack. Non-static variables and objects that are declared in the thread function, or in any function called by the thread function, will be stored on the thread's stack.</p>
 <br>
 

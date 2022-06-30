@@ -152,6 +152,7 @@ flags : ... tsc  rdtscp constant_tsc nonstop_tsc ...
 <li>You need <code>constant_tsc</code>, which should be there on modern intel CPU. check <code>/proc/cpuinfo</code>. A CPU with a constant, invariant TSC (time-stamp counter). This means that the TSC runs at a constant rate across all sockets/cores, regardless of frequency changes made to the CPU by power management code.</li>
 <li>Register cobblering (overwriting): <br>
 <code>RDTSC</code> instruction, once called, overwrites the <code>EAX</code> and <code>EDX</code> registers.</li>
+<li>beawre of CPU jumping - one thread starts execution on one cpu, but migrate to another CPU during the test. Need to pin the thread on one core.</li>
 <li>Out of order execution
 <ul>
 <li>CPU can out-of-order execute the instruction, so the measuring points may not be executed at the sequence in the code. Even though “<code>asm violite</code>”  ensures the compiler won't move it around (compiler barrier), but volatile means nothing to the CPU (processor barrier).</li>
@@ -170,7 +171,7 @@ flags : ... tsc  rdtscp constant_tsc nonstop_tsc ...
 <li>As of Linux kernel 5.4, <code>lfence</code> is used to serialize rdtsc on both Intel and AMD. See this commit &quot;x86: Remove X86_FEATURE_MFENCE_RDTSC&quot;: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=be261ffce6f13229dad50f59c5e491f933d3167f">https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=be261ffce6f13229dad50f59c5e491f933d3167f</a></li>
 </ul>
 </li>
-<li>The cost of CPUID + RDTSC overhead as to be subtracted</li>
+<li>The cost of CPUID + RDTSC overhead has to be subtracted</li>
 <li>Need call <code>preempt_dsiable()</code> to disable the interruption (including scheduling preemption) on the CPU.</li>
 </ul>
 <p><a href="https://stackoverflow.com/questions/13772567/how-to-get-the-cpu-cycle-count-in-x86-64-from-c">https://stackoverflow.com/questions/13772567/how-to-get-the-cpu-cycle-count-in-x86-64-from-c</a></p>

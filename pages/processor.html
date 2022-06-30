@@ -2,7 +2,7 @@
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>CPU pipeline</title>
+        <title>Processor</title>
         <style>
 /* From extension vscode.github */
 /*---------------------------------------------------------------------------------------------
@@ -44,11 +44,11 @@
         <style>
 #button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
 </style>
-        
-        
     </head>
     <body class="vscode-body vscode-light">
-        <ul>
+        <!-- title: Processor -->
+<p><a href="#" class="to-top">➤</i></a></p>
+<ul>
 <li><a href="#cpu-pipeline">CPU pipeline</a>
 <ul>
 <li><a href="#the-pipeline-in-pm">The pipeline in PM</a></li>
@@ -74,6 +74,7 @@
 <h1 id="cpu-pipeline">CPU pipeline</h1>
 <p>The pipeline in PPro, P2 and P3</p>
 <p><img src="images/2022-01-24-22-25-38.png" alt=""></p>
+<p><img src="images/2022-06-27-12-37-04.png" alt=""></p>
 <p>The main stages in the pipeline are:</p>
 <ul>
 <li>branch prediction,</li>
@@ -177,7 +178,7 @@ the microprocessor can fetch the value of [MEM2] at the same time as it is doing
 <li>Speculative execution means that the instructions are decoded and executed, but the results are not retired into the permanent register file, and memory writes are pending until the branch instruction is finally resolved.</li>
 <li>In case of <strong>branch misprediction</strong>, the pipeline is flushed, the results of the speculative execution are discarded and the other branch is fed into the pipeline. The number of wasted clock cycles is approximately equal to the length of the pipeline.</li>
 </ul>
-<p>Speculative execution can execute invalid instruction that normally could result in crash, e.g., the processor really does dereference a NULL pointer (like in below code) or read the non-existing vector element v[i+1]  (towards the end of loop) during the speculative execution, then pretends that it never happened. The catastrophic response to such a potential disaster must be held pending, neither discarded nor allowed to become a reality until the branch condition is actually evaluated</p>
+<p>Speculative execution can execute invalid instruction that normally could result in crash, e.g., the processor really does dereference a NULL pointer (like in below code) or read the non-existing vector element <code>v[i+1]</code>  (towards the end of loop) during the speculative execution, then pretends that it never happened. The catastrophic response to such a potential disaster must be held pending, neither discarded nor allowed to become a reality until the branch condition is actually evaluated. One particular case is memory writes must be held until branch evaluation (this is done via CPU write buffer).</p>
 <pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">f</span><span class="hljs-params">(<span class="hljs-keyword">int</span>* p)</span> </span>{
     <span class="hljs-keyword">if</span> (p) {
         <span class="hljs-keyword">return</span> *p;
@@ -193,7 +194,8 @@ the microprocessor can fetch the value of [MEM2] at the same time as it is doing
 <li>predicting whether a conditional jump will be taken or not</li>
 <li>predicting the target address that a conditional or unconditional jump goes to.</li>
 </ul>
-<p>A cache called Branch Target Buffer (BTB) stores the target address of all jumps.</p>
+<p>A cache called <strong>Branch Target Buffer</strong> (BTB) stores the target address of all jumps.</p>
+<p>With <code>perf stat</code>, you can see the <em>branch-misses</em> stats, even 1% is pretty bad in practice.</p>
 <h2 id="optimize-jump-and-call">Optimize jump and call</h2>
 <ul>
 <li>It is good to place more frequent taken branch first (right after conditional jump)</li>
@@ -209,7 +211,8 @@ We can say that a conditional jump is faster than a conditional move if the code
 </ul>
 </li>
 </ul>
-<p><a href="#" class="to-top">➤</i></a></p>
 
+        
+        
     </body>
     </html>

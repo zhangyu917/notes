@@ -53,6 +53,7 @@
 <li><a href="#publishing-shared-pointers">Publishing shared pointers</a></li>
 </ul>
 </li>
+<li><a href="#rcu">RCU</a></li>
 <li><a href="#thread-safe-stack">Thread-safe stack</a>
 <ul>
 <li><a href="#design-thread-safe-interface">Design thread-safe interface.</a></li>
@@ -119,6 +120,17 @@ std::shared_ptr&lt;T&gt; p_;
 <span class="hljs-keyword">const</span> T* data = std::<span class="hljs-built_in">atomic_load_explicit</span>(
     &amp;p_, std::memory_order_acquire).<span class="hljs-built_in">get</span>();
 </div></code></pre>
+<br>
+<br>
+<h1 id="rcu">RCU</h1>
+<p>RCU stands for &quot;Read, Copy, Update&quot;. It can be seen as a publishing protocol.</p>
+<ul>
+<li>Data is accessible via &quot;root pointer&quot; (can be a pointer, or an index into an array, or even a size variable), must be atomic</li>
+<li>Reader: acquire &quot;root pointer&quot; atomically, access data</li>
+<li>Write: read current data, copy to new data, update new data, and publish it</li>
+<li>Some readers see old data, other readers see new data.</li>
+</ul>
+<br>
 <br>
 <h1 id="thread-safe-stack">Thread-safe stack</h1>
 <p>One of the simplest data structures is stack because stack deals with the top element only.</p>

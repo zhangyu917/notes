@@ -2,7 +2,7 @@
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>C&plus;&plus; CAS&comma; Mutexes&comma; Locks</title>
+        <title>C&plus;&plus; atomic&comma; CAS&comma; Mutexes&comma; Locks</title>
         <style>
 /* From extension vscode.github */
 /*---------------------------------------------------------------------------------------------
@@ -46,10 +46,11 @@
 </style>
     </head>
     <body class="vscode-body vscode-light">
-        <!-- title: C++ CAS, Mutexes, Locks -->
-<h1>C++ CAS, Mutexes, Locks</h1>
+        <!-- title: C++ atomic, CAS, Mutexes, Locks -->
+<h1>C++ atomic, CAS, Mutexes, Locks</h1>
 <p><a href="#" class="to-top">➤</i></a></p>
 <ul>
+<li><a href="#stdatomic"><code>std::atomic</code></a></li>
 <li><a href="#cas">CAS</a></li>
 <li><a href="#mutex">Mutex</a></li>
 <li><a href="#locks">Locks</a>
@@ -76,34 +77,105 @@
 </ul>
 </li>
 </ul>
+<h1 id="stdatomic"><code>std::atomic</code></h1>
+<p>atomic operation is an operation that is guaranteed to execute as a single transaction</p>
+<ul>
+<li>other threads will see the state of the system before the operation or after, but not any intermediate state</li>
+<li>At the low level, atomic operations the special hardware instructions (hardware guarantees atomicity)</li>
+</ul>
+<p>Any <em><strong>trivially copyable</strong></em> type can be made atomic. What is trivally copyable?</p>
+<ul>
+<li>Continous chunk of memory</li>
+<li>Copying the object means copying all bits (basically it means you can copy it via <code>memcpy</code>)</li>
+<li>No virtual functions, noexcept constructor</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;atomic&gt;</span></span>
+std::atomic&lt;<span class="hljs-keyword">int</span>&gt; x{<span class="hljs-number">0</span>}; <span class="hljs-comment">// not okay: x = 0;  okay: x(0);</span>
+std::atomic&lt;<span class="hljs-keyword">double</span>&gt; y; <span class="hljs-comment">// okay</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">S</span> {</span> <span class="hljs-keyword">long</span> x; <span class="hljs-keyword">long</span> y};
+std::atomic&lt;S&gt; s; <span class="hljs-comment">// okay</span>
+
+++x; <span class="hljs-comment">// atomic pre-increment</span>
+x++; <span class="hljs-comment">// atomic post-increment</span>
+x += <span class="hljs-number">1</span>; <span class="hljs-comment">// atomic increment</span>
+x |= <span class="hljs-number">1</span>; <span class="hljs-comment">// atomic bitset</span>
+<span class="hljs-comment">//x *= 2; // No atomic multiplication </span>
+<span class="hljs-keyword">int</span> y = x * <span class="hljs-number">2</span>; <span class="hljs-comment">// atomic read of x</span>
+x = y + <span class="hljs-number">1</span>; <span class="hljs-comment">// atomic write of x</span>
+x = x + <span class="hljs-number">1</span>; <span class="hljs-comment">// the whole expression is not atomic!! it is an atomic read followed by an atomic write</span>
+</div></code></pre>
+<p>Operations supported on <code>std::atomic&lt;T&gt;</code></p>
+<ul>
+<li>Assignment and copy (also explicit <code>load()</code>/<code>store()</code>) for all types (build-in and user-defined)</li>
+<li><code>exchange()</code>, <code>compare_exchange_weak()</code>, <code>compare_exchange_strong()</code></li>
+<li>Addition, subtraction, bitwise operataion for integers (++, +=, --, -=, |=, &amp;=, ^=)</li>
+<li>Increment and decrement for raw pointers</li>
+<li>std::atomic<bool> is valid, no special operations (only read/write)</li>
+<li>std::atomic<double> is valid, no special operations (only read/write)
+<ul>
+<li><a href="c20.html#atomic-floating-point-types">c++20 provides additional atomic operations appropriate to floating-point types</a></li>
+</ul>
+</li>
+</ul>
+<p>std::atomic is not always lock-free</p>
+<ul>
+<li>Use <code>std::atomic&lt;T&gt;::is_lock_free()</code> to check at runtime. This is done at runtime due to alignment, some platforms have alignment requirement for lock free.</li>
+<li>C++17 adds constexpr <code>is_always_lock_free()</code> at compile time.</li>
+</ul>
+<pre><code class="language-C++"><div><span class="hljs-comment">// below types, std::atomic&lt;T&gt;::is_lock_free() return true;</span>
+<span class="hljs-keyword">long</span> x;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">A</span> {</span> <span class="hljs-keyword">long</span> x; };
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">B</span> {</span> <span class="hljs-keyword">long</span> x; <span class="hljs-keyword">long</span> y; }; <span class="hljs-comment">// 16-bytes atomic move to %mmx</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">C</span> {</span> <span class="hljs-keyword">long</span> x; <span class="hljs-keyword">int</span> y; };  <span class="hljs-comment">// 16-bytes (with padding)</span>
+
+<span class="hljs-comment">// below types, std::atomic&lt;T&gt;::is_lock_free() return false;</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">D</span> {</span> <span class="hljs-keyword">int</span> x; <span class="hljs-keyword">int</span> y; <span class="hljs-keyword">int</span> z; }; <span class="hljs-comment">// 12 bytes, not lock_free</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">E</span> {</span> <span class="hljs-keyword">long</span> x; <span class="hljs-keyword">long</span> y; <span class="hljs-keyword">long</span> z;}; <span class="hljs-comment">// larger than 16 bytes type, x86 doesn&#x27;t have atomic instruction operating on types larger than 16 bytes.</span>
+</div></code></pre>
 <h1 id="cas">CAS</h1>
 <p><a href="https://preshing.com/20150402/you-can-do-any-kind-of-atomic-read-modify-write-operation/">https://preshing.com/20150402/you-can-do-any-kind-of-atomic-read-modify-write-operation/</a></p>
 <p>Atomic read-modify-write operations – or “RMWs” – let you read from a variable in shared memory and simultaneously write a different value in its place. In the C++11 atomic library, all of the following functions perform an RMW:</p>
 <ul>
-<li>std::atomic&lt;&gt;::fetch_add()</li>
+<li>std::atomic&lt;&gt;::fetch_add() // returns the old value</li>
 <li>std::atomic&lt;&gt;::fetch_sub()</li>
 <li>std::atomic&lt;&gt;::fetch_and()</li>
 <li>std::atomic&lt;&gt;::fetch_or()</li>
 <li>std::atomic&lt;&gt;::fetch_xor()</li>
-<li>std::atomic&lt;&gt;::exchange()</li>
-<li>std::atomic&lt;&gt;::compare_exchange_strong()</li>
+<li>std::atomic&lt;&gt;::exchange() // returns the old value</li>
+<li>std::atomic&lt;&gt;::compare_exchange_strong() // retrns a bool (if the operation was successful)</li>
 <li>std::atomic&lt;&gt;::compare_exchange_weak()</li>
 </ul>
 <p>Out of all the available RMW operations in C++11, the only one that is absolutely essential is <code>compare_exchange_weak</code>. Every other RMW operation can be implemented using that one.</p>
 <ul>
 <li><code>compare_exchange_weak</code> will sometimes false (spurious), so use it in a loop</li>
+<li>in X86, <code>compare_exchange_weak()</code> and <code>compare_exchange_strong()</code> generates same instruction.</li>
 </ul>
 <p>compare and swap conceptually an atomic execution of</p>
-<pre><code class="language-C++"><div>  <span class="hljs-keyword">bool</span> atomic&lt;T&gt;::<span class="hljs-built_in">compare_exchange_strong</span>(T&amp; expected, T desired) {
-      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>-&gt;value == expected) {
-          <span class="hljs-keyword">this</span>-&gt;value = desired; <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>; 
-      }
-      <span class="hljs-keyword">else</span> { 
-          expected = <span class="hljs-keyword">this</span>-&gt;value; <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>; 
-      }
-  }
+<pre><code class="language-C++"><div><span class="hljs-keyword">bool</span> atomic&lt;T&gt;::<span class="hljs-built_in">compare_exchange_strong</span>(T&amp; expected, T desired) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>-&gt;value == expected) {
+        <span class="hljs-keyword">this</span>-&gt;value = desired; <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>; 
+    }
+    <span class="hljs-keyword">else</span> { 
+        expected = <span class="hljs-keyword">this</span>-&gt;value; <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>; 
+    }
+}
 </div></code></pre>
 <p><img src="images/2022-04-26-14-38-16.png" alt=""></p>
+<p><code>compare_exchange_*</code> can have two memory ordering parameters. You can conceptually think of it like below</p>
+<pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">compare_exchange_strong</span><span class="hljs-params">(T&amp; expected, T desired, memory_order on_success, memory_order on_failure)</span> </span>{
+    T tmp = value.<span class="hljs-built_in">load</span>(on_failure); <span class="hljs-comment">// on_failure: memory ordering for the load operation if the comparison fails.</span>
+    <span class="hljs-keyword">if</span> (tmp != expected) {
+        expected = tmp; <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+    Lock L; <span class="hljs-comment">// now get exclusive access</span>
+    tmp = value; <span class="hljs-comment">// load value again, value could have changed. Same idea of double-checking lock</span>
+    <span class="hljs-keyword">if</span> (tmp != expected) {
+        expected = tmp; <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+    value.<span class="hljs-built_in">store</span>(desired, on_success); <span class="hljs-comment">// on_success: memory ordering for the read-modify-write operation if the comparison succeeds.</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+}
+</div></code></pre>
 <p><strong>Implement spin lock with CAS</strong></p>
 <pre><code class="language-C++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">spin_lock</span>
 {</span>

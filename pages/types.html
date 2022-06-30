@@ -57,7 +57,6 @@
 </li>
 <li><a href="#floating-numbers">Floating numbers</a>
 <ul>
-<li><a href="#fp-operation-cost">FP operation Cost</a></li>
 <li><a href="#floating-point-representation">Floating-point representation</a></li>
 <li><a href="#underflow">Underflow</a></li>
 <li><a href="#propagation-of-nan-and-inf">Propagation of NAN and INF</a></li>
@@ -94,26 +93,22 @@
 <ul>
 <li>Division by a constant: <strong>Unsigned is faster</strong> than signed when you divide an integer with a constant. This also applies to the modulo operator %.</li>
 <li>Conversion to floating point: <strong>Signed is faster</strong> than unsigned integers for most instruction sets.</li>
-<li>One case here: [links] The art of writing efficient programs</li>
+<li>prefer unsigned to signed except when converting to floating point</li>
 </ul>
-<p>Conversion between signed and unsigned integers is costless. It is simply a matter of interpreting the same bits differently.</p>
+<p><strong>Conversion between signed and unsigned integers is costless</strong>. It is simply a matter of interpreting the same bits differently.</p>
 <pre><code class="language-C++"><div><span class="hljs-keyword">int</span> a, b;
 <span class="hljs-keyword">double</span> c;
 b = (<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>)a / <span class="hljs-number">10</span>; 	<span class="hljs-comment">// Convert to unsigned for fast division</span>
 c = a * <span class="hljs-number">2.5</span>;			    <span class="hljs-comment">// Use signed when converting to double</span>
 </div></code></pre>
 <p><strong>Not to mix signed and unsigned integers in comparisons</strong>, such as &lt;. The result of comparing signed with unsigned integers is ambiguous and may produce undesired results.</p>
-<p>Multiplication and division take longer time.</p>
+<p>Multiplication, especially division take longer time.</p>
 <ul>
 <li>Integer multiplication takes 3 - 4 clock cycles on most modern microprocessors.</li>
 <li>Integer division takes 40 - 80 clock cycles</li>
+<li>Integer division is even more expensive than floating-point division!</li>
 </ul>
-<p>Pre-increment operator ++i and the post-increment operator i++ are same in efficiency by themselves, they are as fast as additions. But they are some exceptions.</p>
-<ul>
-<li>x = array[i++] is more efficient than x = array[++i], because in the latter case, the calculation of the address of the array element has to wait for the new value of i which will delay the availability of x for approximately two clock cycles.</li>
-<li>in the case a = ++b; the compiler will recognize that the values of a and b are the same after this statement so that it can use the same register for both. This is not the case for a = b++;</li>
-</ul>
-<p>The following guidelines can be used for improving code that contains integer division:</p>
+<p><strong>Integer division guidelines:</strong></p>
 <ul>
 <li>Integer division by a constant is faster than division by a variable. Make sure the value of the divisor is known at compile time.</li>
 <li>Integer division by a constant is faster if the constant is a power of 2</li>
@@ -127,6 +122,17 @@ a = (<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</
 a = b / <span class="hljs-number">16</span>; 			     <span class="hljs-comment">// Faster if divisor is a power of 2</span>
 a = (<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>)b / <span class="hljs-number">16</span>;	 <span class="hljs-comment">// Still faster if unsigned</span>
 </div></code></pre>
+<p>Pre-increment operator <code>++i</code> and the post-increment operator <code>i++</code> are same in efficiency by themselves, they are as fast as additions. But they are some exceptions.</p>
+<ul>
+<li><code>array[i++]</code> is more efficient than <code>array[++i]</code>, because in the latter case, the calculation of the address of the array element has to wait for the new value of i which will delay the availability of x for approximately two clock cycles.</li>
+<li>in the case <code>a = ++b</code>; the compiler will recognize that the values of <code>a</code> and <code>b</code> are the same after this statement so that it can use the same register for both. This is not the case for <code>a = b++</code>;</li>
+</ul>
+<p>Prefer 32-bit ints to all other sizes because ALU can do two 32-bit operations at the same time.</p>
+<ul>
+<li>64-bit may make some code 20x slower</li>
+<li>8, 16-bit computations use conversion to 32 bits and back</li>
+<li>use small ints in arrays</li>
+</ul>
 <h3 id="integer-2s-complement-representation">Integer 2's Complement Representation</h3>
 <p>In 2's complement representation:</p>
 <ul>
@@ -179,9 +185,9 @@ An n-bit 2's complement signed integer can represent integers from <code>-2^(n-1
 <p>Modern compilers will use vector registers (instead of x87 registers) for floating point calculations whenever they are available, i.e. in 64-bit mode or when the SSE or higher instruction set is enabled.</p>
 <p>In most cases, double precision calculations take no more time than single precision.</p>
 <ul>
-<li>Single precision division, square root, and mathematical functions are calculated faster than double precision when the XMM registers are used,</li>
+<li>Single precision division, square root, and mathematical functions are calculated faster than double precision when the XMM registers are used.</li>
 </ul>
-<h3 id="fp-operation-cost">FP operation Cost</h3>
+<p><strong>FP operation Cost</strong></p>
 <ul>
 <li>Floating point addition takes 3 - 6 clock cycles.</li>
 <li>Multiplication takes 4 - 8 clock cycles.</li>
@@ -195,14 +201,15 @@ The compiler will calculate (1./1.2345) at compile time and insert the reciproca
 </li>
 </ul>
 <br>
-<p>Do not mix single and double precision in the same expression.</p>
+<p><strong>Do not mix single and double precision in the same expression.</strong></p>
 <pre><code class="language-c++"><div><span class="hljs-keyword">float</span> a, b;
 a = b * <span class="hljs-number">1.2</span>; <span class="hljs-comment">// 1.2 is double. Mixing double and float is bad. Use 1.2f instead.</span>
 </div></code></pre>
 <p>The C/C++ standard specifies that all floating point constants are double precision by default, so 1.2 in this example is a double precision constant. The code needs to convert b from single precision to double precision before multiplying with the double precision constant and then convert the result back to single precision. These conversions take time.</p>
-<p>Avoid conversions between integers and floating point variables, if possible.</p>
+<p><strong>Avoid integers and floating point conversions</strong>, if possible.</p>
 <ul>
 <li>refer to <a href="#integer-to-float-conversion">below</a></li>
+<li>In general: int -&gt; FP relatively cheap, FP -&gt; int very expensive</li>
 </ul>
 <h3 id="floating-point-representation">Floating-point representation</h3>
 <ul>

@@ -63,6 +63,7 @@
 </ul>
 </li>
 <li><a href="#small-vector-optimization">Small vector optimization</a></li>
+<li><a href="#vectorbool"><code>vector&lt;bool&gt;</code></a></li>
 </ul>
 </li>
 <li><a href="#stdmap">std::map</a>
@@ -148,6 +149,18 @@ T(n) = y/n = (m-1)/2 = n/2C - 1/2 = O(n)
 <p>Normal vector has 3 pointers (start, finish, end_of_storage), 24 bytes</p>
 <p><strong>SmallVector&lt;Type, N&gt;</strong> - The main advantage of SmallVector is that it allocates space for some number of elements (N) in the object itself. Because of this, if the SmallVector is dynamically smaller than N, no malloc is performed.</p>
 <p><strong>SmallVector<T></strong> (that is, omitting the N). This will choose a default number of inlined elements reasonable for allocation on the stack (for example, trying to keep sizeof(SmallVector<T>) around 64 bytes).</p>
+<br>
+<h2 id="vectorbool"><code>vector&lt;bool&gt;</code></h2>
+<p><code>std::vector&lt;bool&gt;</code> is a space-efficient specialization of <code>std::vector</code> for <code>bool</code>. It uses single bit to represent each bool in the vector.</p>
+<ul>
+<li>Also note the data stored is not required to be contiguous, so a <code>vector&lt;bool&gt;</code> can't be passed to a C API which expects a bool array.</li>
+</ul>
+<p>Becuase there is no way to reference single bit in C++, its <code>operator[]</code> (also <code>front()</code>, <code>back()</code> accessor) and dereferencing of iterators return a proxy object. This object knows how to set a particular bit in the underlying compact bits representation.</p>
+<pre><code class="language-C++"><div>std::vector&lt;<span class="hljs-keyword">bool</span>&gt; v = {<span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>};
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> &amp;b: v) { } <span class="hljs-comment">// error, can&#x27;t bind reference to a temporary object</span>
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> b : v) { b = <span class="hljs-number">1</span>; } <span class="hljs-comment">// okay</span>
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> &amp;&amp;b : v) { b = <span class="hljs-number">1</span>; } <span class="hljs-comment">// okay too, maybe preferable</span>
+</div></code></pre>
 <br>
 <br>
 <h1 id="stdmap">std::map</h1>

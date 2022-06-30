@@ -44,8 +44,6 @@
         <style>
 #button { display: inline-block; background-color: #FF9800; width: 50px; height: 50px; text-align: center; border-radius: 4px; position: fixed; bottom: 30px; right: 30px; transition: background-color .3s, opacity .5s, visibility .5s; opacity: 0; /*visibility: hidden;*/ z-index: 1000; } #button::after { content: "\f077"; font-family: FontAwesome; font-weight: normal; font-style: normal; font-size: 2em; line-height: 50px; color: #fff; } #button:hover { cursor: pointer; background-color: #333; } #button:active { background-color: #555; } #button.show { opacity: 1; visibility: visible; } #btn-back-to-top { position: fixed; bottom: 20px; right: 20px; display: none; } .to-top { background: white; position: fixed; bottom: 16px; right:32px; width:50px; height:50px; border-radius: 50%; border-color: white; display: flex; align-items: center; justify-content: center; font-size:32px; color:#1f1f1f; text-decoration: none; opacity: 0.5; pointer-events: auto; transition: all .4s; transform: rotate(270deg); } 
 </style>
-        
-        
     </head>
     <body class="vscode-body vscode-light">
         <ul>
@@ -54,7 +52,8 @@
 <li><a href="#branch-vs-cmov">branch vs cmov</a></li>
 <li><a href="#c-branch-optimization-technique">C++ Branch Optimization technique</a></li>
 <li><a href="#use-lookup-tables-for-branches">Use Lookup tables for branches</a></li>
-<li><a href="#counter-optimization-examples">Counter optimization examples</a></li>
+<li><a href="#code-optimizations">Code optimizations</a></li>
+<li><a href="#counter-bad-optimization-examples">Counter (bad) optimization examples</a></li>
 <li><a href="#cpu-branch-prediction">CPU Branch Prediction</a></li>
 <li><a href="#switch-statements">Switch statements</a>
 <ul>
@@ -78,25 +77,38 @@
 <li>The branch has the shortest latency,</li>
 <li>but the conditional move avoids the risk of branch misprediction.</li>
 </ul>
+<p>sometimes the compiler (depending on compiler) will do a branchless transformation for you</p>
+<ul>
+<li>often using conditional move instruction</li>
+<li>In particular, this is almost always branchless <code>return cond ? x : y;</code></li>
+<li>optimize only if the profiler shows high misprediction rate.</li>
+</ul>
 <h2 id="c-branch-optimization-technique">C++ Branch Optimization technique</h2>
 <h2 id="use-lookup-tables-for-branches"><a href="optimization_technique.html#lookup-table-for-branches">Use Lookup tables for branches</a></h2>
+<h2 id="code-optimizations">Code optimizations</h2>
 <p>Below may yield one or more badly predicted branches even when the overall result is predictable.</p>
-<pre><code class="language-C++"><div>    <span class="hljs-keyword">if</span> (a[i] || b[i] || c[i]) { … <span class="hljs-keyword">do</span> something … }
+<pre><code class="language-C++"><div><span class="hljs-keyword">if</span> (a[i] || b[i] || c[i]) { … <span class="hljs-keyword">do</span> something … }
     
-    <span class="hljs-comment">//Maybe it is better to do below, with only 1 branch.</span>
-    <span class="hljs-keyword">if</span> (a[i] + b[i] + c[i]) { … <span class="hljs-keyword">do</span> something … }
+<span class="hljs-comment">//Maybe it is better to do below, with only 1 branch, but a bit more compuatation</span>
+<span class="hljs-keyword">if</span> (a[i] + b[i] + c[i]) { … <span class="hljs-keyword">do</span> something … }
 </div></code></pre>
-<h2 id="counter-optimization-examples">Counter optimization examples</h2>
+<p>Another example:</p>
+<pre><code class="language-C++"><div><span class="hljs-keyword">if</span>(b) s += x;
+
+<span class="hljs-comment">// can be transformed to</span>
+s += b * x;
+</div></code></pre>
+<h2 id="counter-bad-optimization-examples">Counter (bad) optimization examples</h2>
 <p>It is almost never useful to manually optimize this very common code:</p>
 <pre><code class="language-C++"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">f</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span> </span>{ <span class="hljs-keyword">return</span> (x &gt; <span class="hljs-number">0</span>) ? x : <span class="hljs-number">0</span>; }
 </div></code></pre>
 <p>On x86, some compilers will use the CMOVE instruction, which does a conditional move: it moves the value from one of two source registers to the destination, depending on the condition.  With a conditional move implementation, the sequence of instructions is perfectly linear, and their order is predetermined, so there is nothing to guess.</p>
 <p>Another common example that is <strong>unlikely</strong> to benefit from a branchless optimization is a
 conditional function call:</p>
-<pre><code class="language-C++"><div><span class="hljs-keyword">if</span> (condition) f1(… args …) <span class="hljs-keyword">else</span> f2(… args …);
+<pre><code class="language-C++"><div><span class="hljs-keyword">if</span> (condition) <span class="hljs-built_in">f1</span>(… args …) <span class="hljs-keyword">else</span> <span class="hljs-built_in">f2</span>(… args …);
 
 <span class="hljs-comment">// A branchless implementation is possible using an array of function pointers:</span>
-<span class="hljs-keyword">using</span> func_ptr = <span class="hljs-keyword">int</span>(*)(… params …);
+<span class="hljs-keyword">using</span> func_ptr = <span class="hljs-built_in"><span class="hljs-keyword">int</span></span>(*)(… params …);
 <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> func_ptr f[<span class="hljs-number">2</span>] = { &amp;f1, &amp;f2 };
 (*f[condition])(… args …);
 </div></code></pre>
@@ -144,5 +156,7 @@ conditional function call:</p>
 </ul>
 <br>
 
+        
+        
     </body>
     </html>

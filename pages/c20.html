@@ -2300,6 +2300,7 @@ cr = y; <span class="hljs-comment">// OK (would not be OK for const std::atomic&
 </ul>
 <h2 id="atomic-floating-point-types">Atomic Floating-Point Types</h2>
 <p>Both std::atomic&lt;&gt; and std::atomic_ref&lt;&gt; now provide full specializations for floating-point types <code>float</code>, <code>double</code>, and <code>long double</code>.</p>
+<p>including <code>fetch_*</code> family, <code>+=</code>, <code>-=</code>, <code>|=</code>, <code>&amp;=</code>, <code>^=</code>, not <code>++</code>, <code>--</code></p>
 <h2 id="stdatomic-wait-and-notify_"><code>std::atomic</code> <code>wait()</code> and <code>notify_*()</code></h2>
 <p>All atomic types (<code>std::atomic&lt;&gt;</code>, <code>std::atomic_ref&lt;&gt;</code>, and <code>std::atomic_flag</code>) now provide a simple
 API to let threads block and wait for changes of their values caused by other threads.</p>

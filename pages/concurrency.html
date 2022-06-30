@@ -59,6 +59,7 @@
 </li>
 <li><a href="#reordering">Reordering</a>
 <ul>
+<li><a href="#x86-has-a-strong-memory-model">x86 has a strong memory model</a></li>
 <li><a href="#compiler-barrier">Compiler barrier</a></li>
 <li><a href="#memory-barrier">Memory barrier</a></li>
 <li><a href="#storeload">#StoreLoad</a></li>
@@ -68,7 +69,6 @@
 <li><a href="#mfence-httpswwwfelixcloutiercomx86mfence"><code>mfence</code> (https://www.felixcloutier.com/x86/mfence)</a></li>
 <li><a href="#sfence-httpswwwfelixcloutiercomx86sfence"><code>sfence</code> (https://www.felixcloutier.com/x86/sfence)</a></li>
 <li><a href="#lfence-httpswwwfelixcloutiercomx86lfence"><code>lfence</code> (https://www.felixcloutier.com/x86/lfence)</a></li>
-<li><a href="#x86-has-a-strong-memory-model">x86 has a strong memory model</a></li>
 </ul>
 </li>
 </ul>
@@ -250,6 +250,20 @@ writres Y<br></li>
 <ul>
 <li>that's the major reason we have relaxed atomics in c++11 standard</li>
 </ul>
+<h2 id="x86-has-a-strong-memory-model">x86 has a strong memory model</h2>
+<p>A strong hardware memory model is one in which every machine instruction comes implicitly with acquire and release semantics.</p>
+<ul>
+<li>all reads have acquire semantic</li>
+<li>all writes have release semantic
+<ul>
+<li>As a result, when one CPU core performs a sequence of writes, every other CPU core sees those values change in the same order that they were written.</li>
+<li>non-temporal instructions have its own semantics.</li>
+</ul>
+</li>
+<li>This means you get <code>lfence</code> and <code>sfence</code> for free. But <code>lfense</code> + <code>sfence</code> != <code>mfence</code> or full memory barrier. Specifically, for #StoreLoad, you can reorder an acquire-load ahead of a release-store. In fact, it does happen on x86.</li>
+<li>all read-modify-write operations have acquire-release semantic.</li>
+<li><code>std::memory_order_acq_rel</code> and <code>std::memory_order_seq_cst</code> are the same thing on x86</li>
+</ul>
 <h2 id="compiler-barrier">Compiler barrier</h2>
 <p><a href="https://preshing.com/20120625/memory-ordering-at-compile-time/">https://preshing.com/20120625/memory-ordering-at-compile-time/</a></p>
 <p><strong>Direct way:</strong>
@@ -294,6 +308,7 @@ The minimalist approach to preventing compiler reordering is by using a special 
 <li>Compiler transformations that introduce assignments to a potentially shared memory location that would not be modified by the abstract machine are generally precluded by this standard.</li>
 </ul>
 <h2 id="memory-barrier">Memory barrier</h2>
+<p>Memory barriers control how changes to memory made by one CPU become visible to other CPUs. This is a global control across all CPUs. In low level, memory barriers are implemented by the hardware, it can be invoked by processor-specific instructions. C++11 provides standard memory barriers via <code>std::memory_order_*</code>, which are the modifiers of atomic operations.</p>
 <p>You can enforce correct memory ordering on the processor by issuing any instruction which acts as a memory barrier. In some ways, this is the only technique you need to know, because when you use such instructions, compiler ordering is taken care of automatically. Examples of instructions which act as memory barriers include (but are not limited to) the following:</p>
 <ul>
 <li>Certain inline assembly directives in GCC, such as the PowerPC-specific <code>asm volatile(&quot;lwsync&quot; ::: &quot;memory&quot;)</code></li>
@@ -346,11 +361,6 @@ The minimalist approach to preventing compiler reordering is by using a special 
 <h3 id="lfence-httpswwwfelixcloutiercomx86lfence"><code>lfence</code> (<a href="https://www.felixcloutier.com/x86/lfence">https://www.felixcloutier.com/x86/lfence</a>)</h3>
 <p>Performs a serializing operation on all load-from-memory instructions that were issued prior the LFENCE instruction. Specifically, LFENCE does not execute until all prior instructions have completed locally, and no later instruction begins execution until LFENCE completes. In particular, an instruction that loads from memory and that precedes an LFENCE receives data from memory prior to completion of the LFENCE.</p>
 <p>In practice, it drains the local invalidation queue and re-order buffer (load queue). I am not aware of when this is useful on x86.</p>
-<h3 id="x86-has-a-strong-memory-model">x86 has a strong memory model</h3>
-<ul>
-<li>A strong hardware memory model is one in which every machine instruction comes implicitly with acquire and release semantics. As a result, when one CPU core performs a sequence of writes, every other CPU core sees those values change in the same order that they were written.</li>
-<li>On x86, barring non-temporal instructions, all reads have acquire semantic and all writes have release semantic. This means you get <code>lfence</code> and <code>sfence</code> for free. But <code>lfense</code> + <code>sfence</code> != <code>mfence</code> or full memory barrier. Specifically, for #StoreLoad, you can reorder an acquire-load ahead of a release-store. In fact, it does happen on x86.</li>
-</ul>
 <br>
 <br>
 <h1 id="memory-order">Memory order</h1>
