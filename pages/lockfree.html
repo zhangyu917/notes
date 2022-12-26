@@ -127,9 +127,14 @@ std::shared_ptr&lt;T&gt; p_;
 <ul>
 <li>Data is accessible via &quot;root pointer&quot; (can be a pointer, or an index into an array, or even a size variable), must be atomic</li>
 <li>Reader: acquire &quot;root pointer&quot; atomically, access data</li>
-<li>Write: read current data, copy to new data, update new data, and publish it</li>
+<li>Write: read current data, copy to new data, update new data, and publish it
+<ul>
+<li>RCU implies the writer publishes a new copy of the data instead of changing the data in place.</li>
+</ul>
+</li>
 <li>Some readers see old data, other readers see new data.</li>
 </ul>
+<p>The problem: readers may hold &quot;stale&quot; reference to the data that the writer already made inaccessible from the &quot;root pointer&quot;. The problem is when to delete (reclaim) the memory. This way of memory reclaimation is what made RCU special.</p>
 <br>
 <br>
 <h1 id="thread-safe-stack">Thread-safe stack</h1>
