@@ -119,6 +119,12 @@
 <li><a href="#tma-in-perf">TMA in <code>perf</code></a></li>
 </ul>
 </li>
+<li><a href="#last-branch-record-lbr">Last Branch Record (LBR)</a>
+<ul>
+<li><a href="#perf-with-lbr">perf with LBR</a></li>
+</ul>
+</li>
+<li><a href="#intel-precossor-traces-pt">Intel Precossor Traces (PT)</a></li>
 </ul>
 </li>
 <li><a href="#observability-sources">Observability Sources</a>
@@ -346,6 +352,65 @@ Percent | Disassembly of a.out for MEM_LOAD_RETIRED.L3_MISS
 0.00 : 400e16: ret
 
 </code></pre>
+<br>
+<br>
+<h2 id="last-branch-record-lbr">Last Branch Record (LBR)</h2>
+<p>Branches can be used to determine the control flow of our program. Branches are always the last instruction in a basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch.</p>
+<p>CPU can continuously log branches to a set of model-specific registers (MSRs), Hardware logs the “from” and “to” address of each branch along with some additional metadata. The registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes.</p>
+<ul>
+<li>Last Branch Record (LBR) Stack — since Skylake provides 32 pairs of MSRs that store the source and destination address of recently taken branches. (In Haswell and Broadwell architectures LBR stack is 16 entries deep).
+<ul>
+<li>LBR Entry:
+<ul>
+<li><code>FROM_IP</code> and <code>TO_IP</code>, which are basically source address of the branch and destination address.</li>
+<li>dedicate bit to indicate branch mispredication</li>
+<li>Since Skylake additional <code>LBR_INFO</code> component was added to the LBR entry, which has and <code>Cycle Count</code> field that counts elapsed core clocks since the last update to the LBR stack.</li>
+</ul>
+</li>
+<li>The exact format of LBR entry for a specific processor can be found in [Int, 2020, Volume 3B, Chapters 17,18]</li>
+</ul>
+</li>
+<li>Last Branch Record Top-of-Stack (TOS) Pointer — contains a pointer to the MSR in the LBR stack that contains the most recent branch, interrupt or exception recorded.</li>
+</ul>
+<p>Note:</p>
+<ul>
+<li>only taken branches are being logged with the LBR mechanism.</li>
+<li>this is still sampling, so not every executed branch can be examined</li>
+<li>Runtime overhead for the majority of LBR use cases is below 1%</li>
+</ul>
+<h3 id="perf-with-lbr">perf with LBR</h3>
+<p>Basic usage:</p>
+<pre><code>$ ~/perf record -b -e cycles ./a.exe
+[ perf record: Woken up 68 times to write data ]
+[ perf record: Captured and wrote 17.205 MB perf.data (22089 samples) ]
+
+# LBR stacks can also be collected using below command, but the amount of information collected is less than using `perf record -b`. Those info from LBR Entry is not captured
+$ perf record --call-graph lbr
+</code></pre>
+<p>Some specifc usage</p>
+<pre><code># Capture call graph
+$ perf record --call-graph lbr -- ./a.exe
+$ perf report -n --stdio
+
+# Identify hot branches
+$ perf record -e cycles -b -- ./a.exe
+$ perf report -n --sort overhead,srcline_from,srcline_to -F +dso,symbol_from,symbol_to --stdio
+
+# Analyze branch misprediction rate
+# https://lwn.net/Articles/680996/
+$ perf record -e cycles -b -- ./a.exe
+$ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srcline_to --stdio
+</code></pre>
+<p>Precise timing of machine code - Currently, timed LBR is the most precise cycle-accurate source of timing information in the system.</p>
+<pre><code># This prints all functions grouped by cycle count
+# filter interested function, we will get the latency distribution for the basic block that ends with this branch
+$ perf record -e cycles -b -- ./a.exe
+$ perf report -n --sort symbol_from,symbol_to -F +cycles,srcline_from,srcline_to --stdio
+</code></pre>
+<br>
+<h2 id="intel-precossor-traces-pt">Intel Precossor Traces (PT)</h2>
+<p>a CPU feature that records the program execution by encoding packets in a highly compressed binary format that can be used to reconstruct execution flow with a timestamp on every instruction. PT relatively small overhead (usually below 5%). Its main usages are postmortem
+analysis and root-causing performance glitches.</p>
 <br>
 <br>
 <h1 id="observability-sources">Observability Sources</h1>

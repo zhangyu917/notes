@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>NUMA</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+        <style>
+#button {
+    display: inline-block;
+    background-color: #FF9800;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    border-radius: 4px;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    transition: background-color .3s, 
+      opacity .5s, visibility .5s;
+    opacity: 0;
+    /*visibility: hidden;*/
+    z-index: 1000;
+}
+#button::after {
+    content: "\f077";
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 2em;
+    line-height: 50px;
+    color: #fff;
+}
+#button:hover {
+    cursor: pointer;
+    background-color: #333;
+}
+#button:active {
+    background-color: #555;
+}
+#button.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#btn-back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+  }
+
+  .to-top {
+    background: white;
+    position: fixed;
+    bottom: 16px;
+    right:32px;
+    width:50px;
+    height:50px;
+    border-radius: 50%;
+    border-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size:32px;
+    color:#1f1f1f;
+    text-decoration: none;
+    opacity: 0.5;
+    pointer-events: auto;
+    transition: all .4s;
+    transform: rotate(270deg);
+  }
+  
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <h1 id="numa">NUMA</h1>
+<h2 id="first-touch-numa-policy">&quot;first-touch&quot; NUMA policy</h2>
+<p>calling <code>new</code> does not actually allocate physical memory. Memory policies specify what should happen when the system needs to allocate memory for a virtual address. Pages in a process's memory space that have not been touched or that are zero do not have memory assigned to them. The processor will generate a hardware fault when a process touches or writes to an address (page fault) that is not yet populated. During page-fault handling by the kernel, the page is allocated. The first-touch policy refers to the fact that a page is allocated based on the effective policy when some process first uses a page in some fashion.</p>
+<p>The default policy is to try to allocate the new page on the same NUMA node, where the thread that accessed the memory area runs. This is called a &quot;first-touch&quot; NUMA policy. If there is not enough memory on that NUMA node, the page is allocated on some other node with enough free memory.</p>
+<h2 id="numa_maps---see-where-memory-is-allocated">numa_maps - See where memory is allocated</h2>
+<p>The active memory allocation policies for all memory segments of a process (and information that shows how much memory was actually allocated from which node) can be seen by determining the process id and then looking at the contents of <code>/proc/&lt;pid&gt;/numa_maps</code>.</p>
+<p>The output shows the virtual address of the policy and then some information about the NUMA characteristics of the memory range. <code>Anon</code> means that the pages do not have an associated file on disk. `Nx shows the number of pages on the respective node.</p>
+<pre><code># cat /proc/1/numa_maps
+7f830c175000 default anon=1 dirty=1 active=0 N1=1
+7f830c177000 default file=/lib/x86_64-linux-gnu/ld-2.15.so anon=1 dirty=1 active=0 N1=1
+7f830c178000 default file=/lib/x86_64-linux-gnu/ld-2.15.so anon=2 dirty=2 active=0 N1=2
+7f830c17a000 default file=/sbin/init mapped=18 N1=18
+7f830c39f000 default file=/sbin/init anon=2 dirty=2 active=0 N1=2
+7f830c3a1000 default file=/sbin/init anon=1 dirty=1 active=0 N1=1
+7f830dc56000 default heap anon=223 dirty=223 active=0 N0=52 N1=171
+7fffb6395000 default stack anon=5 dirty=5 active=1 N1=5
+</code></pre>
+<p>The information about how memory is used in the system as a whole is available in <code>/proc/meminfo</code>. The same information is also available for each NUMA node in <code>/sys/devices/system/node/node&lt;X&gt;/meminfo</code>.</p>
+<h2 id="numactl">numactl</h2>
+<p>The hardware NUMA configuration of a system can be viewed by using <code>numactl -hardware</code>.</p>
+<pre><code>$ numactl --hardware
+$ numactl -H
+available: 2 nodes (0-1)
+node 0 cpus: 0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30
+node 0 size: 131026 MB
+node 0 free: 588 MB
+node 1 cpus: 1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31
+node 1 size: 131072 MB
+node 1 free: 169 MB
+node distances:
+node  0  1
+  0: 10 20
+  1: 20 10
+</code></pre>
+<p>This includes a dump of the SLIT (system locality information table) that shows the cost of accesses to different nodes in a NUMA system. The example below shows a NUMA system with two nodes. The distance for a local access is 10. A remote access costs twice as much on this system (20). This is the convention, but the practice of some vendors (especially for two-node systems) is simply to report 10 and 20 without regard to the actual latency differences to memory.</p>
+<h2 id="numastat">numastat</h2>
+<p>Numastat is another tool that is used to show how many allocations were satisfied from the local node. Of particular interest is the numa_miss counter, which indicates that the system assigned memory from a different node in order to avoid reclaim. These allocations also contribute to other node. The remainder of the count is intentional off-node allocations. The amount of off-node memory can be used as a guide to figure out how effectively memory was assigned to processes running on the system.</p>
+<pre><code>$ numastat
+                node0       node1
+numa_hit        13273229839 4595119371
+numa_miss       2104327350  6833844068
+numa_foreign    6833844068  2104327350
+interleave_hit  52991       52864
+local_node      13273229554 4595091108
+other_node      2104327635  6833872331
+</code></pre>
+
+        <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+        
+    </body>
+    </html>

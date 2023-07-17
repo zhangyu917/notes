@@ -246,7 +246,14 @@ P4/NetBurst design has been discontinued.</p>
 <h3 id="pipeline-hazards">Pipeline hazards</h3>
 <p>Pipeline hazards prevent the ideal pipeline behavior resulting in stalls. The three classes of hazards are structural hazards (resource conflicts), data hazards (described below), and control hazards (caused by branches and other instructions that change the program flow).</p>
 <ul>
-<li>Read-after-write (RAW) hazard requires dependent read to execute after write. CPUs implement data forwarding from a later stage of the pipeline to an earlier stage (called <em>“bypassing”</em>) to mitigate the penalty associated with the RAW hazard.</li>
+<li>Read-after-write (RAW) hazard requires dependent read to execute after write. CPUs implement data forwarding from a later stage of the pipeline to an earlier stage (called <em>“bypassing”</em>) to mitigate the penalty associated with the RAW hazard.
+<ul>
+<li>write buffer (store buffer) bypass, AKA, store-to-load forwarding</li>
+</ul>
+</li>
+</ul>
+<img src="images/2023-07-01-21-13-31.png" width="600">
+<ul>
 <li>Write-after-read (WAR) hazard requires dependent write to execute after read. WAR hazard is not a true dependency and can be eliminated by <em>register renaming</em></li>
 </ul>
 <pre><code>R1 = R0 ADD 1

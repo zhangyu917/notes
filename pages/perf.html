@@ -283,7 +283,7 @@ perf <span class="hljs-built_in">stat</span> -e <span class="hljs-string">&#x27;
 <li>On every sample (or on interrupt from hardware PMU) <code>perf</code> will record current PC (EIP, instruction pointer,  i.e. where was the program when it was interrupted) and/or callstack; (<code>perf</code> has Interrupt Service Routine (ISR) for doing this)</li>
 <li>When using <code>perf record</code> with PMCs, a default sample frequency (typically 4000) is used so that not every event is recorded.</li>
 </ul>
-<p><img src="images/2023-06-25-21-28-53.png" alt=""></p>
+<img src="images/2023-06-25-21-28-53.png" width="600">
 <p><code>perf --help record</code></p>
 <ul>
 <li><code>-a</code>: Record across all CPUs (this became the default in Linux 4.11)</li>
@@ -316,6 +316,7 @@ perf record -F 99 <span class="hljs-built_in">command</span>
 </code></pre>
 <h2 id="perf-report"><code>perf report</code></h2>
 <p><em><code>*perf report</code></em>* will parse <code>perf.data</code> to get all PC recorded in it. It will count how many times each PC was sampled to build histogram [PC] -&gt; sample_count. Every PC will be associated with the exact function it belongs (<code>perf report</code> will parse memory map, as mmap events are recorded in <code>perf.data</code> too, open every binary used, find symbols table of every binary).</p>
+<p><a href="https://man7.org/linux/man-pages/man1/perf-report.1.html">https://man7.org/linux/man-pages/man1/perf-report.1.html</a></p>
 <p><code>perf --help report</code></p>
 <ul>
 <li><code>--tui</code>: Use the TUI interface (default)</li>
