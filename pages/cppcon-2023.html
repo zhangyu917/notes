@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>lifetime safty</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+        <style>
+#button {
+    display: inline-block;
+    background-color: #FF9800;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    border-radius: 4px;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    transition: background-color .3s, 
+      opacity .5s, visibility .5s;
+    opacity: 0;
+    /*visibility: hidden;*/
+    z-index: 1000;
+}
+#button::after {
+    content: "\f077";
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 2em;
+    line-height: 50px;
+    color: #fff;
+}
+#button:hover {
+    cursor: pointer;
+    background-color: #333;
+}
+#button:active {
+    background-color: #555;
+}
+#button.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#btn-back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+  }
+
+  .to-top {
+    background: white;
+    position: fixed;
+    bottom: 16px;
+    right:32px;
+    width:50px;
+    height:50px;
+    border-radius: 50%;
+    border-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size:32px;
+    color:#1f1f1f;
+    text-decoration: none;
+    opacity: 0.5;
+    pointer-events: auto;
+    transition: all .4s;
+    transform: rotate(270deg);
+  }
+  
+</style>
+    </head>
+    <body class="vscode-body vscode-light">
+        <h1 id="lifetime-safty">lifetime safty</h1>
+<p>Memory safty: 70% of all security bugs are memory safefty errors</p>
+<ul>
+<li>spartial safety
+<ul>
+<li>out of bundary access
+<ul>
+<li>buffer check - microsoft to be released soon</li>
+<li>ASAN, GWP-ASAN, HWASAN + Fuzzing</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>temporal safety
+<ul>
+<li>use-after-free issues
+<ul>
+<li>ASAN, GWP-ASAN</li>
+<li>Lifetime saftey profile</li>
+<li>etc (in pic)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>appoaches to safety</li>
+</ul>
+<ul>
+<li>safe-by-construction vs opportunistic bug-finding</li>
+<li>(in pic)</li>
+<li>hybrid apporach</li>
+</ul>
+<p>c++ is getting safer</p>
+<ul>
+<li>constexr/consteval</li>
+<li>some examples thats available in C++23</li>
+<li>(missing pic)</li>
+</ul>
+<ul>
+<li>The lifetime safety toolbox</li>
+</ul>
+<p>statement-local lifetime analysis</p>
+<ul>
+<li>(example in pic)</li>
+<li>MSVC, -Wdangling-gsl in clang (it is on by default in recent clang version), -Wdangling-refernce in GCC</li>
+<li>Wdangling-gsl examples</li>
+</ul>
+<p>lifetiembound annotation</p>
+<ul>
+<li>(example in pic)</li>
+<li>available both in msvc and clang</li>
+</ul>
+<p>flow-sensitive lifetime analysis</p>
+<ul>
+<li>condition based lifetime valid-ness</li>
+<li>(example in pic)</li>
+</ul>
+<p>annotation:</p>
+<ul>
+<li>[[post: lifetime (Retunr, {a})]]</li>
+<li><code>_Outptr_</code></li>
+<li>we don't have tool to say vector is not resized (third example in pic)</li>
+</ul>
+<p>other lifetime checks</p>
+<ul>
+<li>dereferenceing empty optional</li>
+<li>use after move</li>
+<li>pic</li>
+</ul>
+<ul>
+<li>what comes next</li>
+</ul>
+<p>short-term investigations at Microsoft</p>
+<ul>
+<li>(pic)</li>
+</ul>
+<p>Building a safe subset from scratch</p>
+<ul>
+<li>add a way to define affine/linear types</li>
+<li>add a safe reference with simplified borrrowing rules</li>
+<li>make safe refeences more expressive</li>
+<li></li>
+</ul>
+
+        
+        
+    </body>
+    </html>

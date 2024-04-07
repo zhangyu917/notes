@@ -113,7 +113,7 @@
 <p>The default policy is to try to allocate the new page on the same NUMA node, where the thread that accessed the memory area runs. This is called a &quot;first-touch&quot; NUMA policy. If there is not enough memory on that NUMA node, the page is allocated on some other node with enough free memory.</p>
 <h2 id="numa_maps---see-where-memory-is-allocated">numa_maps - See where memory is allocated</h2>
 <p>The active memory allocation policies for all memory segments of a process (and information that shows how much memory was actually allocated from which node) can be seen by determining the process id and then looking at the contents of <code>/proc/&lt;pid&gt;/numa_maps</code>.</p>
-<p>The output shows the virtual address of the policy and then some information about the NUMA characteristics of the memory range. <code>Anon</code> means that the pages do not have an associated file on disk. `Nx shows the number of pages on the respective node.</p>
+<p>The output shows the virtual address of the policy and then some information about the NUMA characteristics of the memory range. <code>Anon</code> means that the pages do not have an associated file on disk. <code>Nx</code> shows the number of pages on the respective node.</p>
 <pre><code># cat /proc/1/numa_maps
 7f830c175000 default anon=1 dirty=1 active=0 N1=1
 7f830c177000 default file=/lib/x86_64-linux-gnu/ld-2.15.so anon=1 dirty=1 active=0 N1=1
