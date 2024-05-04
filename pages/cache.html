@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Cache overview</title>
-        <style>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Cache overview</title>
+            <style>
 /* From extension vscode.github */
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
@@ -11,12 +11,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 .vscode-dark img[src$=\#gh-light-mode-only],
-.vscode-light img[src$=\#gh-dark-mode-only] {
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
 	display: none;
 }
 
 </style>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
 <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
@@ -37,6 +39,102 @@
     vertical-align: middle;
     pointer-events: none;
 }
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
 </style>
         <style>
 #button {
@@ -105,11 +203,12 @@
   }
   
 </style>
-    </head>
-    <body class="vscode-body vscode-light">
-        <ul>
+        </head>
+        <body class="vscode-body vscode-light">
+            <ul>
 <li><a href="#cache-overview">Cache overview</a>
 <ul>
+<li><a href="#write-combine-and-wcb">Write-Combine and WCB</a></li>
 <li><a href="#cache-coherence">Cache Coherence</a></li>
 </ul>
 </li>
@@ -146,6 +245,7 @@
 <li><a href="#introduction-to-cache-allocation-technology-cat">Introduction to Cache Allocation Technology (CAT)</a></li>
 </ul>
 </li>
+<li><a href="#ddio">DDIO</a></li>
 <li><a href="#kernel-internals">Kernel Internals</a>
 <ul>
 <li><a href="#address_space-object">address_space object.</a>
@@ -174,8 +274,11 @@
 hierarchy, and the block is not loaded into the cache.</li>
 </ul>
 </li>
-<li><strong>write-back cache</strong>. This is what Linux employs. Processes perform write operations directly into the page cache.The backing store is not immediately updated. Instead, the written-to pages in the page cache are marked as dirty and are added to a dirty list. Periodically, pages in the dirty list are written back to disk.
+<li><strong>write-back cache</strong>. This is what Linux employs. Processes perform write operations directly into the page cache.The backing store (main memory) is not immediately updated. Instead, the written-to pages in the page cache are marked as dirty and are added to a dirty list. Periodically, pages in the dirty list are written back to disk.
 <ul>
+<li>Recent Intel processors like Core, Xeon, etc. implement multi-level caches that are generally write-back at all levels (L1, L2, L3/LLC).</li>
+<li>Write-back is handled by dedicated cache controllers/agents like the CHA (Caching Home Agent) in recent server processors that manage writing back dirty lines to memory.</li>
+<li>The <code>WBINVD</code> instruction can be used to write back all modified lines from all levels of the CPU cache hierarchy (including write-back buffers) to main memory and invalidate (flushes) the entire cache hierarchy. <code>WBINVD</code> operates across all cores/processors in the system. <code>WBINVD</code> is a serializing instruction that stalls the CPU pipeline until the write-back and invalidation operations complete. It can be an expensive operation.</li>
 <li>Cache misses on write operations: write-allocate policy: the data for the missed location is loaded into the cache from
 the lower level of the hierarchy, and the write operation is subsequently handled like a write hit.</li>
 </ul>
@@ -183,6 +286,17 @@ the lower level of the hierarchy, and the write operation is subsequently handle
 </ul>
 <p>Some caching techniques:
 <a href="https://stackoverflow.com/questions/49092541/which-cache-mapping-technique-is-used-in-intel-core-i7-processor">https://stackoverflow.com/questions/49092541/which-cache-mapping-technique-is-used-in-intel-core-i7-processor</a></p>
+<h2 id="write-combine-and-wcb">Write-Combine and WCB</h2>
+<ul>
+<li>Write-combining is a way to combine and temporarily buffer multiple write operations to memory <strong>within the same cache line</strong> before writing them out to the system bus in a single burst transaction. This avoids having to perform slower partial writes to memory for every individual store operation, improving bandwidth utilization.</li>
+<li>It is a weakly-ordered memory type that does not enforce coherency with the CPU caches. Writes can be delayed and combined in the write-combining buffer (WCB).</li>
+<li>Intel processors have dedicated write-combining buffers, typically 4-10 cache-line sized (64-byte) buffers per core. On Ice Lake and later processors, the number of WCBs has increased from 10 to 12 per core.</li>
+<li>The WCBs are used for writes to memory regions marked as Write-Combining (WC), Uncached Speculative Write Combining (USWC), and regular Writeback (WB) memory types when using non-temporal store instructions.
+<ul>
+<li>On recent Intel processors, the WCB is also used for writes to regular Writeback (WB) memory when using non-temporal store instructions like <code>MOVNTDQ</code>/<code>MOVNTPS</code>.</li>
+</ul>
+</li>
+</ul>
 <h2 id="cache-coherence">Cache Coherence</h2>
 <p>Cachce coherence is handled by the hardware (processor). Processor also provides some instructions to operate on cache. In x86, there are below instructions to invalidate/flush the cache.</p>
 <ul>
@@ -568,6 +682,25 @@ Memcpy the function ptr and its length to a buffer (can be just a static buffer)
 <li><a href="https://software.intel.com/en-us/articles/code-and-data-prioritization-proof-points-and-software-enabling">https://software.intel.com/en-us/articles/code-and-data-prioritization-proof-points-and-software-enabling</a></li>
 </ul>
 <br>
+<h1 id="ddio">DDIO</h1>
+<p>DDIO (Data Direct I/O) is a hardware feature found in recent Intel Xeon server processors that allows network devices and other peripherals to directly access the CPU's last-level cache (LLC) instead of going through main memory.</p>
+<ul>
+<li>DDIO is enabled by default on Intel Xeon E5, E7 and newer Scalable Processor families like Cascade Lake and Ice Lake.</li>
+<li>By default, DDIO uses 2 ways out of the total LLC ways on Intel Xeon processors. For example, on an 11-way LLC, DDIO uses 2 out of the 11 ways. In practice, DDIO uses the two rightmost ways in LLC(i.e., bitmask of 0x003). The specific LLC ways used by DDIO are statically assigned and cannot be changed by software.</li>
+<li>DDIO's cache region is not isolated from CPU cores or other applications. This can lead to cache contention if the CPU cores also use the same ways as DDIO.</li>
+<li>DDIO is ineffective for the remote socket and it pollutes the LLC on the socket connected to the NIC.</li>
+<li>For Cascade Lake (2nd Gen Scalable) processors, you can enable/disable DDIO on a per PCIe root port basis</li>
+</ul>
+<p><img src="images/2024-05-04-09-51-24.png" alt=""></p>
+<p>figure b: DCA exploits PCIe Transaction Layer Packet Processing Hint,making it possible to prefetch portions of I/Odata to the processor’s cache. Potentially,this overcomes the drawbacks of traditional DMA, thereby achieving maximal I/O bandwidth and reducing processor stall time. it is still inefficient in terms of memory bandwidth usage since the whole packet is DMAed into main memory.</p>
+<p><strong>Writing packets</strong>. When a NIC writes a cacheline to LLC via PCIe, DDIO overwrites the cache line if it is already present in any LLC way(aka a PCIe write hit or write update). Otherwise,the cacheline is allocated in the LLC and DDIO writes the data in to the newly allocated cacheline (aka a PCIe write miss or write allocate). In the latter case, DDIO is restricted to use only a limited portion of LLC when allocating cache lines. It is possible to artificially increase this portion by warming up the cache with processor writes to the address of these buffers, then DDIO performs write-updates.</p>
+<p><strong>Reading packets.</strong> A NIC can read a cache line from LLC if the cache line is present in any LLC way (aka a PCIe read hit). Otherwise, the NIC reads a cache-line-sized chunk from system memory (aka a PCIe read miss).</p>
+<p>reference:</p>
+<ul>
+<li><a href="https://www.usenix.org/system/files/atc20-farshin.pdf">https://www.usenix.org/system/files/atc20-farshin.pdf</a></li>
+<li><a href="https://www.youtube.com/watch?v=m_yx_Sbao2I&amp;ab_channel=USENIX">https://www.youtube.com/watch?v=m_yx_Sbao2I&amp;ab_channel=USENIX</a></li>
+</ul>
+<br>
 <h1 id="kernel-internals">Kernel Internals</h1>
 <h2 id="address_space-object">address_space object.</h2>
 <p>To maintain a generic page cache, one not tied to physical files or the inode structure, Linux uses <code>address_space</code> object to represent a page cache. Think of <code>address_space</code> as the physical analogue to the virtual <code>vm_area_struct</code>.</p>
@@ -650,7 +783,7 @@ Memcpy the function ptr and its length to a buffer (can be just a static buffer)
 }
 </code></pre>
 
-        <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
-        
-    </body>
-    </html>
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>
