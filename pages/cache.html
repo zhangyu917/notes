@@ -208,7 +208,11 @@
             <ul>
 <li><a href="#cache-overview">Cache overview</a>
 <ul>
-<li><a href="#write-combine-and-wcb">Write-Combine and WCB</a></li>
+<li><a href="#write-combine-and-wcb">Write-Combine and WCB</a>
+<ul>
+<li><a href="#movdir64b"><code>MOVDIR64B</code></a></li>
+</ul>
+</li>
 <li><a href="#cache-coherence">Cache Coherence</a></li>
 </ul>
 </li>
@@ -294,6 +298,27 @@ the lower level of the hierarchy, and the write operation is subsequently handle
 <li>The WCBs are used for writes to memory regions marked as Write-Combining (WC), Uncached Speculative Write Combining (USWC), and regular Writeback (WB) memory types when using non-temporal store instructions.
 <ul>
 <li>On recent Intel processors, the WCB is also used for writes to regular Writeback (WB) memory when using non-temporal store instructions like <code>MOVNTDQ</code>/<code>MOVNTPS</code>.</li>
+</ul>
+</li>
+<li>The WCB aggressively combines any size writes (bytes, words, doublewords, etc.) that target the same 64-byte cache line region into a single cache line transfer. Once a WCB is full (with 64 bytes of combined writes) or gets evicted, the combined 64-byte cache line write is burst out to the memory subsystem.
+<ul>
+<li>For the WCB to be effectively utilized, the access pattern should have good spatial locality, i.e. multiple writes targeting the same 64-byte region to allow combining. Random or strided access patterns may lead to ineffective write-combining in the WCB if the writes are not coalescing into full 64-byte cache lines.</li>
+</ul>
+</li>
+</ul>
+<h3 id="movdir64b"><code>MOVDIR64B</code></h3>
+<p><a href="https://www.felixcloutier.com/x86/movdir64b">https://www.felixcloutier.com/x86/movdir64b</a></p>
+<p>Moves 64-bytes as <strong>direct-store</strong> with 64-byte write atomicity from source memory address to destination memory address.</p>
+<ul>
+<li><code>MOVDIR64B</code> requires the destination address to be 64-byte aligned. It guarantees 64-byte write-completion atomicity.</li>
+<li>No alignment restriction is enforced for source operand. There is no atomicity guarantee provided for the 64-byte load operation from source address, and processor implementations may use multiple load operations to read the 64-bytes.</li>
+<li>Direct-stores always follow WC memory type protocol irrespective of destination address memory type (including UC/WP types)</li>
+<li>Direct-stores are eligible for immediate eviction from the write-combining buffer. It doesn't combine with younger stores, but it may combie with older WC stores held in WCB (of the same address).</li>
+<li>Direct-stores are weakly ordered relative to other stores. Software that desires stronger ordering should use a fencing instruction (MFENCE or SFENCE) before or after a direct store to enforce the ordering desired.</li>
+<li>Other Direct-store (storing to memory that bypasses the caches) instructions
+<ul>
+<li><code>MOVDIRI</code> (Move Direct Store)</li>
+<li>non-temporal store (sometimes called streaming store) instructions like <code>MOVNTDQ</code>/<code>MOVNTPS</code> are designed to bypass the caches and write directly to memory. (But it can still use processor's WCB when write to a memory region marked as Write-Combining (WC) or Uncacheable Speculative Write Combining (USWC))</li>
 </ul>
 </li>
 </ul>
